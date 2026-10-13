@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 330" role="img" aria-labelledby="title desc">
+  <title id="title">Equipamentos acadêmicos</title>
+  <desc id="desc">Ilustração vetorial provisória com planta, livros, notebook e projetor.</desc>
+  <defs>
+    <linearGradient id="wall" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#edf6ef"/>
+      <stop offset="1" stop-color="#dcebe0"/>
+    </linearGradient>
+    <linearGradient id="screen" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#354c43"/>
+      <stop offset="1" stop-color="#132a22"/>
+    </linearGradient>
+    <linearGradient id="desk" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#c6d9ca"/>
+      <stop offset="1" stop-color="#adc8b5"/>
+    </linearGradient>
+  </defs>
+  <ellipse cx="248" cy="296" rx="207" ry="15" fill="#5c8a6e" opacity=".12"/>
+  <rect x="38" y="22" width="404" height="258" rx="19" fill="url(#wall)"/>
+  <path d="M54 40h372M54 40v225" stroke="#fff" stroke-width="5" opacity=".7"/>
+  <rect x="300" y="40" width="112" height="95" rx="5" fill="#fff" opacity=".82"/>
+  <text x="316" y="62" font-family="Arial, sans-serif" font-size="9" letter-spacing="1.4" fill="#708477">TECNOLOGIA</text>
+  <text x="316" y="78" font-family="Arial, sans-serif" font-size="9" letter-spacing="1.4" fill="#708477">A SERVIÇO</text>
+  <text x="316" y="94" font-family="Arial, sans-serif" font-size="9" letter-spacing="1.4" fill="#708477">DA EDUCAÇÃO</text>
+  <path d="M316 108h26" stroke="#39855e" stroke-width="3" stroke-linecap="round"/>
+  <!-- Plant -->
+  <path d="M88 220c0-44-7-72-25-91 26 6 39 31 39 58 6-39 25-60 50-66-10 27-24 49-46 69 23-18 44-19 60-12-20 25-45 37-75 39" fill="#42865f"/>
+  <path d="M101 214c-2-32 2-54 14-78" fill="none" stroke="#2f6e4d" stroke-width="3" stroke-linecap="round"/>
+  <path d="M69 219h74l-9 49H79z" fill="#b8cbbd"/>
+  <path d="M73 219h66l-5 11H78z" fill="#8da997"/>
+  <!-- Books -->
+  <g>
+    <rect x="62" y="254" width="135" height="19" rx="3" fill="#1e5c42"/>
+    <rect x="70" y="257" width="4" height="13" rx="1" fill="#8ab79b"/>
+    <text x="84" y="267" font-family="Arial, sans-serif" font-size="9" font-weight="700" letter-spacing="1" fill="#f1f8f2">ENSINO</text>
+    <rect x="72" y="232" width="127" height="19" rx="3" fill="#377b55"/>
+    <rect x="80" y="235" width="4" height="13" rx="1" fill="#b3d3bd"/>
+    <text x="94" y="245" font-family="Arial, sans-serif" font-size="9" font-weight="700" letter-spacing="1" fill="#f1f8f2">PESQUISA</text>
+    <rect x="83" y="210" width="120" height="19" rx="3" fill="#679b77"/>
+    <rect x="91" y="213" width="4" height="13" rx="1" fill="#d0e3d4"/>
+    <text x="105" y="223" font-family="Arial, sans-serif" font-size="9" font-weight="700" letter-spacing=".6" fill="#fff">EXTENSÃO</text>
+  </g>
+  <!-- Notebook -->
+  <g transform="translate(172 130)">
+    <path d="M17 15Q17 7 26 7h143q8 0 8 8v99H17z" fill="#879b8d"/>
+    <rect x="24" y="14" width="145" height="91" rx="3" fill="url(#screen)"/>
+    <path d="M31 21h131v76H31z" fill="#263c32"/>
+    <path d="M5 116h183l-16 17H20z" fill="#87998c"/>
+    <path d="M22 117h149l-9 9H32z" fill="#d2ddd4"/>
+    <path d="M74 120h43" stroke="#9faea3" stroke-width="2" stroke-linecap="round"/>
+  </g>
+  <!-- Projector -->
+  <g transform="translate(247 242)">
+    <path d="M9 12Q9 4 18 4h121q8 0 8 8v37q0 7-8 7H18q-9 0-9-7z" fill="#e9eee9" stroke="#c4d1c7" stroke-width="2"/>
+    <path d="M17 10h120v7H17z" fill="#fff" opacity=".8"/>
+    <circle cx="119" cy="31" r="15" fill="#9daea2"/>
+    <circle cx="119" cy="31" r="10" fill="#344a40"/>
+    <circle cx="119" cy="31" r="5" fill="#779184"/>
+    <rect x="25" y="25" width="40" height="5" rx="2.5" fill="#b5c4b8"/>
+    <rect x="25" y="35" width="30" height="4" rx="2" fill="#c5d1c7"/>
+    <path d="M24 56v7m105-7v7" stroke="#899b8d" stroke-width="4" stroke-linecap="round"/>
+  </g>
+  <!-- Headphones -->
+  <g transform="translate(380 198)">
+    <path d="M6 47V29a34 34 0 0 1 68 0v18" fill="none" stroke="#243a30" stroke-width="12" stroke-linecap="round"/>
+    <rect x="0" y="38" width="19" height="42" rx="8" fill="#243a30"/>
+    <rect x="61" y="38" width="19" height="42" rx="8" fill="#243a30"/>
+    <rect x="5" y="44" width="9" height="29" rx="4" fill="#637c6c"/>
+    <rect x="66" y="44" width="9" height="29" rx="4" fill="#637c6c"/>
+  </g>
+  <path d="M50 286h378" stroke="#a7c6af" stroke-width="3" stroke-linecap="round" opacity=".8"/>
+</svg>
