@@ -1,0 +1,100 @@
+/* Equipamentos — listagem */
+
+.filtros {
+  display: grid;
+  grid-template-columns: minmax(220px, 2fr) repeat(4, minmax(130px, 1fr)) auto;
+  gap: .9rem;
+  align-items: end;
+  margin-bottom: 1rem;
+}
+
+select.input {
+  appearance: none;
+  padding-right: 2.5rem;
+  cursor: pointer;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23A7B0C5' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+}
+
+.filtros .btn { min-height: 52px; }
+
+.lista-info {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: .5rem 1rem;
+  margin-bottom: 1rem;
+  color: var(--muted);
+}
+
+.table-eq .link-item { color: var(--text); font-weight: 600; text-decoration: none; }
+.table-eq .link-item:hover { color: var(--cyan); text-decoration: underline; }
+.table-eq .col-acao { text-align: right; white-space: nowrap; }
+.btn-sm { min-height: 38px; padding: 0 1.1rem; font-size: .9rem; }
+
+.cond { display: inline-flex; align-items: center; gap: .45rem; }
+.cond::before { content: ""; width: .5rem; height: .5rem; border-radius: 2px; background: var(--c); }
+.cond-bom { --c: var(--st-ok); }
+.cond-regular { --c: var(--st-maint); }
+.cond-danificado { --c: var(--st-late); }
+
+@media (max-width: 1180px) {
+  .filtros { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .filtros .campo-busca { grid-column: 1 / -1; }
+  .filtros .btn { grid-column: 1 / -1; }
+}
+
+/* Tabela vira lista de cartões em telas estreitas */
+@media (max-width: 760px) {
+  .table-eq { min-width: 0; }
+  .table-eq thead { display: none; }
+  .table-eq, .table-eq tbody, .table-eq tr, .table-eq td { display: block; }
+  .table-eq tr {
+    margin-bottom: .75rem;
+    padding: .9rem 1rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-m);
+  }
+  .table-eq td {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    padding: .3rem 0;
+    border: 0;
+  }
+  .table-eq td::before { content: attr(data-label); color: var(--muted); font-size: .85rem; }
+  .table-eq td.cell-nome { display: block; padding-bottom: .5rem; font-size: 1.05rem; }
+  .table-eq td.cell-nome::before, .table-eq td.col-acao::before { content: none; }
+  .table-eq td.col-acao { justify-content: stretch; padding-top: .6rem; }
+  .table-eq td.col-acao .btn { width: 100%; }
+}
+
+@media (max-width: 480px) {
+  .filtros { grid-template-columns: 1fr; }
+}
+
+/* ---------- Formulário de equipamento ---------- */
+.form-panel { max-width: 880px; }
+.form-sec { margin: 0 0 1rem; font-size: 1.1rem; font-weight: 700; }
+.form-sec:not(:first-child) { margin-top: 2rem; padding-top: 1.75rem; border-top: 1px solid var(--border); }
+.form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.1rem 1.25rem; }
+.form-grid .col-2 { grid-column: 1 / -1; }
+
+.input[readonly] { color: var(--muted); background: transparent; border-style: dashed; cursor: default; }
+textarea.input { min-height: 110px; padding: .85rem 1.1rem; border-radius: 18px; resize: vertical; line-height: 1.5; }
+.input[aria-invalid="true"] { border-color: var(--st-late); }
+.input[aria-invalid="true"]:focus { box-shadow: 0 0 0 3px rgba(251, 113, 133, .2); }
+
+.hint { color: var(--muted); font-size: .85rem; }
+.field-erro { color: #FDA4AF; font-size: .875rem; }
+.field-erro:empty { display: none; }
+
+.form-actions { display: flex; flex-wrap: wrap; gap: .75rem; margin-top: 2rem; }
+
+@media (max-width: 640px) {
+  .form-grid { grid-template-columns: 1fr; }
+  .form-actions .btn { width: 100%; }
+}
