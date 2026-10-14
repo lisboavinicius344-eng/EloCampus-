@@ -1,7 +1,7 @@
 
 # Controle de Equipamentos — UFOB
 
-Sistema para gestão de equipamentos, empréstimos e devoluções.
+Sistema para gestão de equipamentos, empréstimos e devoluções. 
 
 ## Tecnologias
 
