@@ -14,8 +14,6 @@
     { chave: "inativos",    rotulo: "Inativo",       cls: "off",   cor: "var(--st-off)" },
   ];
 
-  if (MODO_DADOS === "demo") $("aviso-demo").hidden = false;
-
   function renderKpis(r) {
     const pct = (n) => (r.total ? Math.round((n / r.total) * 100) : 0);
     const itens = [

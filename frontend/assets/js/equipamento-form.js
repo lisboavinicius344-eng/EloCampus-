@@ -1,125 +1,151 @@
-/* ELO Campus — listagem de equipamentos
- * Busca e filtros rodam no navegador sobre a lista recebida da API.
- * Com muitos itens, mover filtros e paginação para o back-end
- * (ex.: GET /api/equipamentos?busca=&situacao=&pagina=). */
+/* ELO Campus — cadastro e edição de equipamento
+ * Sem ?id= na URL cadastra; com ?id=3 edita o equipamento 3.
+ * A validação aqui é só para ajudar o usuário: o back-end valida de novo. */
 
 (async function () {
   const $ = (id) => document.getElementById(id);
   const { esc } = EloUtil;
 
-  const SITUACOES = {
-    disponivel: { rotulo: "Disponível",    cls: "ok" },
-    emprestado: { rotulo: "Emprestado",    cls: "loan" },
-    atrasado:   { rotulo: "Atrasado",      cls: "late" },
-    manutencao: { rotulo: "Em manutenção", cls: "maint" },
-    inativo:    { rotulo: "Inativo",       cls: "off" },
-  };
-
-  const norm = (s) => String(s ?? "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
-  const unicos = (lista, campo) => [...new Set(lista.map((e) => e[campo]))].sort((a, b) => a.localeCompare(b, "pt-BR"));
-  const opcoes = (select, valores) => {
-    select.insertAdjacentHTML("beforeend", valores.map((v) => `<option value="${esc(v)}">${esc(v)}</option>`).join(""));
-  };
+  const id = new URLSearchParams(window.location.search).get("id");
+  const form = $("eq-form");
+  const botao = $("salvar");
+  const erroGeral = $("erro");
+  const textoBotao = id ? "Salvar alterações" : "Salvar equipamento";
 
   const campos = {
-    busca: $("f-busca"),
-    situacao: $("f-situacao"),
+    nome: $("f-nome"),
+    patrimonio: $("f-patrimonio"),
     categoria: $("f-categoria"),
     setor: $("f-setor"),
     condicao: $("f-condicao"),
+    observacoes: $("f-obs"),
+  };
+  const spansErro = {
+    nome: $("e-nome"),
+    patrimonio: $("e-patrimonio"),
+    categoria: $("e-categoria"),
+    setor: $("e-setor"),
+    condicao: $("e-condicao"),
+    observacoes: $("e-obs"),
+  };
+  const identificador = $("f-identificador");
+
+  const normalizarPatrimonio = (v) => v.trim().toUpperCase();
+  const atualizarIdentificador = () => {
+    identificador.value = normalizarPatrimonio(campos.patrimonio.value);
   };
 
-  if (MODO_DADOS === "demo") $("aviso-demo").hidden = false;
-
-  let todos = [];
-
-  function filtrar() {
-    const termo = norm(campos.busca.value.trim());
-    return todos.filter((e) =>
-      (!termo || norm(e.nome).includes(termo) || norm(e.patrimonio).includes(termo)) &&
-      (!campos.situacao.value || e.situacao === campos.situacao.value) &&
-      (!campos.categoria.value || e.categoria === campos.categoria.value) &&
-      (!campos.setor.value || e.setor === campos.setor.value) &&
-      (!campos.condicao.value || e.condicao === campos.condicao.value)
-    );
+  function lerDados() {
+    return {
+      nome: campos.nome.value.trim(),
+      patrimonio: normalizarPatrimonio(campos.patrimonio.value),
+      categoria: campos.categoria.value.trim(),
+      setor: campos.setor.value.trim(),
+      condicao: campos.condicao.value,
+      observacoes: campos.observacoes.value.trim(),
+    };
   }
 
-  function render() {
-    const lista = filtrar().sort((a, b) => a.nome.localeCompare(b.nome, "pt-BR"));
-    const filtrando = lista.length !== todos.length;
-    $("contagem").textContent = lista.length === 1
-      ? `1 equipamento${filtrando ? ` de ${todos.length}` : ""}`
-      : `${lista.length} equipamentos${filtrando ? ` de ${todos.length}` : ""}`;
-
-    if (!lista.length) {
-      $("lista").innerHTML = `<p class="estado-vazio">${todos.length
-        ? "Nenhum equipamento corresponde a esses filtros. Tente outro termo ou limpe os filtros."
-        : "Nenhum equipamento cadastrado ainda. Use “Cadastrar equipamento” para começar."}</p>`;
-      return;
-    }
-
-    $("lista").innerHTML = `
-      <table class="table table-eq">
-        <thead><tr>
-          <th scope="col">Equipamento</th><th scope="col">Patrimônio</th><th scope="col">Tipo</th>
-          <th scope="col">Setor</th><th scope="col">Condição</th><th scope="col">Situação</th>
-          <th scope="col"><span class="sr-only">Ações</span></th>
-        </tr></thead>
-        <tbody>
-          ${lista.map((e) => {
-            const s = SITUACOES[e.situacao] || { rotulo: e.situacao, cls: "off" };
-            const cond = norm(e.condicao);
-            const href = `equipamento-detalhe.html?id=${encodeURIComponent(e.id)}`;
-            return `<tr>
-              <td class="cell-nome"><a class="link-item" href="${href}">${esc(e.nome)}</a></td>
-              <td data-label="Patrimônio">${esc(e.patrimonio)}</td>
-              <td data-label="Tipo">${esc(e.categoria)}</td>
-              <td data-label="Setor">${esc(e.setor)}</td>
-              <td data-label="Condição"><span class="cond cond-${esc(cond)}">${esc(e.condicao)}</span></td>
-              <td data-label="Situação"><span class="badge badge-${s.cls}">${s.rotulo}</span></td>
-              <td class="col-acao"><a class="btn btn-ghost btn-sm" href="${href}">Ver detalhes</a></td>
-            </tr>`;
-          }).join("")}
-        </tbody>
-      </table>`;
+  function validar(d) {
+    const m = {};
+    if (!d.nome) m.nome = "Informe o nome do equipamento.";
+    if (!d.patrimonio) m.patrimonio = "Informe o número de patrimônio.";
+    else if (!/^[A-Z0-9][A-Z0-9._-]*$/.test(d.patrimonio))
+      m.patrimonio = "Use apenas letras, números, hífen, ponto ou sublinhado.";
+    if (!d.categoria) m.categoria = "Informe o tipo ou categoria.";
+    if (!d.setor) m.setor = "Informe o setor responsável.";
+    if (!d.condicao) m.condicao = "Selecione a condição física.";
+    return m;
   }
 
-  try {
-    todos = await ELO.equipamentos();
-  } catch (err) {
-    $("contagem").textContent = "";
-    const erro = $("erro");
-    erro.innerHTML = `${esc(err.message)} <button class="btn btn-primary btn-sm" type="button" id="tentar">Tentar de novo</button>`;
-    erro.hidden = false;
-    $("tentar").addEventListener("click", () => window.location.reload());
-    return;
+  function limparErros() {
+    erroGeral.hidden = true;
+    Object.keys(campos).forEach((k) => {
+      spansErro[k].textContent = "";
+      campos[k].removeAttribute("aria-invalid");
+    });
   }
 
-  campos.situacao.insertAdjacentHTML("beforeend",
-    Object.entries(SITUACOES).map(([k, v]) => `<option value="${k}">${v.rotulo}</option>`).join(""));
-  opcoes(campos.categoria, unicos(todos, "categoria"));
-  opcoes(campos.setor, unicos(todos, "setor"));
-  opcoes(campos.condicao, unicos(todos, "condicao"));
+  function mostrarErros(msgs) {
+    let primeiro = null;
+    Object.entries(msgs).forEach(([campo, texto]) => {
+      if (!campos[campo]) return;
+      spansErro[campo].textContent = texto;
+      campos[campo].setAttribute("aria-invalid", "true");
+      if (!primeiro) primeiro = campos[campo];
+    });
+    if (primeiro) primeiro.focus();
+  }
 
-  // Permite abrir a página já filtrada, ex.: equipamentos.html?situacao=atrasado
-  const inicial = new URLSearchParams(window.location.search).get("situacao");
-  if (inicial && SITUACOES[inicial]) campos.situacao.value = inicial;
+  function mostrarErroGeral(texto) {
+    erroGeral.textContent = texto;
+    erroGeral.hidden = false;
+  }
 
-  Object.values(campos).forEach((c) => c.addEventListener("input", render));
-  $("filtros").addEventListener("submit", (e) => e.preventDefault());
-  $("limpar").addEventListener("click", () => {
-    Object.values(campos).forEach((c) => { c.value = ""; });
-    campos.busca.focus();
-    render();
+  // Limpa o erro de um campo assim que a pessoa volta a digitar nele
+  Object.keys(campos).forEach((k) => {
+    campos[k].addEventListener("input", () => {
+      spansErro[k].textContent = "";
+      campos[k].removeAttribute("aria-invalid");
+    });
   });
+  campos.patrimonio.addEventListener("input", atualizarIdentificador);
 
-  // Confirmação vinda do formulário (equipamentos.html?salvo=criado|editado)
-  const salvo = new URLSearchParams(window.location.search).get("salvo");
-  if (salvo === "criado" || salvo === "editado") {
-    $("filtros").insertAdjacentHTML("beforebegin",
-      `<div class="alert alert-ok" role="status" style="margin-bottom:1.25rem">${salvo === "criado" ? "Equipamento salvo." : "Alterações salvas."}</div>`);
-    history.replaceState(null, "", window.location.pathname);
+  // Sugestões de tipo e setor a partir do que já existe (se falhar, segue sem elas)
+  try {
+    const lista = await ELO.equipamentos();
+    const preencher = (idLista, campo) => {
+      const valores = [...new Set(lista.map((e) => e[campo]).filter(Boolean))]
+        .sort((a, b) => a.localeCompare(b, "pt-BR"));
+      $(idLista).innerHTML = valores.map((v) => `<option value="${esc(v)}"></option>`).join("");
+    };
+    preencher("lista-categorias", "categoria");
+    preencher("lista-setores", "setor");
+  } catch { /* sugestões são opcionais */ }
+
+  // Modo edição
+  if (id) {
+    $("titulo").textContent = "Editar equipamento";
+    $("subtitulo").textContent = "Altere os dados e salve. O patrimônio continua único.";
+    document.title = "Editar equipamento — ELO Campus";
+    botao.textContent = textoBotao;
+    botao.disabled = true;
+    try {
+      const e = await ELO.equipamento(id);
+      campos.nome.value = e.nome ?? "";
+      campos.patrimonio.value = e.patrimonio ?? "";
+      campos.categoria.value = e.categoria ?? "";
+      campos.setor.value = e.setor ?? "";
+      campos.condicao.value = e.condicao ?? "";
+      campos.observacoes.value = e.observacoes ?? "";
+      atualizarIdentificador();
+      botao.disabled = false;
+    } catch (err) {
+      mostrarErroGeral(err.message);
+      return; // sem dados não há o que editar: o botão continua desabilitado
+    }
   }
 
-  render();
+  form.addEventListener("submit", async (ev) => {
+    ev.preventDefault();
+    limparErros();
+
+    const dados = lerDados();
+    const msgs = validar(dados);
+    if (Object.keys(msgs).length) { mostrarErros(msgs); return; }
+
+    botao.disabled = true;
+    botao.textContent = "Salvando…";
+
+    try {
+      await ELO.salvarEquipamento(dados, id);
+      window.location.href = `equipamentos.html?salvo=${id ? "editado" : "criado"}`;
+    } catch (err) {
+      // Erros 409/422 do servidor trazem o campo (ex.: patrimônio duplicado)
+      if (err.campo && campos[err.campo]) mostrarErros({ [err.campo]: err.message });
+      else mostrarErroGeral(err.message);
+      botao.disabled = false;
+      botao.textContent = textoBotao;
+    }
+  });
 })();

@@ -70,7 +70,6 @@ if (form) {
   const toggle = document.getElementById("senha-toggle");
 
   if (obterSessao()) window.location.replace(DASHBOARD_URL);
-  if (AUTH_MODE === "demo") document.getElementById("demo-aviso").hidden = false;
 
   const mostrarErro = (msg) => { erro.textContent = msg; erro.hidden = false; };
 

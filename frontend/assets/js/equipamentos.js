@@ -16,7 +16,7 @@
   };
 
   const norm = (s) => String(s ?? "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
-  const unicos = (lista, campo) => [...new Set(lista.map((e) => e[campo]))].sort((a, b) => a.localeCompare(b, "pt-BR"));
+  const unicos = (lista, campo) => [...new Set(lista.map((e) => e[campo]).filter(Boolean))].sort((a, b) => a.localeCompare(b, "pt-BR"));
   const opcoes = (select, valores) => {
     select.insertAdjacentHTML("beforeend", valores.map((v) => `<option value="${esc(v)}">${esc(v)}</option>`).join(""));
   };
@@ -28,8 +28,6 @@
     setor: $("f-setor"),
     condicao: $("f-condicao"),
   };
-
-  if (MODO_DADOS === "demo") $("aviso-demo").hidden = false;
 
   let todos = [];
 
@@ -112,6 +110,14 @@
     campos.busca.focus();
     render();
   });
+
+  // Confirmação vinda do formulário (equipamentos.html?salvo=criado|editado)
+  const salvo = new URLSearchParams(window.location.search).get("salvo");
+  if (salvo === "criado" || salvo === "editado") {
+    $("filtros").insertAdjacentHTML("beforebegin",
+      `<div class="alert alert-ok" role="status" style="margin-bottom:1.25rem">${salvo === "criado" ? "Equipamento salvo." : "Alterações salvas."}</div>`);
+    history.replaceState(null, "", window.location.pathname);
+  }
 
   render();
 })();
