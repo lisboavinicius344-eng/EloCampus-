@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0B1020">
+  <meta name="robots" content="noindex">
+  <title>Consulta de equipamento — ELO Campus</title>
+  <link rel="icon" type="image/svg+xml" href="../assets/img/logo.svg">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="stylesheet" href="../assets/css/consulta.css">
+</head>
+<body>
+  <main class="consulta">
+    <div class="c-brand">
+      <img src="../assets/img/logo.svg" alt="">
+      <div><strong>ELO Campus</strong><small>IF Baiano — Campus Lapa</small></div>
+    </div>
+
+    <div id="resultado" aria-live="polite">
+      <p class="c-aviso">Consultando equipamento…</p>
+    </div>
+
+    <section class="c-busca" aria-labelledby="t-busca">
+      <h2 id="t-busca">Consultar outro patrimônio</h2>
+      <form class="linha" id="busca" role="search">
+        <label class="sr-only" for="q">Número de patrimônio</label>
+        <input class="input" id="q" type="text" autocomplete="off" autocapitalize="characters"
+               placeholder="Ex.: AUD-0031">
+        <button class="btn btn-primary" type="submit">Consultar</button>
+      </form>
+    </section>
+
+    <p class="c-rodape">
+      Para registrar empréstimos ou devoluções, <a href="../index.html">entre no sistema</a>.
+    </p>
+  </main>
+
+  <script src="../assets/js/util.js"></script>
+  <script src="../assets/js/dados-demo.js"></script>
+  <script src="../assets/js/api.js"></script>
+  <script src="../assets/js/qr.js"></script>
+</body>
+</html>

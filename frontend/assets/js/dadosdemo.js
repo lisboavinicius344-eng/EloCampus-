@@ -122,7 +122,13 @@ function demoMovimentacoes() {
 function demoEquipamento(id) {
   const e = demoEquipamentos().find((x) => String(x.id) === String(id));
   if (!e) throw new Error("Equipamento não encontrado. Ele pode ter sido removido.");
-  return e;
+  const l = demoEmprestimos().find((x) => String(x.equipamento.id) === String(id) && !x.devolvida);
+  const emprestimoAtual = l ? { solicitante: l.solicitante.nome, retirada: l.retirada, prevista: l.prevista } : null;
+  return { ...e, emprestimoAtual };
+}
+
+function demoMovimentacoesEquipamento(id) {
+  return demoMovimentacoes().filter((m) => String(m.equipamento.id) === String(id));
 }
 
 function demoSalvarEquipamento(d, id) {
@@ -156,4 +162,16 @@ function demoSalvarEquipamento(d, id) {
 
   try { localStorage.setItem(CHAVE_DEMO, JSON.stringify(DEMO.equipamentos)); } catch { /* ignora */ }
   return salvo;
+}
+
+// Somente campos que podem ser vistos sem login (nunca quem está com o item).
+function demoConsultaPublica(patrimonio) {
+  const alvo = String(patrimonio).trim().toUpperCase();
+  const e = demoEquipamentos().find((x) => x.patrimonio.toUpperCase() === alvo);
+  if (!e) {
+    const erro = new Error("Equipamento não encontrado.");
+    erro.naoEncontrado = true;
+    throw erro;
+  }
+  return { nome: e.nome, patrimonio: e.patrimonio, categoria: e.categoria, setor: e.setor, condicao: e.condicao, situacao: e.situacao };
 }

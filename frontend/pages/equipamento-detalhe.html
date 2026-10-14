@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0B1020">
+  <title>Equipamento — ELO Campus</title>
+  <link rel="icon" type="image/svg+xml" href="../assets/img/logo.svg">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="stylesheet" href="../assets/css/layout.css">
+  <link rel="stylesheet" href="../assets/css/equipamentos.css">
+</head>
+<body data-pagina="equipamentos">
+  <div class="app">
+    <aside class="sidebar" id="sidebar"></aside>
+
+    <div class="content">
+      <header class="topbar" id="topbar"></header>
+
+      <main class="main">
+        <div class="alert alert-error" id="erro" style="margin-bottom:1.25rem" role="alert" hidden></div>
+
+        <div id="conteudo" hidden>
+          <div class="page-head">
+            <div>
+              <h1 id="nome"></h1>
+              <div class="linha-situacao">
+                <span id="patrimonio"></span>
+                <span id="situacao-badge"></span>
+              </div>
+            </div>
+            <div class="acoes-topo">
+              <a class="btn btn-ghost" href="equipamentos.html">Voltar para a lista</a>
+              <a class="btn btn-primary" id="link-editar" href="#">Editar equipamento</a>
+            </div>
+          </div>
+
+          <div class="det-grid">
+            <div class="det-col">
+              <section class="panel" aria-labelledby="t-info">
+                <h2 class="panel-title" id="t-info">Informações</h2>
+                <dl class="info-lista" id="info"></dl>
+              </section>
+
+              <section class="panel" aria-labelledby="t-atual">
+                <h2 class="panel-title" id="t-atual">Situação atual</h2>
+                <div class="atual" id="atual"></div>
+              </section>
+
+              <section class="panel" aria-labelledby="t-hist">
+                <h2 class="panel-title" id="t-hist">Histórico de movimentações</h2>
+                <div id="historico"></div>
+              </section>
+            </div>
+
+            <div class="det-col">
+              <section class="panel" aria-labelledby="t-qr">
+                <h2 class="panel-title" id="t-qr">QR Code e etiqueta</h2>
+
+                <div class="alert alert-info" id="aviso-url" style="margin-bottom:1rem" hidden>
+                  Este QR Code aponta para o endereço atual, que só funciona neste computador ou rede.
+                  Defina <code>URL_CONSULTA_BASE</code> no <code>api.js</code> antes de imprimir etiquetas de verdade.
+                </div>
+
+                <div class="etiqueta" id="etiqueta">
+                  <div class="etiqueta-qr" id="qr" role="img" aria-label="QR Code do equipamento"></div>
+                  <div class="etiqueta-txt">
+                    <span class="etiqueta-marca">ELO CAMPUS</span>
+                    <small>IF Baiano — Campus Lapa</small>
+                    <span class="etiqueta-pat" id="etiqueta-pat"></span>
+                    <small>Leia o QR Code para consultar este equipamento.</small>
+                  </div>
+                </div>
+
+                <div class="qr-acoes">
+                  <button class="btn btn-primary btn-sm" type="button" id="imprimir">Imprimir etiqueta</button>
+                  <button class="btn btn-ghost btn-sm" type="button" id="baixar">Baixar QR Code (SVG)</button>
+                </div>
+
+                <p class="hint qr-url">Endereço do QR Code: <span id="qr-url"></span></p>
+              </section>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script src="../assets/js/vendor/qrcode.js"></script>
+  <script src="../assets/js/util.js"></script>
+  <script src="../assets/js/auth.js"></script>
+  <script src="../assets/js/layout.js"></script>
+  <script src="../assets/js/dados-demo.js"></script>
+  <script src="../assets/js/api.js"></script>
+  <script src="../assets/js/equipamento-detalhe.js"></script>
+</body>
+</html>

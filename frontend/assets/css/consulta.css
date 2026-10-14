@@ -1,0 +1,71 @@
+/* Consulta pública por QR Code — pensada primeiro para celular */
+
+body {
+  background:
+    radial-gradient(70% 40% at 50% 0%, rgba(139, 92, 246, .2), transparent 70%),
+    var(--bg);
+}
+
+.consulta {
+  width: min(100%, 520px);
+  margin: 0 auto;
+  padding: 1.25rem 1rem 2.5rem;
+  display: grid;
+  gap: 1.25rem;
+}
+
+.c-brand { display: flex; align-items: center; gap: .7rem; }
+.c-brand img { width: 38px; height: 38px; }
+.c-brand strong { display: block; font-size: 1.25rem; line-height: 1.1; }
+.c-brand small { color: var(--muted); font-size: .85rem; }
+
+.c-card {
+  display: grid;
+  gap: 1.25rem;
+  padding: 1.5rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-l);
+  box-shadow: 0 30px 70px -35px rgba(0, 0, 0, .8);
+}
+
+.c-card h1 { font-size: clamp(1.6rem, 7vw, 2rem); font-weight: 800; letter-spacing: -.02em; line-height: 1.15; }
+.c-pat { margin-top: .25rem; color: var(--muted); }
+
+/* A situação é a informação mais importante: destaque com texto grande */
+.c-situacao {
+  display: grid;
+  gap: .35rem;
+  padding: 1rem 1.1rem;
+  border-radius: var(--radius-m);
+  background: color-mix(in srgb, var(--c) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--c) 40%, transparent);
+}
+.c-situacao strong { color: var(--c); font-size: 1.35rem; font-weight: 700; }
+.c-situacao span { color: var(--text); }
+.c-situacao.s-ok    { --c: var(--st-ok); }
+.c-situacao.s-loan  { --c: var(--st-loan); }
+.c-situacao.s-late  { --c: var(--st-late); }
+.c-situacao.s-maint { --c: var(--st-maint); }
+.c-situacao.s-off   { --c: var(--st-off); }
+
+.c-dados { display: grid; gap: .9rem; margin: 0; }
+.c-dados div { display: flex; justify-content: space-between; gap: 1rem; padding-bottom: .9rem; border-bottom: 1px solid var(--border); }
+.c-dados div:last-child { border-bottom: 0; padding-bottom: 0; }
+.c-dados dt { color: var(--muted); }
+.c-dados dd { margin: 0; font-weight: 600; text-align: right; }
+
+.c-aviso { color: var(--muted); font-size: .925rem; }
+
+.c-busca { display: grid; gap: .75rem; }
+.c-busca h2 { font-size: 1.05rem; font-weight: 600; }
+.c-busca .linha { display: flex; gap: .6rem; }
+.c-busca .input { flex: 1; min-width: 0; padding-right: 1.1rem; }
+.c-busca .btn { flex: none; padding: 0 1.25rem; }
+
+.c-rodape { text-align: center; color: var(--muted); font-size: .9rem; }
+
+@media (max-width: 380px) {
+  .c-busca .linha { flex-direction: column; }
+  .c-busca .btn { width: 100%; }
+}

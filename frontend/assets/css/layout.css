@@ -147,6 +147,16 @@ a.nav-item:hover { background: rgba(139, 92, 246, .12); color: #fff; }
 .muted { color: var(--muted); }
 .estado-vazio { padding: 1.5rem .5rem; color: var(--muted); }
 
+/* ---------- Linha do tempo de movimentações ---------- */
+.movs { display: grid; gap: 1.1rem; margin: 0; padding: 0; list-style: none; }
+.mov { display: grid; grid-template-columns: 12px 1fr; gap: .85rem; }
+.mov-ponto { width: 12px; height: 12px; margin-top: .4rem; border-radius: 50%; background: var(--c); box-shadow: 0 0 10px var(--c); }
+.mov-retirada   { --c: var(--purple); }
+.mov-devolucao  { --c: var(--cyan); }
+.mov-manutencao { --c: var(--st-maint); }
+.mov strong { display: block; font-weight: 600; }
+.mov span, .mov small { display: block; color: var(--muted); font-size: .9rem; }
+
 /* ---------- Barra superior e menu móvel ---------- */
 .topbar { display: none; }
 .scrim { display: none; }
