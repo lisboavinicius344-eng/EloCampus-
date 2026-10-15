@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Novo empréstimo · ELO Campus</title>
+  <link rel="stylesheet" href="../css/emprestimos.css">
+  <link rel="stylesheet" href="../css/novo-emprestimo.css">
+</head>
+<body>
+<div class="app">
+
+  <!-- Menu lateral -->
+  <aside class="sidebar">
+    <div>
+      <div class="brand">
+        <svg width="48" height="48" viewBox="0 0 64 64" fill="none" aria-hidden="true">
+          <defs>
+            <linearGradient id="g1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#4B0FF0"/><stop offset="1" stop-color="#C02EF0"/></linearGradient>
+            <linearGradient id="g2" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#00D1FF"/><stop offset="1" stop-color="#FF4FD0"/></linearGradient>
+          </defs>
+          <rect x="6" y="10" width="34" height="30" rx="15" transform="rotate(-35 23 25)" stroke="url(#g1)" stroke-width="9"/>
+          <rect x="24" y="24" width="34" height="30" rx="15" transform="rotate(-35 41 39)" stroke="url(#g2)" stroke-width="9"/>
+        </svg>
+        <div>
+          <div class="brand-name">ELO Campus</div>
+          <div class="brand-tag">Equipamentos em movimento</div>
+        </div>
+      </div>
+      <nav class="nav" aria-label="Principal">
+        <a href="dashboard.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l9-8 9 8v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z"/></svg>Painel
+        </a>
+        <a href="equipamentos.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 8l-9-5-9 5v8l9 5 9-5zM3 8l9 5 9-5M12 13v8"/></svg>Equipamentos
+        </a>
+        <a href="novo-emprestimo.html" aria-current="page">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18zM12 8v8M8 12h8"/></svg>Novo empréstimo
+        </a>
+        <a href="emprestimos.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 7h13l-4-4M17 17H4l4 4"/></svg>Empréstimos
+        </a>
+        <a href="servidor.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h16v6H4zM4 14h16v6H4zM8 7h.01M8 17h.01"/></svg>Servidor
+        </a>
+        <a href="consulta-qr.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h16v6H4zM4 14h16v6H4zM8 7h.01M8 17h.01"/></svg>Consulta-qr
+        </a>
+        <a href="relatorio.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v16"/><path d="M16 13h2"/><path d="M16 9h2"/><path d="M20.001 19A2 2 0 0022 17V5a2 2 0 00-1.999-2L16 3.002A5 5 0 0012 5a5 5 0 00-4-2H4a2 2 0 00-2 2v12a2 2 0 001.999 2H8a5 5 0 014 2 5 5 0 014-2z"/><path d="M6 13h2"/><path d="M6 9h2"/></svg>Relatorio
+        </a>
+        <a href="solicitantes.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" x2="19" y1="8" y2="14"/><line x1="22" x2="16" y1="11" y2="11"/></svg>Solicitantes
+        </a>
+        <a href="usuarios.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>Usuarios
+        </a>
+        <a href="devolucoes.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22V12"/><polyline points="3.29 7 12 12 20.71 7"/><path d="m7.5 4.27 9 5.15"/></svg>Devoluções
+        </a>
+      </nav>
+    </div>
+    <div class="user-card">
+      <div class="avatar">TI</div>
+      <div><strong>Estagiário TI</strong><div class="muted" style="font-size:13px">Campus Lapa</div></div>
+    </div>
+  </aside>
+
+  <!-- Conteúdo -->
+  <main class="main">
+    <header class="page-head">
+      <div>
+        <h1>Novo empréstimo</h1>
+        <p>Registre a retirada de equipamentos em três passos.</p>
+      </div>
+    </header>
+
+    <ol class="steps" aria-label="Etapas">
+      <li class="step done"><span class="step-num">✓</span>Solicitante</li>
+      <li class="step current" aria-current="step"><span class="step-num">2</span>Equipamentos</li>
+      <li class="step"><span class="step-num">3</span>Confirmação</li>
+    </ol>
+
+    <form class="split" action="#" method="post">
+      <!-- Formulário -->
+      <div class="card grow-2 form-card">
+
+        <section class="form-section" aria-labelledby="t-solicitante">
+          <h2 id="t-solicitante">Solicitante</h2>
+          <div class="form-row">
+            <div class="field">
+              <label for="solicitante">Nome ou matrícula</label>
+              <input class="input input-block" id="solicitante" name="solicitante" type="search" list="lista-solicitantes" placeholder="Digite para buscar" value="Mariana Costa · 2024118" required>
+              <datalist id="lista-solicitantes">
+                <option value="Mariana Costa · 2024118">
+                <option value="Juliana Rocha · 2023076">
+                <option value="Lucas Ferreira · 2024203">
+              </datalist>
+              <span class="hint">Não encontrou? <a href="solicitantes.html">Cadastrar solicitante</a></span>
+            </div>
+            <div class="field">
+              <label for="vinculo">Vínculo</label>
+              <select class="input input-block" id="vinculo" name="vinculo">
+                <option>Aluno</option>
+                <option>Professor</option>
+                <option>Servidor</option>
+                <option>Grupo ou setor</option>
+              </select>
+            </div>
+          </div>
+        </section>
+
+        <section class="form-section" aria-labelledby="t-equip">
+          <h2 id="t-equip">Equipamentos</h2>
+          <div class="add-row">
+            <div class="field">
+              <label for="equip">Adicionar por nome, patrimônio ou QR Code</label>
+              <input class="input input-block" id="equip" type="search" placeholder="Ex.: LAP-0142">
+            </div>
+            <button class="btn btn-line" type="button">+ Adicionar</button>
+          </div>
+
+          <div class="picked-list">
+            <div class="picked">
+              <div class="picked-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h16v11H4zM2 19h20"/></svg>
+              </div>
+              <div class="picked-info"><strong>Notebook Dell Latitude</strong><small>LAP-0142 · Sala TI</small></div>
+              <button class="icon-btn" type="button" aria-label="Remover Notebook Dell Latitude">×</button>
+            </div>
+            <div class="picked">
+              <div class="picked-icon cool">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 3v6a3 3 0 0 0 3 3h8a3 3 0 0 1 3 3v6M3 3h4M17 21h4"/></svg>
+              </div>
+              <div class="picked-info"><strong>Cabo HDMI 3 m</strong><small>CAB-0045 · Sala TI</small></div>
+              <button class="icon-btn" type="button" aria-label="Remover Cabo HDMI 3 m">×</button>
+            </div>
+          </div>
+        </section>
+
+        <section class="form-section" aria-labelledby="t-prazo">
+          <h2 id="t-prazo">Prazo e finalidade</h2>
+          <div class="form-row">
+            <div class="field">
+              <label for="retirada">Retirada</label>
+              <input class="input input-block" id="retirada" name="retirada" type="datetime-local" value="2026-10-15T15:20" required>
+            </div>
+            <div class="field">
+              <label for="devolucao">Devolução prevista</label>
+              <input class="input input-block" id="devolucao" name="devolucao" type="datetime-local" value="2026-10-16T18:00" required>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="field">
+              <label for="finalidade">Finalidade</label>
+              <select class="input input-block" id="finalidade" name="finalidade">
+                <option>Aula</option>
+                <option>Evento</option>
+                <option>Projeto ou pesquisa</option>
+                <option>Uso administrativo</option>
+                <option>Outro</option>
+              </select>
+            </div>
+          </div>
+          <div class="field">
+            <label for="obs">Observações</label>
+            <textarea class="input input-block" id="obs" name="obs" placeholder="Local de uso, condição do item na retirada…"></textarea>
+          </div>
+        </section>
+      </div>
+
+      <!-- Resumo -->
+      <aside class="grow-1 summary" aria-label="Resumo do empréstimo">
+        <h2>Resumo</h2>
+        <div class="stack-sm" style="font-size:16px">
+          <div class="summary-row"><span>Solicitante</span><strong>Mariana Costa</strong></div>
+          <div class="summary-row"><span>Itens</span><strong>2 equipamentos</strong></div>
+          <div class="summary-row"><span>Retirada</span><strong>15/10 · 15:20</strong></div>
+          <div class="summary-row"><span>Devolução</span><strong>16/10 · 18:00</strong></div>
+        </div>
+        <label class="terms">
+          <input type="checkbox" required>
+          Li e aceito o termo de responsabilidade de uso do equipamento.
+        </label>
+        <button class="btn btn-white btn-block" type="submit">Registrar empréstimo</button>
+        <a class="cancel" href="emprestimos.html">Cancelar</a>
+      </aside>
+    </form>
+  </main>
+</div>
+</body>
+</html>
