@@ -113,9 +113,9 @@
 
   // Confirmação vinda do formulário (equipamentos.html?salvo=criado|editado)
   const salvo = new URLSearchParams(window.location.search).get("salvo");
-  if (salvo === "criado" || salvo === "editado") {
+  if (salvo === "criado" || salvo === "editado" || salvo === "removido") {
     $("filtros").insertAdjacentHTML("beforebegin",
-      `<div class="alert alert-ok" role="status" style="margin-bottom:1.25rem">${salvo === "criado" ? "Equipamento salvo." : "Alterações salvas."}</div>`);
+      `<div class="alert alert-ok" role="status" style="margin-bottom:1.25rem">${salvo === "criado" ? "Equipamento salvo." : salvo === "editado" ? "Alterações salvas." : "Equipamento retirado com segurança."}</div>`);
     history.replaceState(null, "", window.location.pathname);
   }
 

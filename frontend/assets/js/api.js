@@ -63,6 +63,7 @@ const ELO = {
   movimentacoes:   () => origem(demoMovimentacoes, "/movimentacoes?limite=8"),
 
   // Só confirma sucesso depois que o servidor (ou o demo) aceitou o registro.
+  removerEquipamento: (id) => MODO_DADOS === "demo" ? Promise.resolve(demoRemoverEquipamento(id)) : requisitar(`/equipamentos/${encodeURIComponent(id)}`, { metodo: "DELETE" }),
   salvarEquipamento: (dados, id) => origem(
     () => demoSalvarEquipamento(dados, id),
     id ? `/equipamentos/${encodeURIComponent(id)}` : "/equipamentos",

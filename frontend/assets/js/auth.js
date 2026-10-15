@@ -1,106 +1,21 @@
-/* ELO Campus — autenticação
- *
- * AUTH_MODE = "demo": valida contra contas fictícias (apenas protótipo).
- * AUTH_MODE = "api" : envia as credenciais ao back-end (POST /api/auth/login).
- *
- * Atenção: a validação real de acesso e permissões é do back-end.
- * Esconder botões no front-end não protege nenhuma operação.
- */
-
+/* Autenticação demo preparada para futura API. */
 const AUTH_MODE = "demo";
-// API_BASE_URL vem do api.js (carregue o api.js antes deste arquivo no index.html)
 const SESSION_KEY = "elo.sessao";
+const REMEMBER_KEY = "elo.sessao.lembrar";
 const DASHBOARD_URL = "pages/dashboard.html";
-
-// Dados de demonstração — remover na integração com a API.
 const CONTAS_DEMO = [
-  { login: "admin",    senha: "admin123",    nome: "Administrador", perfil: "administrador" },
-  { login: "operador", senha: "operador123", nome: "Operador",      perfil: "operador" },
+  { login: "admin", senha: "admin123", nome: "Administrador", perfil: "administrador", email: "admin@instituicao.edu.br", telefone: "(77) 99999-0000", matricula: "ADM-0001", setor: "Direção", instituicao: "Instituição de Ensino", campus: "Campus Lapa" },
+  { login: "operador", senha: "operador123", nome: "Operador", perfil: "operador", email: "operador@instituicao.edu.br", telefone: "(77) 98888-1111", matricula: "SRV-0024", setor: "Coordenação de TI", instituicao: "Instituição de Ensino", campus: "Campus Lapa" },
 ];
-
-async function autenticar(login, senha) {
-  if (AUTH_MODE === "demo") {
-    await new Promise((r) => setTimeout(r, 400)); // simula a rede
-    const conta = CONTAS_DEMO.find((c) => c.login === login && c.senha === senha);
-    if (!conta) throw new Error("Usuário ou senha incorretos. Confira os dados e tente de novo.");
-    return { nome: conta.nome, perfil: conta.perfil, token: "demo" };
-  }
-
-  let resposta;
-  try {
-    resposta = await fetch(`${API_BASE_URL}/auth/login`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ login, senha }),
-    });
-  } catch {
-    throw new Error("Não foi possível conectar ao servidor. Verifique a rede e tente novamente.");
-  }
-
-  if (resposta.status === 401) throw new Error("Usuário ou senha incorretos. Confira os dados e tente de novo.");
-  if (!resposta.ok) throw new Error("O servidor não confirmou o acesso. Tente novamente em instantes.");
-  return resposta.json();
-}
-
-function salvarSessao(sessao) {
-  sessionStorage.setItem(SESSION_KEY, JSON.stringify(sessao));
-}
-
-function obterSessao() {
-  try {
-    return JSON.parse(sessionStorage.getItem(SESSION_KEY));
-  } catch {
-    return null;
-  }
-}
-
-function sair() {
-  sessionStorage.removeItem(SESSION_KEY);
-  window.location.href = "../index.html";
-}
-
-/* ---------- Página de login ---------- */
-const form = document.getElementById("login-form");
-
-if (form) {
-  const erro = document.getElementById("login-erro");
-  const botao = document.getElementById("login-btn");
-  const campoLogin = document.getElementById("login");
-  const campoSenha = document.getElementById("senha");
-  const toggle = document.getElementById("senha-toggle");
-
-  if (obterSessao()) window.location.replace(DASHBOARD_URL);
-
-  const mostrarErro = (msg) => { erro.textContent = msg; erro.hidden = false; };
-
-  toggle.addEventListener("click", () => {
-    const visivel = campoSenha.type === "text";
-    campoSenha.type = visivel ? "password" : "text";
-    toggle.textContent = visivel ? "Mostrar" : "Ocultar";
-    toggle.setAttribute("aria-pressed", String(!visivel));
-  });
-
-  form.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    erro.hidden = true;
-
-    const login = campoLogin.value.trim();
-    const senha = campoSenha.value;
-
-    if (!login) { mostrarErro("Informe o usuário."); campoLogin.focus(); return; }
-    if (!senha) { mostrarErro("Informe a senha."); campoSenha.focus(); return; }
-
-    botao.disabled = true;
-    botao.textContent = "Entrando…";
-
-    try {
-      salvarSessao(await autenticar(login, senha));
-      window.location.href = DASHBOARD_URL;
-    } catch (err) {
-      mostrarErro(err.message);
-      botao.disabled = false;
-      botao.textContent = "Entrar";
-      campoSenha.select();
-    }
-  });
+async function autenticar(login, senha) { await new Promise(r => setTimeout(r, 350)); const conta=CONTAS_DEMO.find(c=>c.login===login&&c.senha===senha); if(!conta) throw new Error("Usuário ou senha incorretos. Confira os dados e tente de novo."); return {...conta, token:"demo"}; }
+function salvarSessao(sessao, lembrar=false) { const alvo=lembrar?localStorage:sessionStorage; alvo.setItem(SESSION_KEY, JSON.stringify(sessao)); if(lembrar) sessionStorage.removeItem(SESSION_KEY); else localStorage.removeItem(SESSION_KEY); }
+function obterSessao() { for (const store of [sessionStorage, localStorage]) { try { const value=store.getItem(SESSION_KEY); if(value) return JSON.parse(value); } catch {} } return null; }
+function sair() { sessionStorage.removeItem(SESSION_KEY); localStorage.removeItem(SESSION_KEY); window.location.href="../index.html"; }
+const form=document.getElementById("login-form");
+if(form){ const erro=document.getElementById("login-erro"), botao=document.getElementById("login-btn"), login=document.getElementById("login"), senha=document.getElementById("senha"), toggle=document.getElementById("senha-toggle"), lembrar=document.getElementById("lembrar"), recuperar=document.getElementById("esqueci-senha");
+  if(obterSessao()) window.location.replace(DASHBOARD_URL);
+  try { const salvo=JSON.parse(localStorage.getItem("elo.login.salvo")); if(salvo){login.value=salvo;lembrar.checked=true;} } catch {}
+  toggle.addEventListener("click",()=>{const v=senha.type==="text";senha.type=v?"password":"text";toggle.textContent=v?"Mostrar":"Ocultar";toggle.setAttribute("aria-pressed",String(!v));});
+  recuperar.addEventListener("click",()=>{erro.textContent="Para recuperar o acesso, informe seu e-mail institucional à administração. Em produção, este fluxo enviará um link seguro de redefinição.";erro.className="alert alert-info";erro.hidden=false;});
+  form.addEventListener("submit",async e=>{e.preventDefault();erro.hidden=true;erro.className="alert alert-error";if(!login.value.trim())return erro.textContent="Informe o usuário.",erro.hidden=false,login.focus();if(!senha.value)return erro.textContent="Informe a senha.",erro.hidden=false,senha.focus();botao.disabled=true;botao.textContent="Entrando…";try{const sessao=await autenticar(login.value.trim(),senha.value);salvarSessao(sessao,lembrar.checked);if(lembrar.checked)localStorage.setItem("elo.login.salvo",login.value.trim());else localStorage.removeItem("elo.login.salvo");window.location.href=DASHBOARD_URL;}catch(err){erro.textContent=err.message;erro.hidden=false;botao.disabled=false;botao.textContent="Entrar";senha.select();}});
 }

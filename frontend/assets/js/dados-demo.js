@@ -158,3 +158,13 @@ function demoSalvarEquipamento(d, id) {
   try { localStorage.setItem(CHAVE_DEMO, JSON.stringify(DEMO.equipamentos)); } catch { /* ignora */ }
   return salvo;
 }
+
+function demoRemoverEquipamento(id) {
+  const i = DEMO.equipamentos.findIndex(e => String(e.id) === String(id));
+  if (i < 0) throw new Error("Equipamento não encontrado.");
+  const emprestado = DEMO.emprestimos.some(l => String(l.equipamentoId) === String(id) && !l.devolvida);
+  if (emprestado) throw new Error("Não é possível retirar um equipamento que está emprestado.");
+  DEMO.equipamentos.splice(i, 1);
+  try { localStorage.setItem(CHAVE_DEMO, JSON.stringify(DEMO.equipamentos)); } catch {}
+  return true;
+}

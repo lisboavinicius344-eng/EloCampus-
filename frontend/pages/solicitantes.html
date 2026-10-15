@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Solicitantes · ELO Campus</title>
-  <link rel="stylesheet" href="../css/emprestimos.css">
+  <link rel="stylesheet" href="../assets/css/emprestimos.css">
 </head>
 <body>
 <div class="app">
@@ -13,17 +13,10 @@
   <aside class="sidebar">
     <div>
       <div class="brand">
-        <svg width="48" height="48" viewBox="0 0 64 64" fill="none" aria-hidden="true">
-          <defs>
-            <linearGradient id="g1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#4B0FF0"/><stop offset="1" stop-color="#C02EF0"/></linearGradient>
-            <linearGradient id="g2" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#00D1FF"/><stop offset="1" stop-color="#FF4FD0"/></linearGradient>
-          </defs>
-          <rect x="6" y="10" width="34" height="30" rx="15" transform="rotate(-35 23 25)" stroke="url(#g1)" stroke-width="9"/>
-          <rect x="24" y="24" width="34" height="30" rx="15" transform="rotate(-35 41 39)" stroke="url(#g2)" stroke-width="9"/>
-        </svg>
+        <img src="../assets/img/elo-interlace.svg" width="48" height="48" alt="">
         <div>
           <div class="brand-name">ELO Campus</div>
-          <div class="brand-tag">Equipamentos em movimento</div>
+          <div class="brand-tag">Instituição - Campus Lapa</div>
         </div>
       </div>
       <nav class="nav" aria-label="Principal">
@@ -39,7 +32,7 @@
         <a href="emprestimos.html">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 7h13l-4-4M17 17H4l4 4"/></svg>Empréstimos
         </a>
-        <a href="servidor.html">
+        <a href="perfil.html">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h16v6H4zM4 14h16v6H4zM8 7h.01M8 17h.01"/></svg>Servidor
         </a>
         <a href="consulta-qr.html">
@@ -130,7 +123,7 @@
               </tr>
               <tr>
                 <td><strong>Coord. de Eventos</strong><small>Setor administrativo</small></td>
-                <td>Servidor</td><td>1</td>
+                <td>Perfil</td><td>1</td>
                 <td><span class="pill pill-ok">Regular</span></td>
                 <td><button class="btn btn-sm btn-line" type="button">Ver</button></td>
               </tr>
@@ -173,5 +166,6 @@
     </div>
   </main>
 </div>
+<script src="../assets/js/auth.js"></script><script>if(!obterSessao()) window.location.replace("../index.html");</script>
 </body>
 </html>

@@ -53,15 +53,15 @@ const EloUtil = {
   const NAV = [
     { id: "painel", rotulo: "Painel", icone: "home", href: "dashboard.html" },
     { id: "equipamentos", rotulo: "Equipamentos", icone: "box", href: "equipamentos.html" },
-    { id: "emprestimos", rotulo: "Empréstimos", icone: "swap" },
-    { id: "devolucoes", rotulo: "Devoluções", icone: "undo" },
-    { id: "solicitantes", rotulo: "Solicitantes", icone: "users" },
-    { id: "relatorios", rotulo: "Relatórios", icone: "chart" },
+    { id: "novo-emprestimo", rotulo: "Novo empréstimo", icone: "swap", href: "novo-emprestimo.html" },
+    { id: "emprestimos", rotulo: "Empréstimos", icone: "swap", href: "emprestimos.html" },
+    { id: "devolucoes", rotulo: "Devoluções", icone: "undo", href: "devolucoes.html" },
+    { id: "solicitantes", rotulo: "Solicitantes", icone: "users", href: "solicitantes.html" },
+    { id: "relatorios", rotulo: "Relatórios", icone: "chart", href: "relatorio.html" },
     { id: "perfil", rotulo: "Configuração do perfil", icone: "users", href: "perfil.html" },
     // Ocultar o item não protege nada: o back-end também precisa validar o perfil.
-    { id: "usuarios", rotulo: "Usuários", icone: "shield", admin: true },
+    { id: "usuarios", rotulo: "Usuários", icone: "shield", href: "usuarios.html", admin: true },
   ];
-
   const atual = document.body.dataset.pagina;
   const itens = NAV.filter((i) => !i.admin || sessao.perfil === "administrador").map((i) => {
     if (!i.href) {
@@ -77,19 +77,19 @@ const EloUtil = {
 
   document.getElementById("sidebar").innerHTML = `
     <a class="side-brand" href="dashboard.html">
-      <img src="../assets/img/logo.png" alt="">
+      <img src="../assets/img/elo-interlace.svg" alt="">
       <span>ELO Campus<small>Instituição - Campus Lapa</small></span>
     </a>
     <nav aria-label="Principal"><ul class="nav">${itens}</ul></nav>
     <div class="user">
-      <span class="avatar" aria-hidden="true">${EloUtil.esc(iniciais)}</span>
+      <a class="avatar avatar-link" href="perfil.html" aria-label="Abrir configuração do perfil">${EloUtil.esc(iniciais)}</a>
       <div class="user-info"><strong>${nome}</strong><small>${EloUtil.esc(perfil)}</small></div>
       <button class="user-out" type="button" id="btn-sair" aria-label="Sair do sistema" title="Sair">${svg("out")}</button>
     </div>`;
 
   document.getElementById("topbar").innerHTML = `
     <button class="topbar-btn" type="button" id="btn-menu" aria-controls="sidebar" aria-expanded="false" aria-label="Abrir menu">${svg("menu")}</button>
-    <span class="topbar-brand"><img src="../assets/img/logo.png" alt="">ELO Campus</span>`;
+    <span class="topbar-brand"><img src="../assets/img/elo-interlace.svg" alt="">ELO Campus</span>`;
 
   const scrim = document.createElement("div");
   scrim.className = "scrim";

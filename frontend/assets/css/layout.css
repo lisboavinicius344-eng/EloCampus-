@@ -191,3 +191,5 @@ a.nav-item:hover { background: rgba(139, 92, 246, .12); color: #fff; }
   .scrim.is-open { display: block; position: fixed; inset: 0; z-index: 30; background: rgba(5, 8, 18, .65); }
 }/* A nova marca é horizontal/oblíqua: preserve sua proporção nas áreas compactas. */
 .side-brand img, .topbar-brand img { object-fit: contain; }
+
+.avatar-link{color:#fff;text-decoration:none}.avatar-link:hover{color:#fff;transform:scale(1.05)}.toolbar{display:flex;flex-wrap:wrap;gap:.7rem}.btn-danger{background:linear-gradient(90deg,#991b1b,#ef4444);box-shadow:0 8px 24px -8px rgba(239,68,68,.55)}.btn-danger:hover{filter:brightness(1.12)}.modal-backdrop{position:fixed;inset:0;z-index:80;display:grid;place-items:center;padding:1rem;background:rgba(5,8,18,.75);backdrop-filter:blur(5px)}.modal-backdrop[hidden]{display:none}.confirm-modal{width:min(100%,460px);padding:1.5rem;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-l);box-shadow:0 30px 90px #0008}.confirm-modal h2{margin:0 0 .5rem}.confirm-modal p{color:var(--muted)}
