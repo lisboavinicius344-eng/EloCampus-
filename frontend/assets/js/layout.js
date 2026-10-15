@@ -77,7 +77,7 @@ const EloUtil = {
 
   document.getElementById("sidebar").innerHTML = `
     <a class="side-brand" href="dashboard.html">
-      <img src="../assets/img/elo-interlace.svg" alt="">
+      <img src="../assets/img/logo.png" alt="">
       <span>ELO Campus<small>Instituição - Campus Lapa</small></span>
     </a>
     <nav aria-label="Principal"><ul class="nav">${itens}</ul></nav>
@@ -89,7 +89,7 @@ const EloUtil = {
 
   document.getElementById("topbar").innerHTML = `
     <button class="topbar-btn" type="button" id="btn-menu" aria-controls="sidebar" aria-expanded="false" aria-label="Abrir menu">${svg("menu")}</button>
-    <span class="topbar-brand"><img src="../assets/img/elo-interlace.svg" alt="">ELO Campus</span>`;
+    <span class="topbar-brand"><img src="../assets/img/logo.png" alt="">ELO Campus</span>`;
 
   const scrim = document.createElement("div");
   scrim.className = "scrim";

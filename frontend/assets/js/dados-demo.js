@@ -77,7 +77,7 @@ function demoEquipamentos() {
 
 function demoEmprestimos() {
   const porId = new Map(DEMO.equipamentos.map((e) => [e.id, e]));
-  return DEMO.emprestimos.map((l) => {
+  return DEMO.emprestimos.filter((l) => porId.has(l.equipamentoId)).map((l) => {
     const e = porId.get(l.equipamentoId);
     return {
       id: l.id,
@@ -114,6 +114,7 @@ function demoMovimentacoes() {
   });
   DEMO.manutencoes.forEach((m) => {
     const e = DEMO.equipamentos.find((x) => x.id === m.equipamentoId);
+    if (!e) return;
     eventos.push({ classe: "manutencao", tipo: "Manutenção iniciada", quando: m.quando, equipamento: { id: e.id, nome: e.nome, patrimonio: e.patrimonio }, detalhe: "", por: m.por });
   });
   return eventos.sort((a, b) => new Date(b.quando) - new Date(a.quando));
