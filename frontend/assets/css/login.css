@@ -1,0 +1,89 @@
+/* Página de entrada (index.html) */
+
+.login {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+  background:
+    radial-gradient(60% 50% at 8% 0%, rgba(139, 92, 246, .22), transparent 70%),
+    radial-gradient(50% 45% at 100% 100%, rgba(34, 211, 238, .12), transparent 70%),
+    var(--bg);
+}
+
+/* ---------- Lado da marca ---------- */
+.brand-side {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 3rem;
+  padding: clamp(2rem, 5vw, 4.5rem);
+  align-items: center;
+}
+
+.brand { display: flex; align-items: center; gap: .85rem; }
+.brand img { width: 44px; height: 44px; }
+.brand-name { font-size: 1.5rem; font-weight: 700; letter-spacing: -.01em; }
+.brand-sub { display: block; font-size: .85rem; color: var(--muted); font-weight: 400; }
+
+.hero { width: min(100%, 620px); display: grid; justify-items: center; gap: 2rem; text-align: center; }
+
+.interlace-mark { width: clamp(170px, 22vw, 250px); height: auto; overflow: visible; filter: drop-shadow(0 0 22px rgba(210, 40, 255, .38)); }
+.interlace-path { stroke-dasharray: 430; stroke-dashoffset: 430; animation: interlace-draw 1.8s cubic-bezier(.65,.05,.25,1) forwards; }
+.path-b { animation-delay: .32s; }
+@keyframes interlace-draw { to { stroke-dashoffset: 0; } }
+
+.hero h1 {
+  max-width: 14ch;
+  font-size: clamp(2.4rem, 5vw, 4rem);
+  font-weight: 800;
+  line-height: 1.05;
+  letter-spacing: -.025em;
+}
+.hero p { max-width: 42ch; color: var(--muted); font-size: 1.125rem; }
+
+.legend { display: flex; flex-wrap: wrap; gap: .6rem; padding: 0; margin: 0; list-style: none; }
+
+.brand-foot { width: 100%; text-align: center; font-size: .875rem; color: var(--muted); }
+
+/* ---------- Cartão de login ---------- */
+.form-side {
+  display: grid;
+  place-items: center;
+  padding: clamp(1.25rem, 4vw, 3rem);
+}
+
+.card {
+  width: min(100%, 440px);
+  display: grid;
+  gap: 1.5rem;
+  padding: clamp(1.75rem, 4vw, 2.5rem);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-l);
+  box-shadow: 0 30px 80px -30px rgba(0, 0, 0, .7), 0 0 0 1px rgba(139, 92, 246, .06);
+}
+
+.card h2 { font-size: 1.75rem; font-weight: 700; letter-spacing: -.01em; }
+.card-head p { margin-top: .35rem; color: var(--muted); }
+
+form { display: grid; gap: 1.1rem; }
+
+.card-foot {
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--border);
+  font-size: .925rem;
+  color: var(--muted);
+}
+
+.mobile-brand { display: none; }
+
+/* ---------- Responsivo ---------- */
+@media (max-width: 899px) {
+  .login { grid-template-columns: 1fr; }
+  .brand-side { display: none; }
+  .form-side { align-content: center; gap: 1.75rem; }
+  .mobile-brand { display: flex; align-items: center; gap: .75rem; width: min(100%, 440px); }
+  .mobile-brand img { width: 40px; height: 40px; }
+  .mobile-brand strong { font-size: 1.35rem; }
+}
+.brand img, .mobile-brand img { object-fit: contain; }

@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0B1020">
+  <title>Cadastrar equipamento — ELO Campus</title>
+  <link rel="icon" type="image/svg+xml" href="../assets/img/logo.png">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="stylesheet" href="../assets/css/layout.css">
+  <link rel="stylesheet" href="../assets/css/equipamentos.css">
+</head>
+<body data-pagina="equipamentos">
+  <div class="app">
+    <aside class="sidebar" id="sidebar"></aside>
+
+    <div class="content">
+      <header class="topbar" id="topbar"></header>
+
+      <main class="main">
+        <div class="page-head">
+          <div>
+            <h1 id="titulo">Cadastrar equipamento</h1>
+            <p id="subtitulo">Preencha os dados de identificação. O QR Code é gerado a partir do patrimônio.</p>
+          </div>
+          <a class="btn btn-ghost" href="equipamentos.html">Voltar para a lista</a>
+        </div>
+
+        <div class="alert alert-error" id="erro" style="margin-bottom:1.25rem;max-width:880px" role="alert" hidden></div>
+
+        <section class="panel form-panel">
+          <form id="eq-form" novalidate>
+            <h2 class="form-sec">Identificação</h2>
+            <div class="form-grid">
+              <div class="field col-2">
+                <label for="f-nome">Nome do equipamento</label>
+                <input class="input" id="f-nome" type="text" maxlength="120" autocomplete="off"
+                       placeholder="Ex.: Projetor Epson X49" aria-describedby="e-nome" required>
+                <span class="field-erro" id="e-nome"></span>
+              </div>
+
+              <div class="field col-2">
+                <label for="f-foto">Foto do equipamento <span class="muted">(opcional)</span></label>
+                <input class="input file-input" id="f-foto" type="file" accept="image/*" aria-describedby="d-foto e-foto">
+                <span class="hint" id="d-foto">Envie uma foto para identificar o item no cadastro e nos detalhes.</span>
+                <span class="field-erro" id="e-foto"></span>
+                <div class="foto-preview" id="foto-preview" hidden><img id="foto-preview-img" alt="Pré-visualização da foto do equipamento"><button class="btn btn-ghost btn-sm" type="button" id="remover-foto">Remover foto</button></div>
+              </div>
+
+              <div class="field">
+                <label for="f-patrimonio">Número de patrimônio</label>
+                <input class="input" id="f-patrimonio" type="text" maxlength="30" autocomplete="off"
+                       placeholder="Ex.: PRJ-0017" aria-describedby="d-patrimonio e-patrimonio" required>
+                <span class="hint" id="d-patrimonio">Cada patrimônio só pode ser cadastrado uma vez.</span>
+                <span class="field-erro" id="e-patrimonio"></span>
+              </div>
+
+              <div class="field">
+                <label for="f-identificador">Identificador no QR Code</label>
+                <input class="input" id="f-identificador" type="text" readonly tabindex="-1"
+                       aria-describedby="d-identificador" value="">
+                <span class="hint" id="d-identificador">Definido a partir do patrimônio.</span>
+              </div>
+            </div>
+
+            <h2 class="form-sec">Classificação</h2>
+            <div class="form-grid">
+              <div class="field">
+                <label for="f-categoria">Tipo ou categoria</label>
+                <input class="input" id="f-categoria" type="text" maxlength="60" list="lista-categorias"
+                       autocomplete="off" placeholder="Escolha ou digite um tipo" aria-describedby="e-categoria" required>
+                <datalist id="lista-categorias"></datalist>
+                <span class="field-erro" id="e-categoria"></span>
+              </div>
+
+              <div class="field">
+                <label for="f-setor">Setor responsável</label>
+                <input class="input" id="f-setor" type="text" maxlength="60" list="lista-setores"
+                       autocomplete="off" placeholder="Escolha ou digite um setor" aria-describedby="e-setor" required>
+                <datalist id="lista-setores"></datalist>
+                <span class="field-erro" id="e-setor"></span>
+              </div>
+
+              <div class="field">
+                <label for="f-condicao">Condição física</label>
+                <select class="input" id="f-condicao" aria-describedby="e-condicao" required>
+                  <option value="">Selecione</option>
+                  <option value="Bom">Bom</option>
+                  <option value="Regular">Regular</option>
+                  <option value="Danificado">Danificado</option>
+                </select>
+                <span class="field-erro" id="e-condicao"></span>
+              </div>
+              <div class="tipo-visual col-2" id="tipo-visual" aria-live="polite" hidden>
+                <div class="tipo-silhueta" id="tipo-silhueta" aria-hidden="true">▱</div>
+                <div><strong id="tipo-visual-titulo">Visual do equipamento</strong><p id="tipo-visual-texto">A representação muda conforme o tipo e a condição cadastrados.</p></div>
+              </div>
+            </div>
+
+            <h2 class="form-sec">Informações complementares</h2>
+            <div class="form-grid">
+              <div class="field col-2">
+                <label for="f-obs">Observações <span class="muted">(opcional)</span></label>
+                <textarea class="input" id="f-obs" maxlength="500" aria-describedby="e-obs"
+                          placeholder="Acessórios inclusos, número de série, detalhes de uso…"></textarea>
+                <span class="field-erro" id="e-obs"></span>
+              </div>
+            </div>
+
+            <div class="form-actions">
+              <button class="btn btn-primary" type="submit" id="salvar">Salvar equipamento</button>
+              <a class="btn btn-ghost" href="equipamentos.html">Cancelar</a>
+            </div>
+          </form>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <script src="../assets/js/auth.js"></script>
+  <script src="../assets/js/layout.js"></script>
+  <script src="../assets/js/dados-demo.js"></script>
+  <script src="../assets/js/api.js"></script>
+  <script src="../assets/js/equipamento-form.js"></script>
+</body>
+</html>

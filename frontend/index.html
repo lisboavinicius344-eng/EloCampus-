@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0B1020">
+  <title>Entrar — ELO Campus</title>
+  <meta name="description" content="Sistema de controle de equipamentos e empréstimos — Instituição - Campus Lapa.">
+  <link rel="icon" type="image/svg+xml" href="assets/img/logo.png">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="stylesheet" href="assets/css/login.css">
+</head>
+<body>
+  <main class="login">
+
+    <!-- Lado da marca (somente em telas largas) -->
+    <section class="brand-side" aria-label="Apresentação do sistema">
+      <div class="brand">
+        <img src="assets/img/logo.png" alt="">
+          <span class="brand-name">ELO Campus
+          <span class="brand-sub">Instituição - Campus Lapa</span>
+        </span>
+      </div>
+
+      <div class="hero">
+        <svg class="interlace-mark" viewBox="0 0 180 140" fill="none" role="img" aria-label="Logo ELO Campus">
+          <defs>
+            <linearGradient id="interlace-a" x1="12" y1="12" x2="140" y2="118" gradientUnits="userSpaceOnUse"><stop stop-color="#4B00D8"/><stop offset=".55" stop-color="#A300FF"/><stop offset="1" stop-color="#FF29B8"/></linearGradient>
+            <linearGradient id="interlace-b" x1="42" y1="20" x2="168" y2="130" gradientUnits="userSpaceOnUse"><stop stop-color="#C800FF"/><stop offset=".55" stop-color="#FF20C7"/><stop offset="1" stop-color="#FF6B9E"/></linearGradient>
+          </defs>
+          <path class="interlace-path path-a" d="M78 27C58 7 31 12 19 32c-12 20-5 43 14 55l26 17c17 11 39 7 49-8 10-15 6-34-9-44L77 37c-7-5-16-4-22 3-6 7-5 17 2 23l18 15" stroke="url(#interlace-a)" stroke-width="24" stroke-linecap="round" stroke-linejoin="round"/>
+          <path class="interlace-path path-b" d="M102 113c20 20 47 15 59-5 12-20 5-43-14-55l-26-17c-17-11-39-7-49 8-10 15-6 34 9 44l22 15c7 5 16 4 22-3 6-7 5-17-2-23l-18-15" stroke="url(#interlace-b)" stroke-width="24" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+
+        <h1>Conexões organizadas. Equipamentos sob controle.</h1>
+        <p>Consulte a disponibilidade, registre empréstimos e devoluções e acompanhe os prazos em um só lugar.</p>
+
+        <ul class="legend" aria-label="Situações possíveis de um equipamento">
+          <li class="badge badge-ok">Disponível</li>
+          <li class="badge badge-loan">Emprestado</li>
+          <li class="badge badge-late">Atrasado</li>
+          <li class="badge badge-maint">Em manutenção</li>
+          <li class="badge badge-off">Inativo</li>
+        </ul>
+      </div>
+
+      <p class="brand-foot">Projeto de estágio — Desenvolvimento de Sistemas</p>
+    </section>
+
+    <!-- Lado do formulário -->
+    <section class="form-side" aria-labelledby="titulo-login">
+      <div class="mobile-brand">
+        <img src="assets/img/logo.png" alt="">
+        <strong>ELO Campus</strong>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <h2 id="titulo-login">Entrar</h2>
+          <p>Use a conta cadastrada pela administração.</p>
+        </div>
+
+        <div id="login-erro" class="alert alert-error" role="alert" hidden></div>
+
+        <form id="login-form" novalidate>
+          <div class="field">
+            <label for="login">Usuário</label>
+            <input class="input" id="login" name="login" type="text"
+                   autocomplete="username" placeholder="Seu usuário" required autofocus>
+          </div>
+
+          <div class="field">
+            <label for="senha">Senha</label>
+            <div class="input-wrap">
+              <input class="input" id="senha" name="senha" type="password"
+                     autocomplete="current-password" placeholder="Sua senha" required>
+              <button class="input-toggle" id="senha-toggle" type="button"
+                      aria-controls="senha" aria-pressed="false">Mostrar</button>
+            </div>
+          </div>
+
+          <button class="btn btn-primary" id="login-btn" type="submit">Entrar</button>
+        </form>
+        <p class="card-foot">
+          Só precisa consultar um equipamento?
+          <a href="pages/consulta-qr.html">Abrir consulta por QR Code</a>
+        </p>
+      </div>
+    </section>
+
+  </main>
+
+  <script src="assets/js/api.js"></script>
+  <script src="assets/js/auth.js"></script>
+</body>
+</html>
