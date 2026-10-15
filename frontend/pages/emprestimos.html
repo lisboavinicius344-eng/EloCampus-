@@ -52,7 +52,7 @@
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" x2="19" y1="8" y2="14"/><line x1="22" x2="16" y1="11" y2="11"/></svg>Solicitantes
         </a>
         <a href="usuarios.html">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>Usuarios
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Usuarios
         </a>
         <a href="devolucoes.html">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22V12"/><polyline points="3.29 7 12 12 20.71 7"/><path d="m7.5 4.27 9 5.15"/></svg>Devoluções
@@ -66,7 +66,7 @@
   </aside>
 
   <!-- Conteúdo -->
-  <main class="main">
+<main class="main">
     <header class="page-head">
       <div>
         <h1>Empréstimos e devoluções</h1>
@@ -78,13 +78,13 @@
         <a class="btn" href="novo-emprestimo.html">+ Novo empréstimo</a>
       </div>
     </header>
-
+ 
     <div class="tabs" role="tablist" aria-label="Filtro">
       <button class="tab" role="tab" aria-selected="true" type="button">Ativos · 17</button>
       <button class="tab" role="tab" aria-selected="false" type="button">Atrasados · 3</button>
       <button class="tab" role="tab" aria-selected="false" type="button">Histórico</button>
     </div>
-
+ 
     <div class="split">
       <!-- Tabela -->
       <section class="card grow-2" aria-label="Lista de empréstimos">
@@ -137,7 +137,7 @@
           </table>
         </div>
       </section>
-
+ 
       <!-- Detalhe do item selecionado -->
       <aside class="card grow-1 stack" aria-label="Detalhe do empréstimo">
         <div class="item-head">
@@ -155,6 +155,10 @@
           <li><span class="dot dot-cyan"></span><div><strong>Devolução prevista</strong><div class="muted">10/10 · 18:00</div></div></li>
           <li><span class="dot dot-pink"></span><div><strong>Lembrete enviado</strong><div class="muted">11/10 · 08:00 · e-mail automático</div></div></li>
         </ol>
+        <div class="stack-sm">
+          <button class="btn btn-block" type="button">Registrar devolução</button>
+          <button class="btn btn-line btn-block" type="button">Enviar lembrete por e-mail</button>
+        </div>
       </aside>
     </div>
   </main>

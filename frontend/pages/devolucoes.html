@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Devoluções · ELO Campus</title>
+  <link rel="stylesheet" href="../css/emprestimos.css">
+  <link rel="stylesheet" href="../css/devolucoes.css">
+</head>
+<body>
+<div class="app">
+
+  <!-- Menu lateral -->
+  <aside class="sidebar">
+    <div>
+      <div class="brand">
+        <svg width="48" height="48" viewBox="0 0 64 64" fill="none" aria-hidden="true">
+          <defs>
+            <linearGradient id="g1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#4B0FF0"/><stop offset="1" stop-color="#C02EF0"/></linearGradient>
+            <linearGradient id="g2" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#00D1FF"/><stop offset="1" stop-color="#FF4FD0"/></linearGradient>
+          </defs>
+          <rect x="6" y="10" width="34" height="30" rx="15" transform="rotate(-35 23 25)" stroke="url(#g1)" stroke-width="9"/>
+          <rect x="24" y="24" width="34" height="30" rx="15" transform="rotate(-35 41 39)" stroke="url(#g2)" stroke-width="9"/>
+        </svg>
+        <div>
+          <div class="brand-name">ELO Campus</div>
+          <div class="brand-tag">Equipamentos em movimento</div>
+        </div>
+      </div>
+      <nav class="nav" aria-label="Principal">
+        <a href="painel.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l9-8 9 8v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z"/></svg>Painel
+        </a>
+        <a href="dashboard.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 8l-9-5-9 5v8l9 5 9-5zM3 8l9 5 9-5M12 13v8"/></svg>Equipamentos
+        </a>
+        <a href="novo-emprestimo.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18zM12 8v8M8 12h8"/></svg>Novo empréstimo
+        </a>
+        <a href="emprestimos.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 7h13l-4-4M17 17H4l4 4"/></svg>Empréstimos
+        </a>
+        <a href="servidor.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h16v6H4zM4 14h16v6H4zM8 7h.01M8 17h.01"/></svg>Servidor
+        </a>
+        <a href="consulta-qr.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h16v6H4zM4 14h16v6H4zM8 7h.01M8 17h.01"/></svg>Consulta-qr
+        </a>
+        <a href="relatorio.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v16"/><path d="M16 13h2"/><path d="M16 9h2"/><path d="M20.001 19A2 2 0 0022 17V5a2 2 0 00-1.999-2L16 3.002A5 5 0 0012 5a5 5 0 00-4-2H4a2 2 0 00-2 2v12a2 2 0 001.999 2H8a5 5 0 014 2 5 5 0 014-2z"/><path d="M6 13h2"/><path d="M6 9h2"/></svg>Relatorio
+        </a>
+        <a href="solicitantes.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" x2="19" y1="8" y2="14"/><line x1="22" x2="16" y1="11" y2="11"/></svg>Solicitantes
+        </a>
+        <a href="usuarios.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Usuarios
+        </a>
+        <a href="devolucoes.html" aria-current="page">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22V12"/><polyline points="3.29 7 12 12 20.71 7"/><path d="m7.5 4.27 9 5.15"/></svg>Devoluções
+        </a>
+      </nav>
+    </div>
+    <div class="user-card">
+      <div class="avatar">TI</div>
+      <div><strong>Estagiário TI</strong><div class="muted" style="font-size:13px">Campus Lapa</div></div>
+    </div>
+  </aside>
+
+  <!-- Conteúdo -->
+  <main class="main">
+    <header class="page-head">
+      <div>
+        <h1>Devoluções</h1>
+        <p>Registre o retorno dos equipamentos e confira o estado de cada item.</p>
+      </div>
+      <div class="toolbar">
+        <label for="busca" class="sr-only">Buscar</label>
+        <input class="input" id="busca" type="search" placeholder="Buscar por patrimônio ou pessoa" style="width:280px">
+        <a class="btn" href="emprestimos.html">Ver empréstimos ativos</a>
+      </div>
+    </header>
+
+    <!-- Resumo do dia -->
+    <section class="stats" aria-label="Resumo de hoje">
+      <div class="card stat">
+        <div class="stat-icon main">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l3 3 5-6"/></svg>
+        </div>
+        <div><div class="stat-value">5</div><div class="stat-label">Devolvidos hoje</div></div>
+      </div>
+      <div class="card stat">
+        <div class="stat-icon cool">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+        </div>
+        <div><div class="stat-value">3</div><div class="stat-label">Aguardando hoje</div></div>
+      </div>
+      <div class="card stat">
+        <div class="stat-icon warm">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 9v4M12 17h.01M10.3 3.9L1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg>
+        </div>
+        <div><div class="stat-value">1</div><div class="stat-label">Com avaria</div></div>
+      </div>
+    </section>
+
+    <div class="split">
+      <!-- Histórico + fila -->
+      <div class="grow-2 stack">
+        <section class="card" aria-label="Devoluções recentes">
+          <div class="card-title">
+            <h2>Devoluções recentes</h2>
+            <div class="tabs" role="tablist" aria-label="Período">
+              <button class="tab" role="tab" aria-selected="true" type="button">Hoje</button>
+              <button class="tab" role="tab" aria-selected="false" type="button">Semana</button>
+              <button class="tab" role="tab" aria-selected="false" type="button">Mês</button>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Equipamento</th><th>Devolvido por</th><th>Data e hora</th><th>Condição</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Notebook Dell Latitude</strong><small>LAP-0142</small></td>
+                  <td>Mariana Costa</td><td>15/10 · 13:20</td>
+                  <td><span class="pill pill-ok">Perfeito</span></td>
+                </tr>
+                <tr>
+                  <td><strong>Câmera Canon T7</strong><small>CAM-0004</small></td>
+                  <td>Lucas Ferreira</td><td>15/10 · 11:05</td>
+                  <td><span class="pill pill-warn">Incompleto</span></td>
+                </tr>
+                <tr class="is-late">
+                  <td><strong>Caixa de som JBL</strong><small>AUD-0031</small></td>
+                  <td>Grêmio Estudantil</td><td>15/10 · 09:40</td>
+                  <td><span class="pill pill-late">Com avaria</span></td>
+                </tr>
+                <tr>
+                  <td><strong>Tablet Samsung Tab A</strong><small>TAB-0008</small></td>
+                  <td>Juliana Rocha</td><td>15/10 · 08:55</td>
+                  <td><span class="pill pill-ok">Perfeito</span></td>
+                </tr>
+                <tr>
+                  <td><strong>Cabo HDMI 3 m</strong><small>CAB-0045</small></td>
+                  <td>Beatriz Lima</td><td>15/10 · 08:10</td>
+                  <td><span class="pill pill-ok">Perfeito</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="card" aria-label="Aguardando devolução hoje">
+          <div class="card-title"><h2>Aguardando hoje</h2></div>
+          <ul class="queue">
+            <li>
+              <div class="queue-time">15:00</div>
+              <div class="queue-info"><strong>Projetor Epson X49</strong><div class="muted" style="font-size:14px">Prof. Ricardo Alves</div></div>
+              <button class="btn btn-sm" type="button">Receber</button>
+            </li>
+            <li>
+              <div class="queue-time">16:30</div>
+              <div class="queue-info"><strong>Microfone sem fio</strong><div class="muted" style="font-size:14px">Coord. de Eventos</div></div>
+              <button class="btn btn-sm" type="button">Receber</button>
+            </li>
+            <li>
+              <div class="queue-time">17:45</div>
+              <div class="queue-info"><strong>Notebook Lenovo IdeaPad</strong><div class="muted" style="font-size:14px">Carlos Menezes</div></div>
+              <button class="btn btn-sm" type="button">Receber</button>
+            </li>
+          </ul>
+        </section>
+      </div>
+
+      <!-- Formulário -->
+      <aside class="card grow-1" aria-label="Registrar devolução">
+        <form class="form">
+          <h2>Registrar devolução</h2>
+
+          <div class="field">
+            <label for="patrimonio">Patrimônio ou QR Code</label>
+            <input class="input input-block" id="patrimonio" type="search" placeholder="Ex.: AUD-0031" value="AUD-0031">
+          </div>
+
+          <div class="picked">
+            <div class="item-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h12v18H6zM12 14a3 3 0 1 0 0 .01M12 7h.01"/></svg>
+            </div>
+            <div class="picked-info">
+              <strong>Caixa de som JBL</strong>
+              <div class="muted" style="font-size:14px">Grêmio Estudantil · retirada em 08/10</div>
+            </div>
+            <span class="pill pill-late">Atrasado</span>
+          </div>
+
+          <div class="field" role="radiogroup" aria-labelledby="cond-label">
+            <span class="label" id="cond-label">Condição do equipamento</span>
+            <div class="choices">
+              <input type="radio" name="condicao" id="c1" checked><label class="choice" for="c1">Perfeito</label>
+              <input type="radio" name="condicao" id="c2"><label class="choice" for="c2">Incompleto</label>
+              <input type="radio" name="condicao" id="c3"><label class="choice" for="c3">Com avaria</label>
+            </div>
+          </div>
+
+          <fieldset class="checklist" style="border:0;margin:0">
+            <legend class="sr-only">Conferência</legend>
+            <label class="check"><input type="checkbox" checked> Cabos e acessórios conferidos</label>
+            <label class="check"><input type="checkbox" checked> Equipamento limpo e sem danos visíveis</label>
+            <label class="check"><input type="checkbox"> Pessoa assinou o recebimento</label>
+          </fieldset>
+
+          <div class="field">
+            <label for="obs">Observações</label>
+            <textarea class="input input-block" id="obs" placeholder="Descreva avarias ou itens faltantes, se houver"></textarea>
+          </div>
+
+          <div class="stack-sm">
+            <button class="btn btn-block" type="submit">Confirmar devolução</button>
+            <a class="btn btn-line btn-block" href="emprestimos.html">Cancelar</a>
+          </div>
+        </form>
+      </aside>
+    </div>
+  </main>
+</div>
+</body>
+</html>

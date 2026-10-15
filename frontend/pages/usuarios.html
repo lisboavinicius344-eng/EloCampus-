@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Usuários · ELO Campus</title>
+  <link rel="stylesheet" href="../css/emprestimos.css">
+</head>
+<body>
+<div class="app">
+
+  <!-- Menu lateral -->
+  <aside class="sidebar">
+    <div>
+      <div class="brand">
+        <svg width="48" height="48" viewBox="0 0 64 64" fill="none" aria-hidden="true">
+          <defs>
+            <linearGradient id="g1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#4B0FF0"/><stop offset="1" stop-color="#C02EF0"/></linearGradient>
+            <linearGradient id="g2" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#00D1FF"/><stop offset="1" stop-color="#FF4FD0"/></linearGradient>
+          </defs>
+          <rect x="6" y="10" width="34" height="30" rx="15" transform="rotate(-35 23 25)" stroke="url(#g1)" stroke-width="9"/>
+          <rect x="24" y="24" width="34" height="30" rx="15" transform="rotate(-35 41 39)" stroke="url(#g2)" stroke-width="9"/>
+        </svg>
+        <div>
+          <div class="brand-name">ELO Campus</div>
+          <div class="brand-tag">Equipamentos em movimento</div>
+        </div>
+      </div>
+      <nav class="nav" aria-label="Principal">
+        <a href="dashboard.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l9-8 9 8v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z"/></svg>Painel
+        </a>
+        <a href="equipamentos.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 8l-9-5-9 5v8l9 5 9-5zM3 8l9 5 9-5M12 13v8"/></svg>Equipamentos
+        </a>
+        <a href="novo-emprestimo.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18zM12 8v8M8 12h8"/></svg>Novo empréstimo
+        </a>
+        <a href="emprestimos.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 7h13l-4-4M17 17H4l4 4"/></svg>Empréstimos
+        </a>
+        <a href="servidor.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h16v6H4zM4 14h16v6H4zM8 7h.01M8 17h.01"/></svg>Servidor
+        </a>
+        <a href="consulta-qr.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h16v6H4zM4 14h16v6H4zM8 7h.01M8 17h.01"/></svg>Consulta-qr
+        </a>
+        <a href="relatorio.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v16"/><path d="M16 13h2"/><path d="M16 9h2"/><path d="M20.001 19A2 2 0 0022 17V5a2 2 0 00-1.999-2L16 3.002A5 5 0 0012 5a5 5 0 00-4-2H4a2 2 0 00-2 2v12a2 2 0 001.999 2H8a5 5 0 014 2 5 5 0 014-2z"/><path d="M6 13h2"/><path d="M6 9h2"/></svg>Relatorio
+        </a>
+        <a href="solicitantes.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" x2="19" y1="8" y2="14"/><line x1="22" x2="16" y1="11" y2="11"/></svg>Solicitantes
+        </a>
+        <a href="usuarios.html" aria-current="page">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Usuarios
+        </a>
+        <a href="devolucoes.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22V12"/><polyline points="3.29 7 12 12 20.71 7"/><path d="m7.5 4.27 9 5.15"/></svg>Devoluções
+        </a>
+      </nav>
+    </div>
+    <div class="user-card">
+      <div class="avatar">TI</div>
+      <div><strong>Estagiário TI</strong><div class="muted" style="font-size:13px">Campus Lapa</div></div>
+    </div>
+  </aside>
+
+  <!-- Conteúdo -->
+  <main class="main">
+    <header class="page-head">
+      <div>
+        <h1>Usuários</h1>
+        <p>Quem tem acesso ao sistema e o que cada perfil pode fazer.</p>
+      </div>
+      <div class="toolbar">
+        <label for="busca" class="sr-only">Buscar</label>
+        <input class="input" id="busca" type="search" placeholder="Buscar por nome ou e-mail" style="width:280px">
+        <button class="btn" type="button">+ Novo usuário</button>
+      </div>
+    </header>
+
+    <div class="tabs" role="tablist" aria-label="Filtro por perfil">
+      <button class="tab" role="tab" aria-selected="true" type="button">Todos · 8</button>
+      <button class="tab" role="tab" aria-selected="false" type="button">Administradores</button>
+      <button class="tab" role="tab" aria-selected="false" type="button">Estagiários</button>
+      <button class="tab" role="tab" aria-selected="false" type="button">Consulta</button>
+    </div>
+
+    <!-- Blocos invertidos em relação a Empréstimos: perfil e permissões à esquerda, tabela à direita -->
+    <div class="split">
+
+      <div class="grow-1 stack">
+        <!-- Perfil do usuário selecionado -->
+        <aside class="card stack" aria-label="Usuário selecionado">
+          <div class="item-head">
+            <div class="item-icon">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            </div>
+            <div>
+              <h2 style="font-size:22px">Estagiário TI</h2>
+              <div class="muted" style="font-size:14px">estagio.ti@lapa.edu.br</div>
+            </div>
+          </div>
+          <div style="display:flex;flex-wrap:wrap;gap:8px">
+            <span class="pill pill-ok">Ativo</span>
+            <span class="pill pill-warn">Estagiário</span>
+          </div>
+          <div class="stack-sm">
+            <div style="display:flex;justify-content:space-between;gap:12px"><span class="muted">Último acesso</span><strong>Hoje · 14:38</strong></div>
+            <div style="display:flex;justify-content:space-between;gap:12px"><span class="muted">Cadastro</span><strong>02/09/2026</strong></div>
+            <div style="display:flex;justify-content:space-between;gap:12px"><span class="muted">Registros feitos</span><strong>86</strong></div>
+          </div>
+        </aside>
+
+        <!-- Permissões -->
+        <section class="card" aria-label="Permissões do perfil">
+          <h2 style="margin-bottom:16px">Permissões</h2>
+          <div class="stack-sm">
+            <label style="display:flex;align-items:center;gap:12px"><input type="checkbox" checked style="width:20px;height:20px;accent-color:#9b2cf5"> Registrar empréstimos</label>
+            <label style="display:flex;align-items:center;gap:12px"><input type="checkbox" checked style="width:20px;height:20px;accent-color:#9b2cf5"> Registrar devoluções</label>
+            <label style="display:flex;align-items:center;gap:12px"><input type="checkbox" checked style="width:20px;height:20px;accent-color:#9b2cf5"> Cadastrar equipamentos</label>
+            <label style="display:flex;align-items:center;gap:12px"><input type="checkbox" style="width:20px;height:20px;accent-color:#9b2cf5"> Gerenciar usuários</label>
+            <label style="display:flex;align-items:center;gap:12px"><input type="checkbox" style="width:20px;height:20px;accent-color:#9b2cf5"> Acessar área do servidor</label>
+          </div>
+          <div class="stack-sm" style="margin-top:20px">
+            <button class="btn btn-block" type="button">Salvar alterações</button>
+            <button class="btn btn-line btn-block" type="button">Redefinir senha</button>
+          </div>
+        </section>
+      </div>
+
+      <!-- Tabela de usuários -->
+      <section class="card grow-2" aria-label="Lista de usuários">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Usuário</th><th>Perfil</th><th>Último acesso</th><th>Status</th>
+                <th><span class="sr-only">Ação</span></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Estagiário TI</strong><small>estagio.ti@lapa.edu.br</small></td>
+                <td>Estagiário</td><td>Hoje · 14:38</td>
+                <td><span class="pill pill-ok">Ativo</span></td>
+                <td><button class="btn btn-sm btn-line" type="button">Editar</button></td>
+              </tr>
+              <tr>
+                <td><strong>Coordenação de TI</strong><small>coord.ti@lapa.edu.br</small></td>
+                <td>Administrador</td><td>Hoje · 09:12</td>
+                <td><span class="pill pill-ok">Ativo</span></td>
+                <td><button class="btn btn-sm btn-line" type="button">Editar</button></td>
+              </tr>
+              <tr>
+                <td><strong>Camila Duarte</strong><small>camila.duarte@lapa.edu.br</small></td>
+                <td>Estagiário</td><td>14/10 · 17:50</td>
+                <td><span class="pill pill-ok">Ativo</span></td>
+                <td><button class="btn btn-sm btn-line" type="button">Editar</button></td>
+              </tr>
+              <tr>
+                <td><strong>Biblioteca</strong><small>biblioteca@lapa.edu.br</small></td>
+                <td>Consulta</td><td>12/10 · 10:05</td>
+                <td><span class="pill pill-warn">Convite pendente</span></td>
+                <td><button class="btn btn-sm btn-line" type="button">Editar</button></td>
+              </tr>
+              <tr class="is-late">
+                <td><strong>Rafael Teixeira</strong><small>rafael.teixeira@lapa.edu.br</small></td>
+                <td>Estagiário</td><td>28/09 · 16:20</td>
+                <td><span class="pill pill-late">Desativado</span></td>
+                <td><button class="btn btn-sm btn-line" type="button">Editar</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+  </main>
+</div>
+</body>
+</html>
