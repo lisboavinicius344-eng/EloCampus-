@@ -63,11 +63,14 @@ const DEMO = (() => {
 const CHAVE_DEMO = "elo.demo.equipamentos";
 try {
   const salvo = localStorage.getItem(CHAVE_DEMO);
-  if (salvo) DEMO.equipamentos = JSON.parse(salvo);
+  if (salvo) {
+    const carregados = JSON.parse(salvo);
+    if (Array.isArray(carregados)) DEMO.equipamentos = carregados.filter((e) => e && e.id != null && typeof e === "object");
+  }
 } catch { /* sem armazenamento: segue com os dados originais */ }
 
 function demoEquipamentos() {
-  return DEMO.equipamentos.map((e) => {
+  return DEMO.equipamentos.filter((e) => e && e.id != null).map((e) => {
     const ativo = DEMO.emprestimos.find((l) => l.equipamentoId === e.id && !l.devolvida);
     let situacao = e.base === "ativo" ? "disponivel" : e.base;
     if (ativo) situacao = EloUtil.diasAtraso(ativo.prevista) > 0 ? "atrasado" : "emprestado";
@@ -81,7 +84,7 @@ function demoEmprestimos() {
     const e = porId.get(l.equipamentoId);
     return {
       id: l.id,
-      equipamento: { id: e.id, nome: e.nome, patrimonio: e.patrimonio },
+      equipamento: { id: e.id, nome: e.nome, patrimonio: e.patrimonio, categoria: e.categoria },
       solicitante: { nome: l.solicitante },
       retirada: l.retirada,
       prevista: l.prevista,
@@ -115,7 +118,7 @@ function demoMovimentacoes() {
   DEMO.manutencoes.forEach((m) => {
     const e = DEMO.equipamentos.find((x) => x.id === m.equipamentoId);
     if (!e) return;
-    eventos.push({ classe: "manutencao", tipo: "Manutenção iniciada", quando: m.quando, equipamento: { id: e.id, nome: e.nome, patrimonio: e.patrimonio }, detalhe: "", por: m.por });
+    eventos.push({ classe: "manutencao", tipo: "Manutenção iniciada", quando: m.quando, equipamento: { id: e.id, nome: e.nome, patrimonio: e.patrimonio, categoria: e.categoria }, detalhe: "", por: m.por });
   });
   return eventos.sort((a, b) => new Date(b.quando) - new Date(a.quando));
 }

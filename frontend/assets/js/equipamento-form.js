@@ -101,13 +101,9 @@
     const condicao = campos.condicao.value;
     const visual = $("tipo-visual");
     if (!categoria || !condicao) { visual.hidden = true; return; }
-    const tipo = categoria.includes("projet") ? { simbolo: "▱", nome: "Projetor" }
-      : categoria.includes("notebook") || categoria.includes("comput") ? { simbolo: "▣", nome: "Computador" }
-      : categoria.includes("câmera") || categoria.includes("camera") ? { simbolo: "◉", nome: "Câmera" }
-      : categoria.includes("áudio") || categoria.includes("audio") || categoria.includes("microfone") ? { simbolo: "◌", nome: "Áudio" }
-      : categoria.includes("tablet") ? { simbolo: "▤", nome: "Tablet" }
-      : { simbolo: "◇", nome: "Equipamento" };
-    $("tipo-silhueta").textContent = tipo.simbolo;
+    const visualTipo = ELO_VISUAIS.categoria(categoria);
+    const tipo = { simbolo: visualTipo[0], nome: visualTipo[1] };
+    $("tipo-silhueta").innerHTML = tipo.simbolo;
     $("tipo-visual-titulo").textContent = `${tipo.nome} · ${condicao}`;
     $("tipo-visual-texto").textContent = condicao === "Danificado"
       ? "Estado danificado: a visualização sinaliza atenção para manutenção."

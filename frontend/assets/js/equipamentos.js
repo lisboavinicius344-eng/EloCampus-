@@ -67,9 +67,10 @@
           ${lista.map((e) => {
             const s = SITUACOES[e.situacao] || { rotulo: e.situacao, cls: "off" };
             const cond = norm(e.condicao);
+            const visual = ELO_VISUAIS.categoria(e.categoria);
             const href = `equipamento-detalhe.html?id=${encodeURIComponent(e.id)}`;
             return `<tr>
-              <td class="cell-nome"><a class="link-item" href="${href}">${esc(e.nome)}</a></td>
+              <td class="cell-nome"><span class="eq-mini eq-cond-${esc(cond)}" title="${esc(visual[1])}">${visual[0]}</span><a class="link-item" href="${href}">${esc(e.nome)}</a></td>
               <td data-label="Patrimônio">${esc(e.patrimonio)}</td>
               <td data-label="Tipo">${esc(e.categoria)}</td>
               <td data-label="Setor">${esc(e.setor)}</td>

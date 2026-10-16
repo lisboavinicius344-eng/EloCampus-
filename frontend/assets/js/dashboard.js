@@ -44,8 +44,8 @@
   }
 
   function renderAcompanhar(lista) {
-    const ativos = lista
-      .filter((l) => !l.devolvida)
+    const ativos = (Array.isArray(lista) ? lista : [])
+      .filter((l) => l && l.equipamento && l.solicitante && !l.devolvida)
       .sort((a, b) => new Date(a.prevista) - new Date(b.prevista))
       .slice(0, 6);
 
@@ -72,7 +72,7 @@
   }
 
   function renderMovimentacoes(lista) {
-    const recentes = lista.slice(0, 6);
+    const recentes = (Array.isArray(lista) ? lista : []).filter((m) => m && m.equipamento).slice(0, 6);
     if (!recentes.length) {
       $("movs").innerHTML = '<p class="estado-vazio">Ainda não há movimentações registradas.</p>';
       return;
@@ -89,17 +89,22 @@
   }
 
   try {
-    const [resumo, emprestimos, movs] = await Promise.all([
+    let locais = [];
+    try { locais = JSON.parse(localStorage.getItem("elo.demo.movimentacoes") || "[]"); } catch {}
+    const [resumo, emprestimosApi, movsApi] = await Promise.all([
       ELO.resumoDashboard(),
       ELO.emprestimos(),
       ELO.movimentacoes(),
     ]);
+    const extras = Array.isArray(locais) ? locais : [];
+    const emprestimos = [...emprestimosApi, ...extras.filter((x) => x.ativa).map((x, i) => ({ id: `local-${i}`, equipamento: x.equipamento, solicitante: { nome: x.detalhe }, prevista: x.prevista, devolvida: null }))];
+    const movs = [...extras, ...movsApi];
     renderKpis(resumo);
     renderDistribuicao(resumo);
     renderAcompanhar(emprestimos);
     renderMovimentacoes(movs);
   } catch (err) {
-    ["kpis", "dist", "acompanhar", "movs"].forEach((id) => { $(id).innerHTML = ""; });
+    ["kpis", "dist", "acompanhar", "movs"].forEach((id) => { const el = $(id); if (el) el.innerHTML = ""; });
     const erro = $("erro");
     erro.innerHTML = `${esc(err.message)} <button class="btn btn-primary" type="button" id="tentar">Tentar de novo</button>`;
     erro.hidden = false;

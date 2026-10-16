@@ -33,8 +33,10 @@ const EloUtil = {
 };
 
 (function () {
-  const sessao = obterSessao();
-  if (!sessao) { window.location.replace("../index.html"); return; }
+  let sessao = obterSessao();
+  const publico = document.body.dataset.publico === "true";
+  if (!sessao && !publico) { window.location.replace("../index.html"); return; }
+  if (!sessao) sessao = { nome: "Consulta pública", perfil: "visitante" };
 
   const ICONES = {
     home: '<path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/>',
@@ -44,6 +46,11 @@ const EloUtil = {
     users: '<circle cx="9" cy="8" r="4"/><path d="M2 21a7 7 0 0 1 14 0M16 4a4 4 0 0 1 0 8M22 21a7 7 0 0 0-4-6"/>',
     chart: '<path d="M4 20V10M10 20V4M16 20v-8M22 20H2"/>',
     shield: '<path d="M12 3 4 6v6c0 5 3.5 8 8 9 4.5-1 8-4 8-9V6z"/>',
+    gear: '<path d="M12 8.5a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7Z"/><path d="m19.4 15 .1.1-1.7 1.7-.1-.1a2 2 0 0 0-2.2-.4 2 2 0 0 0-1.2 1.8v.2h-2.4v-.2a2 2 0 0 0-1.2-1.8 2 2 0 0 0-2.2.4l-.1.1-1.7-1.7.1-.1a2 2 0 0 0 .4-2.2 2 2 0 0 0-1.8-1.2h-.2v-2.4h.2a2 2 0 0 0 1.8-1.2 2 2 0 0 0-.4-2.2l-.1-.1 1.7-1.7.1.1a2 2 0 0 0 2.2.4 2 2 0 0 0 1.2-1.8v-.2h2.4v.2a2 2 0 0 0 1.2 1.8 2 2 0 0 0 2.2-.4l.1-.1 1.7 1.7-.1.1a2 2 0 0 0-.4 2.2 2 2 0 0 0 1.8 1.2h.2v2.4h-.2a2 2 0 0 0-1.8 1.2 2 2 0 0 0 .4 2.2Z"/>',
+    server: '<rect x="4" y="4" width="16" height="6" rx="1"/><rect x="4" y="14" width="16" height="6" rx="1"/><path d="M8 7h.01M8 17h.01"/>',
+    people: '<circle cx="9" cy="8" r="3"/><path d="M3 20a6 6 0 0 1 12 0M16 11a3 3 0 1 0 0-6M18 20a5 5 0 0 0-2-4"/>',
+    'people-admin': '<circle cx="9" cy="8" r="3"/><path d="M3 20a6 6 0 0 1 12 0M17 14l1 2 2 .3-1.5 1.5.3 2.1-1.8-1-1.8 1 .3-2.1-1.5-1.5 2-.3z"/>', 
+    settings: '<path d="M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8Z"/><path d="m4.9 9.2-1.4-1 .0-2 1.6-.9 1.7.7 1-1.4L7.2 3h2l.9 1.6 1.9-.1L13 3h2l.1 1.7 1.8.8 1.7-.7 1.4 1.4-.7 1.7.9 1.7 1.7.1v2l-1.7.9-.8 1.8.7 1.7-1.4 1.4-1.7-.7-1.7.9-.1 1.7h-2l-.9-1.7-1.8-.8-1.7.7-1.4-1.4.7-1.7-.9-1.7-1.7-.1v-2l1.7-.9.8-1.8Z"/>', 
     menu: '<path d="M4 6h16M4 12h16M4 18h16"/>',
     out: '<path d="M9 21H5a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h4M16 17l5-5-5-5M21 12H9"/>',
   };
@@ -52,23 +59,38 @@ const EloUtil = {
   // Sem href = ainda não implementado (aparece desabilitado).
   const NAV = [
     { id: "painel", rotulo: "Painel", icone: "home", href: "dashboard.html" },
-    { id: "equipamentos", rotulo: "Equipamentos", icone: "box", href: "equipamentos.html" },
-    { id: "novo-emprestimo", rotulo: "Novo empréstimo", icone: "swap", href: "novo-emprestimo.html" },
-    { id: "emprestimos", rotulo: "Empréstimos", icone: "swap", href: "emprestimos.html" },
-    { id: "devolucoes", rotulo: "Devoluções", icone: "undo", href: "devolucoes.html" },
-    { id: "solicitantes", rotulo: "Solicitantes", icone: "users", href: "solicitantes.html" },
-    { id: "relatorios", rotulo: "Relatórios", icone: "chart", href: "relatorio.html" },
-    { id: "perfil", rotulo: "Configuração do perfil", icone: "users", href: "perfil.html" },
-    // Ocultar o item não protege nada: o back-end também precisa validar o perfil.
-    { id: "usuarios", rotulo: "Usuários", icone: "shield", href: "usuarios.html", admin: true },
+    { grupo: "Acervo", itens: [
+      { id: "equipamentos", rotulo: "Equipamentos", icone: "box", href: "equipamentos.html" },
+      { id: "consulta-qr", rotulo: "Consulta por QR Code", icone: "box", href: "consulta-qr-interno.html" },
+      { id: "movimentacoes", rotulo: "Histórico de movimentações", icone: "swap", href: "movimentacoes.html" },
+    ]},
+    { grupo: "Empréstimos e devoluções", itens: [
+      { id: "novo-emprestimo", rotulo: "Novo empréstimo", icone: "swap", href: "novo-emprestimo.html" },
+      { id: "emprestimos", rotulo: "Empréstimos", icone: "swap", href: "emprestimos.html" },
+      { id: "devolucoes", rotulo: "Devoluções", icone: "undo", href: "devolucoes.html" },
+    ]},
+    { grupo: "Administração", itens: [
+      { id: "solicitantes", rotulo: "Solicitantes", icone: "people", href: "solicitantes.html" },
+      { id: "relatorios", rotulo: "Relatórios", icone: "chart", href: "relatorio.html" },
+      { id: "servidor", rotulo: "Servidor", icone: "server", href: "servidor.html" },
+      { id: "usuarios", rotulo: "Usuários", icone: "people-admin", href: "usuarios.html", admin: true },
+    ]},
+    { id: "perfil", rotulo: "Configuração do perfil", icone: "gear", href: "perfil.html" },
   ];
+
   const atual = document.body.dataset.pagina;
-  const itens = NAV.filter((i) => !i.admin || sessao.perfil === "administrador").map((i) => {
-    if (!i.href) {
-      return `<li><span class="nav-item is-disabled" aria-disabled="true">${svg(i.icone)}<span>${i.rotulo}</span><small>Em breve</small></span></li>`;
-    }
+  const itemHtml = (i) => {
+    if (i.admin && sessao.perfil !== "administrador") return "";
     const ativo = i.id === atual;
-    return `<li><a class="nav-item${ativo ? " is-active" : ""}" href="${i.href}"${ativo ? ' aria-current="page"' : ""}>${svg(i.icone)}<span>${i.rotulo}</span></a></li>`;
+    const icon = svg(i.icone);
+    return `<li><a class="nav-item${ativo ? " is-active" : ""}" href="${i.href}"${ativo ? ' aria-current="page"' : ""}>${icon}<span>${i.rotulo}</span></a></li>`;
+  };
+  const itens = NAV.map((item) => {
+    if (!item.grupo) return itemHtml(item);
+    const visiveis = item.itens.filter((i) => !i.admin || sessao.perfil === "administrador");
+    if (!visiveis.length) return "";
+    const aberto = visiveis.some((i) => i.id === atual);
+    return `<li class="nav-section"><details${aberto ? " open" : ""}><summary><span>${item.grupo}</span><b aria-hidden="true">›</b></summary><ul>${visiveis.map(itemHtml).join("")}</ul></details></li>`;
   }).join("");
 
   const nome = EloUtil.esc(sessao.nome || "Usuário");
@@ -82,7 +104,7 @@ const EloUtil = {
     </a>
     <nav aria-label="Principal"><ul class="nav">${itens}</ul></nav>
     <div class="user">
-      <a class="avatar avatar-link" href="perfil.html" aria-label="Abrir configuração do perfil">${EloUtil.esc(iniciais)}</a>
+      <a class="avatar avatar-link${sessao.foto ? " has-photo" : ""}" href="perfil.html" aria-label="Abrir configuração do perfil">${sessao.foto ? `<img src="${EloUtil.esc(sessao.foto)}" alt="Foto de ${nome}">` : EloUtil.esc(iniciais)}</a>
       <div class="user-info"><strong>${nome}</strong><small>${EloUtil.esc(perfil)}</small></div>
       <button class="user-out" type="button" id="btn-sair" aria-label="Sair do sistema" title="Sair">${svg("out")}</button>
     </div>`;
