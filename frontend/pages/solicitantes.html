@@ -8,7 +8,7 @@
   <link rel="icon" type="image/png" href="../assets/img/logo.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../assets/css/emprestimos.css">
   <link rel="stylesheet" href="../assets/css/style.css">
   <link rel="stylesheet" href="../assets/css/layout.css">
@@ -26,7 +26,7 @@
       </div>
       <div class="toolbar">
         <label for="busca" class="sr-only">Buscar</label>
-        <input class="input" id="busca" type="search" placeholder="Buscar por nome ou matrícula" style="width:280px">
+        <input class="input" id="busca" type="search" placeholder="Buscar por nome ou matrícula">
         <button class="btn" type="button">+ Novo solicitante</button>
       </div>
     </header>
@@ -91,22 +91,6 @@
         </div>
       </section>
 
-              <!-- Permissões -->
-        <section class="card" aria-label="Permissões do perfil">
-          <h2 style="margin-bottom:16px">Permissões</h2>
-          <div class="stack-sm">
-            <label style="display:flex;align-items:center;gap:12px"><input type="checkbox" checked style="width:20px;height:20px;accent-color:#9b2cf5"> Registrar empréstimos</label>
-            <label style="display:flex;align-items:center;gap:12px"><input type="checkbox" checked style="width:20px;height:20px;accent-color:#9b2cf5"> Registrar devoluções</label>
-            <label style="display:flex;align-items:center;gap:12px"><input type="checkbox" checked style="width:20px;height:20px;accent-color:#9b2cf5"> Cadastrar equipamentos</label>
-            <label style="display:flex;align-items:center;gap:12px"><input type="checkbox" style="width:20px;height:20px;accent-color:#9b2cf5"> Gerenciar usuários</label>
-            <label style="display:flex;align-items:center;gap:12px"><input type="checkbox" style="width:20px;height:20px;accent-color:#9b2cf5"> Acessar área do servidor</label>
-          </div>
-          <div class="stack-sm" style="margin-top:20px">
-            <button class="btn btn-block" type="button">Salvar alterações</button>
-            <button class="btn btn-line btn-block" type="button">Redefinir senha</button>
-          </div>
-        </section>
-        
       <!-- Detalhe do solicitante selecionado -->
       <aside class="card grow-1 stack" aria-label="Detalhe do solicitante">
         <div class="item-head">
@@ -114,19 +98,19 @@
             <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
           </div>
           <div>
-            <h2 style="font-size:22px">Mariana Costa</h2>
-            <div class="muted" style="font-size:14px">Aluna · Matrícula 2024118</div>
+            <h2 class="h-md">Mariana Costa</h2>
+            <div class="muted small">Aluna · Matrícula 2024118</div>
           </div>
         </div>
-        <span class="pill pill-ok" style="align-self:flex-start">Situação regular</span>
+        <span class="pill pill-ok self-start">Situação regular</span>
 
         <div class="stack-sm">
-          <div style="display:flex;justify-content:space-between;gap:12px"><span class="muted">E-mail</span><strong>mariana@lapa.edu.br</strong></div>
-          <div style="display:flex;justify-content:space-between;gap:12px"><span class="muted">Telefone</span><strong>(11) 90000-0000</strong></div>
-          <div style="display:flex;justify-content:space-between;gap:12px"><span class="muted">Empréstimos no total</span><strong>14</strong></div>
+          <div class="kv"><span class="muted">E-mail</span><strong>mariana@lapa.edu.br</strong></div>
+          <div class="kv"><span class="muted">Telefone</span><strong>(11) 90000-0000</strong></div>
+          <div class="kv"><span class="muted">Empréstimos no total</span><strong>14</strong></div>
         </div>
 
-        <h2 style="font-size:20px">Últimas movimentações</h2>
+        <h2 class="h-sm">Últimas movimentações</h2>
         <ol class="timeline">
           <li><span class="dot dot-purple"></span><div><strong>Retirou Notebook Dell Latitude</strong><div class="muted">14/10 · 14:40 · LAP-0142</div></div></li>
           <li><span class="dot dot-cyan"></span><div><strong>Devolveu Cabo HDMI 3 m</strong><div class="muted">08/10 · 08:10 · CAB-0045</div></div></li>
