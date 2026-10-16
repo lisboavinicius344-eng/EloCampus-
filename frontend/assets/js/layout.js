@@ -65,7 +65,6 @@ const EloUtil = {
       { id: "movimentacoes", rotulo: "Histórico de movimentações", icone: "swap", href: "movimentacoes.html" },
     ]},
     { grupo: "Empréstimos e devoluções", itens: [
-      { id: "novo-emprestimo", rotulo: "Novo empréstimo", icone: "swap", href: "novo-emprestimo.html" },
       { id: "emprestimos", rotulo: "Empréstimos", icone: "swap", href: "emprestimos.html" },
       { id: "devolucoes", rotulo: "Devoluções", icone: "undo", href: "devolucoes.html" },
     ]},

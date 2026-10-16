@@ -14,8 +14,14 @@
   <link rel="stylesheet" href="../assets/css/novo-emprestimo.css">
   <link rel="stylesheet" href="../assets/css/layout.css">
   <link rel="stylesheet" href="../assets/css/salz-bridge.css">
+  <script>
+    // Sem solicitante escolhido, volta para a etapa 1 (lista de solicitantes).
+    if (!new URLSearchParams(location.search).get('nome')) {
+      location.replace('solicitantes.html?origem=novo-emprestimo');
+    }
+  </script>
 </head>
-<body data-pagina="novo-emprestimo">
+<body data-pagina="solicitantes">
   <div class="app">
     <aside class="sidebar" id="sidebar"></aside>
     <div class="content">
@@ -42,13 +48,13 @@
           <div class="form-row">
             <div class="field">
               <label for="solicitante">Nome ou matrícula</label>
-              <input class="input input-block" id="solicitante" name="solicitante" type="search" list="lista-solicitantes" placeholder="Digite para buscar" value="Mariana Costa · 2024118" required>
+              <input class="input input-block" id="solicitante" name="solicitante" type="search" list="lista-solicitantes" placeholder="Escolha o solicitante na etapa anterior" readonly required>
               <datalist id="lista-solicitantes">
                 <option value="Mariana Costa · 2024118">
                 <option value="Juliana Rocha · 2023076">
                 <option value="Lucas Ferreira · 2024203">
               </datalist>
-              <span class="hint">Não encontrou? <a href="solicitantes.html">Cadastrar solicitante</a></span>
+              <span class="hint">Definido na etapa anterior. <a href="solicitantes.html?origem=novo-emprestimo">Alterar solicitante</a></span>
             </div>
             <div class="field">
               <label for="vinculo">Vínculo</label>
@@ -125,7 +131,7 @@
       <aside class="grow-1 summary" aria-label="Resumo do empréstimo">
         <h2>Resumo</h2>
         <div class="stack-sm">
-          <div class="summary-row"><span>Solicitante</span><strong>Mariana Costa</strong></div>
+          <div class="summary-row"><span>Solicitante</span><strong id="resumo-solicitante">—</strong></div>
           <div class="summary-row"><span>Itens</span><strong>2 equipamentos</strong></div>
           <div class="summary-row"><span>Retirada</span><strong>15/10 · 15:20</strong></div>
           <div class="summary-row"><span>Devolução</span><strong>16/10 · 18:00</strong></div>
@@ -140,6 +146,27 @@
     </form></main>
     </div>
   </div>
+  <script>
+    // Preenche o solicitante recebido da etapa 1 (antes dos demais scripts da página).
+    (function () {
+      var p = new URLSearchParams(location.search);
+      var nome = p.get('nome'); if (!nome) return;
+      var mat = p.get('matricula');
+      var campo = document.getElementById('solicitante');
+      campo.value = nome + (mat ? ' · ' + mat : '');
+      campo.dispatchEvent(new Event('input', { bubbles: true }));
+      campo.dispatchEvent(new Event('change', { bubbles: true }));
+      document.getElementById('resumo-solicitante').textContent = nome;
+
+      var v = (p.get('vinculo') || '').toLowerCase();
+      var alvo = v.indexOf('alun') === 0 ? 'Aluno' : v.indexOf('prof') === 0 ? 'Professor'
+               : v.indexOf('grupo') === 0 ? 'Grupo ou setor' : v.indexOf('perfil') === 0 ? 'Perfil' : '';
+      var sel = document.getElementById('vinculo');
+      for (var i = 0; alvo && i < sel.options.length; i++) {
+        if (sel.options[i].text === alvo) { sel.selectedIndex = i; break; }
+      }
+    })();
+  </script>
   <script src="../assets/js/auth.js"></script>
   <script src="../assets/js/layout.js"></script>
   <script src="../assets/js/dados-demo.js"></script>

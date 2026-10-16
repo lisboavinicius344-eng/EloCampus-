@@ -19,7 +19,11 @@
     <aside class="sidebar" id="sidebar"></aside>
     <div class="content">
       <header class="topbar" id="topbar"></header>
-      <main class="main"><header class="page-head">
+      <main class="main"><div class="card" id="aviso-fluxo" role="status" hidden>
+      <strong>Novo empréstimo · etapa 1 de 3</strong>
+      <div class="muted">Escolha o solicitante na lista e clique em “Novo empréstimo para ela”.</div>
+    </div>
+    <header class="page-head">
       <div>
         <h1>Solicitantes</h1>
         <p>Alunos, professores e servidores que podem retirar equipamentos.</p>
@@ -90,21 +94,7 @@
           </table>
         </div>
       </section>
-                    <!-- Permissões -->
-        <section class="card" aria-label="Permissões do perfil">
-          <h2 style="margin-bottom:16px">Permissões</h2>
-          <div class="stack-sm">
-            <label style="display:flex;align-items:center;gap:12px"><input type="checkbox" checked style="width:20px;height:20px;accent-color:#9b2cf5"> Registrar empréstimos</label>
-            <label style="display:flex;align-items:center;gap:12px"><input type="checkbox" checked style="width:20px;height:20px;accent-color:#9b2cf5"> Registrar devoluções</label>
-            <label style="display:flex;align-items:center;gap:12px"><input type="checkbox" checked style="width:20px;height:20px;accent-color:#9b2cf5"> Cadastrar equipamentos</label>
-            <label style="display:flex;align-items:center;gap:12px"><input type="checkbox" style="width:20px;height:20px;accent-color:#9b2cf5"> Gerenciar usuários</label>
-            <label style="display:flex;align-items:center;gap:12px"><input type="checkbox" style="width:20px;height:20px;accent-color:#9b2cf5"> Acessar área do servidor</label>
-          </div>
-          <div class="stack-sm" style="margin-top:20px">
-            <button class="btn btn-block" type="button">Salvar alterações</button>
-            <button class="btn btn-line btn-block" type="button">Redefinir senha</button>
-          </div>
-        </section>
+
       <!-- Detalhe do solicitante selecionado -->
       <aside class="card grow-1 stack" aria-label="Detalhe do solicitante">
         <div class="item-head">
@@ -132,7 +122,7 @@
         </ol>
 
         <div class="stack-sm">
-          <a class="btn btn-block" href="novo-emprestimo.html">Novo empréstimo para ela</a>
+          <a class="btn btn-block" href="novo-emprestimo.html" data-novo-emprestimo>Novo empréstimo para ela</a>
           <button class="btn btn-line btn-block" type="button">Editar cadastro</button>
         </div>
       </aside>
@@ -144,5 +134,30 @@
   <script src="../assets/js/dados-demo.js"></script>
   <script src="../assets/js/api.js"></script>
   <script src="../assets/js/salz-actions.js"></script><script src="../assets/js/solicitantes-ui.js"></script>
+  <script>
+    // Etapa 1 do novo empréstimo: o solicitante é escolhido aqui e segue para a etapa 2.
+    (function () {
+      var origem = new URLSearchParams(location.search).get('origem');
+      var aviso = document.getElementById('aviso-fluxo');
+      if (origem === 'novo-emprestimo' && aviso) aviso.hidden = false;
+
+      document.addEventListener('click', function (e) {
+        var link = e.target.closest('[data-novo-emprestimo]');
+        if (!link) return;
+        var painel = link.closest('aside');
+        var titulo = painel && painel.querySelector('.item-head h2');
+        var sub = painel && painel.querySelector('.item-head .muted');
+        if (!titulo) return;
+        var texto = sub ? sub.textContent : '';
+        var mat = texto.match(/(\d{4,})/);
+        e.preventDefault();
+        location.href = 'novo-emprestimo.html?' + new URLSearchParams({
+          nome: titulo.textContent.trim(),
+          matricula: mat ? mat[1] : '',
+          vinculo: texto.split('·')[0].trim()
+        }).toString();
+      });
+    })();
+  </script>
 </body>
 </html>
