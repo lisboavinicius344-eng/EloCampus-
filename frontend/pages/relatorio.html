@@ -160,3 +160,166 @@
   <script src="../assets/js/salz-actions.js"></script>
 </body>
 </html>
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0B1020">
+  <title>Relatório — ELO Campus</title>
+  <link rel="icon" type="image/png" href="../assets/img/logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/emprestimos.css">
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="stylesheet" href="../assets/css/relatorio.css">
+  <link rel="stylesheet" href="../assets/css/layout.css">
+  <link rel="stylesheet" href="../assets/css/salz-bridge.css">
+</head>
+<body data-pagina="relatorios">
+  <div class="app">
+    <aside class="sidebar" id="sidebar"></aside>
+    <div class="content">
+      <header class="topbar" id="topbar"></header>
+      <main class="main"><header class="page-head">
+      <div>
+        <h1>Relatório</h1>
+        <p>Uso dos equipamentos no Campus Lapa.</p>
+      </div>
+      <div class="export">
+        <button class="btn btn-line" type="button">Exportar CSV</button>
+        <button class="btn" type="button">Exportar PDF</button>
+      </div>
+    </header>
+
+    <!-- Filtros -->
+    <form class="filters" aria-label="Filtros do relatório">
+      <div class="field">
+        <label for="periodo">Período</label>
+        <select class="input" id="periodo">
+          <option>Últimos 30 dias</option>
+          <option>Últimos 6 meses</option>
+          <option>Ano letivo</option>
+          <option>Personalizado</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="categoria">Categoria</label>
+        <select class="input" id="categoria">
+          <option>Todas</option>
+          <option>Notebooks</option>
+          <option>Projetores</option>
+          <option>Áudio e vídeo</option>
+          <option>Cabos e adaptadores</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="vinculo">Vínculo</label>
+        <select class="input" id="vinculo">
+          <option>Todos</option>
+          <option>Alunos</option>
+          <option>Professores</option>
+          <option>Servidores</option>
+        </select>
+      </div>
+      <span class="spacer"></span>
+      <button class="btn" type="submit">Aplicar filtros</button>
+    </form>
+
+    <!-- Resumo -->
+    <section class="rel-stats" aria-label="Resumo do período">
+      <div class="card rel-stat">
+        <div class="rel-stat-label">Empréstimos</div>
+        <div class="rel-stat-value">96</div>
+        <div class="rel-stat-note up">+12% vs. período anterior</div>
+      </div>
+      <div class="card rel-stat">
+        <div class="rel-stat-label">Devolvidos no prazo</div>
+        <div class="rel-stat-value">89%</div>
+        <div class="rel-stat-note up">+4 pontos</div>
+      </div>
+      <div class="card rel-stat">
+        <div class="rel-stat-label">Atrasos</div>
+        <div class="rel-stat-value">11</div>
+        <div class="rel-stat-note down">+2 vs. período anterior</div>
+      </div>
+      <div class="card rel-stat">
+        <div class="rel-stat-label">Itens com avaria</div>
+        <div class="rel-stat-value">3</div>
+        <div class="rel-stat-note muted">Sem variação</div>
+      </div>
+    </section>
+
+    <div class="split">
+      <div class="grow-2 stack">
+        <!-- Gráfico mensal -->
+        <section class="card" aria-label="Empréstimos por mês">
+          <div class="card-title">
+            <h2>Empréstimos por mês</h2>
+            <div class="legend"><span><i></i>Empréstimos</span><span><i class="cool"></i>Devoluções</span></div>
+          </div>
+          <div class="bars" role="img" aria-label="Gráfico de barras: empréstimos por mês de abril a outubro">
+            <div class="bar-col"><span class="bar-val">38</span><div class="bar" style="height:38%"></div></div>
+            <div class="bar-col"><span class="bar-val">52</span><div class="bar" style="height:52%"></div></div>
+            <div class="bar-col"><span class="bar-val">61</span><div class="bar" style="height:61%"></div></div>
+            <div class="bar-col"><span class="bar-val">44</span><div class="bar" style="height:44%"></div></div>
+            <div class="bar-col"><span class="bar-val">70</span><div class="bar" style="height:70%"></div></div>
+            <div class="bar-col"><span class="bar-val">83</span><div class="bar" style="height:83%"></div></div>
+            <div class="bar-col"><span class="bar-val">96</span><div class="bar" style="height:96%"></div></div>
+          </div>
+          <div class="bar-labels"><span>Abr</span><span>Mai</span><span>Jun</span><span>Jul</span><span>Ago</span><span>Set</span><span>Out</span></div>
+        </section>
+
+        <!-- Ranking -->
+        <section class="card" aria-label="Equipamentos mais emprestados">
+          <div class="card-title"><h2>Equipamentos mais emprestados</h2></div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Equipamento</th><th>Categoria</th><th>Empréstimos</th><th>Atrasos</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><strong>Notebook Dell Latitude</strong><small>LAP-0142</small></td><td>Notebooks</td><td>18</td><td><span class="pill pill-ok">0</span></td></tr>
+                <tr><td><strong>Projetor Epson X49</strong><small>PRJ-0017</small></td><td>Projetores</td><td>15</td><td><span class="pill pill-warn">2</span></td></tr>
+                <tr><td><strong>Caixa de som JBL</strong><small>AUD-0031</small></td><td>Áudio e vídeo</td><td>11</td><td><span class="pill pill-late">3</span></td></tr>
+                <tr><td><strong>Cabo HDMI 3 m</strong><small>CAB-0045</small></td><td>Cabos e adaptadores</td><td>9</td><td><span class="pill pill-ok">0</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </div>
+
+      <div class="grow-1 stack">
+        <!-- Por categoria -->
+        <section class="card" aria-label="Empréstimos por categoria">
+          <div class="card-title"><h2>Por categoria</h2></div>
+          <div class="hbars">
+            <div><div class="hbar-head"><span>Notebooks</span><span>34</span></div><div class="hbar-track"><div class="hbar-fill" style="width:88%"></div></div></div>
+            <div><div class="hbar-head"><span>Projetores</span><span>24</span></div><div class="hbar-track"><div class="hbar-fill" style="width:62%"></div></div></div>
+            <div><div class="hbar-head"><span>Áudio e vídeo</span><span>19</span></div><div class="hbar-track"><div class="hbar-fill" style="width:49%"></div></div></div>
+            <div><div class="hbar-head"><span>Tablets</span><span>11</span></div><div class="hbar-track"><div class="hbar-fill" style="width:28%"></div></div></div>
+            <div><div class="hbar-head"><span>Cabos e adaptadores</span><span>8</span></div><div class="hbar-track"><div class="hbar-fill" style="width:21%"></div></div></div>
+          </div>
+        </section>
+
+        <!-- Por vínculo -->
+        <section class="card" aria-label="Empréstimos por vínculo">
+          <div class="card-title"><h2>Por vínculo</h2></div>
+          <div class="hbars">
+            <div><div class="hbar-head"><span>Alunos</span><span>58</span></div><div class="hbar-track"><div class="hbar-fill" style="width:90%"></div></div></div>
+            <div><div class="hbar-head"><span>Professores</span><span>27</span></div><div class="hbar-track"><div class="hbar-fill" style="width:42%"></div></div></div>
+            <div><div class="hbar-head"><span>Servidores</span><span>11</span></div><div class="hbar-track"><div class="hbar-fill" style="width:17%"></div></div></div>
+          </div>
+        </section>
+      </div>
+    </div></main>
+    </div>
+  </div>
+  <script src="../assets/js/auth.js"></script>
+  <script src="../assets/js/layout.js"></script>
+  <script src="../assets/js/dados-demo.js"></script>
+  <script src="../assets/js/api.js"></script>
+  <script src="../assets/js/salz-actions.js"></script>
+</body>
+</html>

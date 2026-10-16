@@ -32,10 +32,14 @@ textarea.input-block { resize: vertical; min-height: 88px; font-family: var(--fo
 .picked { display: flex; align-items: center; gap: 14px; padding: 14px 18px; border-radius: 20px; background: var(--surface-2); }
 .picked .item-icon { width: 48px; height: 48px; border-radius: 16px; background: var(--grad-cool); }
 .picked-info { flex: 1 1 auto; min-width: 0; }
+.picked > .pill { flex: none; }
+.picked .item-icon { flex: none; }
+.stat { min-width: 0; }
 
 /* condição do equipamento (radio em formato de chip) */
 .choices { display: flex; flex-wrap: wrap; gap: 10px; }
-.choices input { position: absolute; left: -9999px; }
+.choices { position: relative; }
+.choices input { position: absolute; opacity: 0; width: 1px; height: 1px; pointer-events: none; }
 .choice {
   border: 2px solid var(--line); background: var(--surface-2); color: var(--text-2);
   border-radius: var(--radius-pill); padding: 10px 18px; font-weight: 600; font-size: 15px; cursor: pointer;
@@ -45,7 +49,7 @@ textarea.input-block { resize: vertical; min-height: 88px; font-family: var(--fo
 .choices input:focus-visible + .choice { outline: 3px solid var(--cyan); outline-offset: 2px; }
 
 /* checklist de conferência */
-.checklist { display: flex; flex-direction: column; gap: 10px; padding: 16px 18px; border-radius: 20px; background: var(--surface-2); }
+.checklist { min-width: 0; border: 0; margin: 0; display: flex; flex-direction: column; gap: 10px; padding: 16px 18px; border-radius: 20px; background: var(--surface-2); }
 .check { display: flex; align-items: center; gap: 12px; font-size: 15px; cursor: pointer; }
 .check input { width: 20px; height: 20px; accent-color: var(--violet); flex: none; }
 
@@ -57,3 +61,4 @@ textarea.input-block { resize: vertical; min-height: 88px; font-family: var(--fo
   background: var(--surface-2); font-family: var(--font-title); font-weight: 600; flex: none;
 }
 .queue-info { flex: 1 1 auto; min-width: 0; }
+.queue .btn { flex: none; }
