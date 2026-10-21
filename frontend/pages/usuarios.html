@@ -113,7 +113,6 @@
                 </ol>
                 <div class="stack-sm">
                   <a class="btn btn-block" href="novo-emprestimo.html" data-novo-emprestimo>Novo empréstimo para ela</a>
-                  <button class="btn btn-line btn-block" type="button">Editar cadastro</button>
                 </div>
               </div>
             </aside>
@@ -445,7 +444,39 @@
 
       document.getElementById('ed-redefinir-senha').addEventListener('click', function () {
         if (!atual || !ehSistema(atual)) return;
-        alert('A ação de redefinição de senha precisa ser conectada à API de autenticação para enviar o link de redefinição.');
+
+        var email = (atual.dataset.sub || '').trim().toLowerCase();
+        var login = email.indexOf('@') > 0 ? email.split('@')[0] : '';
+        if (!login) {
+          alert('Este usuário não possui um e-mail/login identificável para associar à senha local.');
+          return;
+        }
+
+        var nova = prompt('Digite a nova senha para ' + (atual.dataset.nome || email) + ':');
+        if (nova === null) return;
+        nova = nova.trim();
+        if (nova.length < 6) {
+          alert('A senha deve ter pelo menos 6 caracteres.');
+          return;
+        }
+
+        var confirmar = prompt('Digite novamente a nova senha para confirmar:');
+        if (confirmar === null) return;
+        if (nova !== confirmar) {
+          alert('As senhas não coincidem. Nenhuma alteração foi feita.');
+          return;
+        }
+
+        try {
+          var chave = 'elo.senhas.demo';
+          var senhas = JSON.parse(localStorage.getItem(chave) || '{}');
+          senhas[login] = nova;
+          senhas[email] = nova;
+          localStorage.setItem(chave, JSON.stringify(senhas));
+          alert('Senha redefinida neste navegador para ' + (atual.dataset.nome || email) + '.');
+        } catch (erro) {
+          alert('Não foi possível salvar a senha neste navegador. Verifique se o armazenamento local está habilitado.');
+        }
       });
 
       /* ---------- etapa 1 do novo empréstimo ---------- */
