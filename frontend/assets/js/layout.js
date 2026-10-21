@@ -69,10 +69,9 @@ const EloUtil = {
       { id: "devolucoes", rotulo: "Devoluções", icone: "undo", href: "devolucoes.html" },
     ]},
     { grupo: "Administração", itens: [
-      { id: "solicitantes", rotulo: "Solicitantes", icone: "people", href: "solicitantes.html" },
+      { id: "solicitantes", rotulo: "Usuarios", icone: "people", href: "usuarios.html" },
       { id: "relatorios", rotulo: "Relatórios", icone: "chart", href: "relatorio.html" },
-      { id: "servidor", rotulo: "Servidor", icone: "server", href: "servidor.html" },
-      { id: "usuarios", rotulo: "Usuários", icone: "people-admin", href: "usuarios.html", admin: true },
+      { id: "servidor", rotulo: "Servidor", icone: "server", href: "servidor.html" }
     ]},
     { id: "perfil", rotulo: "Configuração do perfil", icone: "gear", href: "perfil.html" },
   ];
