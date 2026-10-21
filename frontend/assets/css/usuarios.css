@@ -40,3 +40,18 @@
 .input-block { width: 100%; border-radius: 16px; padding: 14px 18px; font-size: 16px; }
 #form-edicao[hidden], .pills[hidden], .stack-sm[hidden], #perm-acoes[hidden] { display: none; }
 #permissoes .check input:disabled { opacity: .7; cursor: default; }
+
+
+/* Ajustes dos filtros unificados e ações de cadastro */
+#filtros { display: flex; flex-wrap: wrap; gap: 8px; }
+#filtros .tab { white-space: nowrap; }
+#form-edicao .btn-line { border-color: var(--border, rgba(255,255,255,.16)); }
+#ed-remover-usuario { color: #e56b75; }
+#ed-remover-usuario:hover { background: rgba(229,107,117,.10); }
+#ed-redefinir-senha[hidden] { display: none; }
+@media (max-width: 760px) {
+  .filter-row { align-items: stretch; }
+  #filtros { width: 100%; }
+  #filtros .tab { flex: 1 1 auto; }
+  #tabela { min-width: 560px; }
+}

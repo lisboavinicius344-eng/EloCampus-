@@ -35,7 +35,7 @@
           <div class="toolbar">
             <label for="busca" class="sr-only">Buscar</label>
             <input class="input" id="busca" type="search" placeholder="Buscar usuário">
-            <button class="btn" type="button">+ Novo usuário</button>
+            <button class="btn" id="btn-novo-usuario" type="button">+ Novo usuário</button>
           </div>
         </header>
 
@@ -47,7 +47,6 @@
             <button class="tab" role="tab" aria-selected="false" type="button" data-filtro="servidor">Servidores</button>
             <button class="tab" role="tab" aria-selected="false" type="button" data-filtro="acesso:Administrador">Administradores</button>
             <button class="tab" role="tab" aria-selected="false" type="button" data-filtro="acesso:Estagiário">Estagiários</button>
-            <button class="tab" role="tab" aria-selected="false" type="button" data-filtro="acesso:Consulta">Consulta</button>
           </div>
         </div>
 
@@ -86,18 +85,20 @@
                 <div class="field" data-so="solicitante"><label for="ed-tel">Telefone</label><input class="input input-block" id="ed-tel" name="telefone" type="tel"></div>
                 <div class="field" data-so="solicitante"><label for="ed-vinculo">Vínculo</label>
                   <select class="input input-block" id="ed-vinculo" name="vinculo">
-                    <option>Aluno</option><option>Aluna</option><option>Professor</option><option>Professora</option><option>Servidor</option><option>Servidora</option><option>Grupo</option><option>Perfil</option>
+                    <option>Alunos</option><option>Professores</option><option>Servidores</option><option>Grupo</option><option>Perfil</option>
                   </select></div>
                 <div class="field" data-so="sistema"><label for="ed-perfil">Perfil de acesso</label>
                   <select class="input input-block" id="ed-perfil" name="perfil">
-                    <option>Administrador</option><option>Estagiário</option><option>Consulta</option>
+                    <option>Administrador</option><option>Estagiário</option>
                   </select></div>
                 <div class="field" data-so="sistema"><label for="ed-status">Status</label>
                   <select class="input input-block" id="ed-status" name="status">
-                    <option>Ativo</option><option>Convite pendente</option><option>Desativado</option>
+                    <option>Ativo</option><option>Desativado</option>
                   </select></div>
                 <div class="stack-sm">
                   <button class="btn btn-block" type="submit">Salvar alterações</button>
+                  <button class="btn btn-line btn-block" type="button" id="ed-redefinir-senha" hidden>Redefinir senha</button>
+                  <button class="btn btn-line btn-block" type="button" id="ed-remover-usuario">Remover usuário</button>
                   <button class="btn btn-line btn-block" type="button" id="ed-cancelar">Cancelar</button>
                 </div>
               </form>
@@ -215,13 +216,6 @@
                     <td><span class="pill pill-ok">Ativo</span></td>
                     <td><button class="btn btn-sm btn-line" type="button" data-editar>Editar</button></td>
                   </tr>
-                  <tr data-tipo="equipe" data-grupo="sistema" data-nome="Biblioteca" data-sub="biblioteca@lapa.edu.br" data-perfil="Consulta"
-                      data-status="Convite pendente" data-pill="pill-warn" data-ultimo="12/10 · 10:05" data-perm="">
-                    <td><strong>Biblioteca</strong><small>biblioteca@lapa.edu.br</small></td>
-                    <td>Consulta</td><td>12/10 · 10:05</td>
-                    <td><span class="pill pill-warn">Convite pendente</span></td>
-                    <td><button class="btn btn-sm btn-line" type="button" data-editar>Editar</button></td>
-                  </tr>
                   <tr class="is-late" data-tipo="equipe" data-grupo="sistema" data-nome="Rafael Teixeira" data-sub="rafael.teixeira@lapa.edu.br" data-perfil="Estagiário"
                       data-status="Desativado" data-pill="pill-late" data-ultimo="28/09 · 16:20" data-perm="">
                     <td><strong>Rafael Teixeira</strong><small>rafael.teixeira@lapa.edu.br</small></td>
@@ -305,7 +299,7 @@
             box.appendChild(s); box.appendChild(d); li.appendChild(dot); li.appendChild(box); lista.appendChild(li);
           });
           var link = painel.querySelector('[data-novo-emprestimo]');
-          link.textContent = 'Novo empréstimo para ' + (/a$/i.test(tr.dataset.vinculo || '') ? 'ela' : 'ele');
+          link.textContent = 'Novo empréstimo para ' + (tr.dataset.vinculo === 'Grupo' || tr.dataset.vinculo === 'Perfil' ? 'este cadastro' : 'esta pessoa');
           link.dataset.nome = tr.dataset.nome; link.dataset.matricula = tr.dataset.matricula || ''; link.dataset.vinculo = tr.dataset.vinculo || '';
         }
       }
@@ -321,6 +315,7 @@
         form.querySelectorAll('[data-so]').forEach(function (e) { e.hidden = (e.dataset.so === 'sistema') !== sistema; });
         document.getElementById('ed-nome').value = atual.dataset.nome;
         document.getElementById('ed-email').value = sistema ? atual.dataset.sub : (atual.dataset.email || '');
+        document.getElementById('ed-redefinir-senha').hidden = !sistema;
         if (sistema) {
           document.getElementById('ed-perfil').value = atual.dataset.perfil;
           document.getElementById('ed-status').value = atual.dataset.status;
@@ -329,7 +324,7 @@
           document.getElementById('perm-acoes').hidden = true;
         } else {
           document.getElementById('ed-tel').value = atual.dataset.telefone || '';
-          document.getElementById('ed-vinculo').value = atual.dataset.vinculo || 'Aluno';
+          document.getElementById('ed-vinculo').value = atual.dataset.vinculo || 'Alunos';
         }
         document.getElementById('ed-nome').focus();
       }
@@ -367,7 +362,7 @@
           tr.dataset.email = email; tr.dataset.telefone = document.getElementById('ed-tel').value.trim();
           tr.dataset.vinculo = vinc; tr.dataset.tipo = tipoDe(vinc);
           tr.dataset.sub = vinc + (resto ? ' · ' + resto : '');
-          tds[0].children[0].textContent = nome;
+          tds[0].children[0].textContent = nome; tds[0].children[1].textContent = (tr.dataset.matricula ? 'Matrícula ' + tr.dataset.matricula : (tr.dataset.email || 'Cadastro atualizado'));
           tds[1].textContent = vinc;
         }
         editando = false; form.hidden = true;
@@ -416,6 +411,42 @@
       });
       form.addEventListener('submit', salvar);
       document.getElementById('ed-cancelar').addEventListener('click', function () { sairEdicao(); });
+
+
+      /* ---------- criar usuário ---------- */
+      var criando = false;
+      document.getElementById('btn-novo-usuario').addEventListener('click', function () {
+        var tr = document.createElement('tr');
+        tr.dataset.tipo = 'aluno'; tr.dataset.grupo = 'solicitante';
+        tr.dataset.nome = ''; tr.dataset.sub = 'Alunos'; tr.dataset.vinculo = 'Alunos';
+        tr.dataset.status = 'Situação regular'; tr.dataset.pill = 'pill-ok';
+        tr.dataset.email = ''; tr.dataset.telefone = ''; tr.dataset.total = '0'; tr.dataset.mov = '[]';
+        tr.innerHTML = '<td><strong>Novo usuário</strong><small>Cadastro em edição</small></td><td>Alunos</td><td>Nenhum</td><td><span class="pill pill-ok">Regular</span></td><td><button class="btn btn-sm btn-line" type="button" data-editar>Editar</button></td>';
+        document.querySelector('#tabela tbody').appendChild(tr);
+        linhas.push(tr); criando = true;
+        escolherAba('todos'); selecionar(tr); entrarEdicao();
+        document.getElementById('ed-nome').value = '';
+        document.getElementById('ed-email').value = '';
+        document.getElementById('ed-tel').value = '';
+        document.getElementById('ed-nome').focus();
+      });
+
+      document.getElementById('ed-remover-usuario').addEventListener('click', function () {
+        if (!atual) return;
+        if (!confirm('Tem certeza de que deseja remover este usuário?')) return;
+        var removida = atual;
+        linhas = linhas.filter(function (l) { return l !== removida; });
+        removida.remove(); atual = null; editando = false; form.hidden = true;
+        vistaCampos.forEach(function (e) { e.hidden = false; });
+        permissoes.hidden = true; vistaSol.hidden = true;
+        if (linhas.length) selecionar(linhas.filter(function (l) { return !l.hidden; })[0] || linhas[0]);
+        contar(); aplicar();
+      });
+
+      document.getElementById('ed-redefinir-senha').addEventListener('click', function () {
+        if (!atual || !ehSistema(atual)) return;
+        alert('A ação de redefinição de senha precisa ser conectada à API de autenticação para enviar o link de redefinição.');
+      });
 
       /* ---------- etapa 1 do novo empréstimo ---------- */
       if (fluxo) {
