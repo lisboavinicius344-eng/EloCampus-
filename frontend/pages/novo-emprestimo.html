@@ -17,11 +17,11 @@
   <script>
     // Sem solicitante escolhido, volta para a etapa 1 (lista de solicitantes).
     if (!new URLSearchParams(location.search).get('nome')) {
-      location.replace('solicitantes.html?origem=novo-emprestimo');
+      location.replace('usuarios.html?origem=novo-emprestimo');
     }
   </script>
 </head>
-<body data-pagina="solicitantes">
+<body data-pagina="emprestimos">
   <div class="app">
     <aside class="sidebar" id="sidebar"></aside>
     <div class="content">
@@ -54,7 +54,7 @@
                 <option value="Juliana Rocha · 2023076">
                 <option value="Lucas Ferreira · 2024203">
               </datalist>
-              <span class="hint">Definido na etapa anterior. <a href="solicitantes.html?origem=novo-emprestimo">Alterar solicitante</a></span>
+              <span class="hint">Definido na etapa anterior. <a href="usuarios.html?origem=novo-emprestimo">Alterar solicitante</a></span>
             </div>
             <div class="field">
               <label for="vinculo">Vínculo</label>
@@ -73,26 +73,13 @@
           <div class="add-row">
             <div class="field">
               <label for="equip">Adicionar por nome, patrimônio ou QR Code</label>
-              <input class="input input-block" id="equip" type="search" placeholder="Ex.: LAP-0142">
+              <input class="input input-block" id="equip" type="search" list="lista-equipamentos" placeholder="Ex.: LAP-0142" autocomplete="off"><datalist id="lista-equipamentos"></datalist>
             </div>
-            <button class="btn btn-line" type="button">+ Adicionar</button>
+            <button class="btn btn-line" id="adicionar-equip" type="button">+ Adicionar</button>
           </div>
 
-          <div class="picked-list">
-            <div class="picked">
-              <div class="picked-icon">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h16v11H4zM2 19h20"/></svg>
-              </div>
-              <div class="picked-info"><strong>Notebook Dell Latitude</strong><small>LAP-0142 · Sala TI</small></div>
-              <button class="icon-btn" type="button" aria-label="Remover Notebook Dell Latitude">×</button>
-            </div>
-            <div class="picked">
-              <div class="picked-icon cool">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 3v6a3 3 0 0 0 3 3h8a3 3 0 0 1 3 3v6M3 3h4M17 21h4"/></svg>
-              </div>
-              <div class="picked-info"><strong>Cabo HDMI 3 m</strong><small>CAB-0045 · Sala TI</small></div>
-              <button class="icon-btn" type="button" aria-label="Remover Cabo HDMI 3 m">×</button>
-            </div>
+          <div class="picked-list" id="lista-equipamentos-selecionados" aria-live="polite">
+            <p class="muted" id="nenhum-equipamento">Nenhum equipamento selecionado.</p>
           </div>
         </section>
 
@@ -101,11 +88,11 @@
           <div class="form-row">
             <div class="field">
               <label for="retirada">Retirada</label>
-              <input class="input input-block" id="retirada" name="retirada" type="datetime-local" value="2026-10-15T15:20" required>
+              <input class="input input-block" id="retirada" name="retirada" type="datetime-local" required>
             </div>
             <div class="field">
               <label for="devolucao">Devolução prevista</label>
-              <input class="input input-block" id="devolucao" name="devolucao" type="datetime-local" value="2026-10-16T18:00" required>
+              <input class="input input-block" id="devolucao" name="devolucao" type="datetime-local" required>
             </div>
           </div>
           <div class="form-row">
@@ -132,18 +119,29 @@
         <h2>Resumo</h2>
         <div class="stack-sm">
           <div class="summary-row"><span>Solicitante</span><strong id="resumo-solicitante">—</strong></div>
-          <div class="summary-row"><span>Itens</span><strong>2 equipamentos</strong></div>
-          <div class="summary-row"><span>Retirada</span><strong>15/10 · 15:20</strong></div>
-          <div class="summary-row"><span>Devolução</span><strong>16/10 · 18:00</strong></div>
+          <div class="summary-row"><span>Itens</span><strong id="resumo-itens">0 equipamentos</strong></div>
+          <div class="summary-row"><span>Retirada</span><strong id="resumo-retirada">—</strong></div>
+          <div class="summary-row"><span>Devolução</span><strong id="resumo-devolucao">—</strong></div>
         </div>
         <label class="terms">
           <input type="checkbox" required>
           Li e aceito o termo de responsabilidade de uso do equipamento.
         </label>
-        <button class="btn btn-white btn-block" type="submit">Registrar empréstimo</button>
+        <button class="btn btn-white btn-block" type="submit">Revisar empréstimo</button>
         <a class="cancel" href="emprestimos.html">Cancelar</a>
       </aside>
-    </form></main>
+    </form>
+    <div id="emprestimo-mensagem" class="alert" role="status" hidden style="margin-top:1rem"></div>
+    <section class="card stack" id="revisao-emprestimo" hidden aria-labelledby="titulo-revisao" style="margin-top:1rem">
+      <h2 id="titulo-revisao">Confirmar empréstimo</h2>
+      <p class="muted">Confira os dados antes de registrar a retirada neste navegador.</p>
+      <div id="resumo-revisao"></div>
+      <div class="stack-sm">
+        <button class="btn btn-block" type="button" id="confirmar-emprestimo">Confirmar empréstimo</button>
+        <button class="btn btn-line btn-block" type="button" id="voltar-edicao">Voltar e corrigir</button>
+      </div>
+    </section>
+    </main>
     </div>
   </div>
   <script>
@@ -170,6 +168,8 @@
   <script src="../assets/js/auth.js"></script>
   <script src="../assets/js/layout.js"></script>
   <script src="../assets/js/dados-demo.js"></script>
+  <script src="../assets/js/visuais.js"></script>
+  <script src="../assets/js/runtime-config.js"></script>
   <script src="../assets/js/api.js"></script>
   <script src="../assets/js/salz-actions.js"></script><script src="../assets/js/fluxo-emprestimos.js"></script>
 </body>

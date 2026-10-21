@@ -37,17 +37,17 @@
       <div class="card stat">
         <div class="stat-icon main"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l3 3 5-6"/></svg>
         </div>
-        <div><div class="stat-value">5</div><div class="stat-label">Devolvidos hoje</div></div>
+        <div><div class="stat-value" id="devolvidos-hoje">0</div><div class="stat-label">Devolvidos hoje</div></div>
       </div>
       <div class="card stat">
         <div class="stat-icon cool"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
         </div>
-        <div><div class="stat-value">3</div><div class="stat-label">Aguardando hoje</div></div>
+        <div><div class="stat-value" id="aguardando-hoje">0</div><div class="stat-label">Aguardando hoje</div></div>
       </div>
       <div class="card stat">
         <div class="stat-icon warm"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 9v4M12 17h.01M10.3 3.9L1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg>
         </div>
-        <div><div class="stat-value">1</div><div class="stat-label">Com avaria</div></div>
+        <div><div class="stat-value" id="com-avaria">0</div><div class="stat-label">Com avaria</div></div>
       </div>
     </section>
 
@@ -58,9 +58,9 @@
           <div class="card-title">
             <h2>Devoluções recentes</h2>
             <div class="tabs" role="tablist" aria-label="Período">
-              <button class="tab" role="tab" aria-selected="true" type="button">Hoje</button>
-              <button class="tab" role="tab" aria-selected="false" type="button">Semana</button>
-              <button class="tab" role="tab" aria-selected="false" type="button">Mês</button>
+              <button class="tab" role="tab" aria-selected="true" type="button" data-periodo="hoje">Hoje</button>
+              <button class="tab" role="tab" aria-selected="false" type="button" data-periodo="semana">Semana</button>
+              <button class="tab" role="tab" aria-selected="false" type="button" data-periodo="mes">Mês</button>
             </div>
           </div>
           <div class="table-wrap">
@@ -70,94 +70,45 @@
                   <th>Equipamento</th><th>Devolvido por</th><th>Data e hora</th><th>Condição</th>
                 </tr>
               </thead>
-              <tbody>
-                <tr>
-                  <td><strong>Notebook Dell Latitude</strong><small>LAP-0142</small></td>
-                  <td>Mariana Costa</td><td>15/10 · 13:20</td>
-                  <td><span class="pill pill-ok">Perfeito</span></td>
-                </tr>
-                <tr>
-                  <td><strong>Câmera Canon T7</strong><small>CAM-0004</small></td>
-                  <td>Lucas Ferreira</td><td>15/10 · 11:05</td>
-                  <td><span class="pill pill-warn">Incompleto</span></td>
-                </tr>
-                <tr class="is-late">
-                  <td><strong>Caixa de som JBL</strong><small>AUD-0031</small></td>
-                  <td>Grêmio Estudantil</td><td>15/10 · 09:40</td>
-                  <td><span class="pill pill-late">Com avaria</span></td>
-                </tr>
-                <tr>
-                  <td><strong>Tablet Samsung Tab A</strong><small>TAB-0008</small></td>
-                  <td>Juliana Rocha</td><td>15/10 · 08:55</td>
-                  <td><span class="pill pill-ok">Perfeito</span></td>
-                </tr>
-                <tr>
-                  <td><strong>Cabo HDMI 3 m</strong><small>CAB-0045</small></td>
-                  <td>Beatriz Lima</td><td>15/10 · 08:10</td>
-                  <td><span class="pill pill-ok">Perfeito</span></td>
-                </tr>
-              </tbody>
+              <tbody id="lista-devolucoes-recentes"><tr><td colspan="4" class="muted">Carregando devoluções…</td></tr></tbody>
             </table>
           </div>
         </section>
 
         <section class="card" aria-label="Aguardando devolução hoje">
           <div class="card-title"><h2>Aguardando hoje</h2></div>
-          <ul class="queue">
-            <li>
-              <div class="queue-time">15:00</div>
-              <div class="queue-info"><strong>Projetor Epson X49</strong><div class="muted small">Prof. Ricardo Alves</div></div>
-              <button class="btn btn-sm" type="button">Receber</button>
-            </li>
-            <li>
-              <div class="queue-time">16:30</div>
-              <div class="queue-info"><strong>Microfone sem fio</strong><div class="muted small">Coord. de Eventos</div></div>
-              <button class="btn btn-sm" type="button">Receber</button>
-            </li>
-            <li>
-              <div class="queue-time">17:45</div>
-              <div class="queue-info"><strong>Notebook Lenovo IdeaPad</strong><div class="muted small">Carlos Menezes</div></div>
-              <button class="btn btn-sm" type="button">Receber</button>
-            </li>
-          </ul>
+          <ul class="queue" id="fila-devolucao"><li class="muted">Carregando itens com devolução prevista para hoje…</li></ul>
         </section>
       </div>
 
       <!-- Formulário -->
       <aside class="card grow-1" aria-label="Registrar devolução">
-        <form class="form">
+        <form class="form" id="form-devolucao">
           <h2>Registrar devolução</h2>
 
           <div class="field">
             <label for="patrimonio">Patrimônio ou QR Code</label>
-            <input class="input input-block" id="patrimonio" type="search" placeholder="Ex.: AUD-0031" value="AUD-0031">
+            <input class="input input-block" id="patrimonio" type="search" placeholder="Use o botão Devolver na lista de empréstimos" autocomplete="off" readonly>
           </div>
 
-          <div class="picked">
-            <div class="item-icon">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h12v18H6zM12 14a3 3 0 1 0 0 .01M12 7h.01"/></svg>
-            </div>
-            <div class="picked-info">
-              <strong>Caixa de som JBL</strong>
-              <div class="muted small">Grêmio Estudantil · retirada em 08/10</div>
-            </div>
-            <span class="pill pill-late">Atrasado</span>
+          <div class="picked-list" id="itens-devolucao" aria-live="polite">
+            <p class="muted">Abra uma devolução pela página de Empréstimos para carregar os dados do registro.</p>
           </div>
 
           <div class="field" role="radiogroup" aria-labelledby="cond-label">
             <span class="label" id="cond-label">Condição do equipamento</span>
             <div class="choices">
-              <input type="radio" name="condicao" id="c1" checked><label class="choice" for="c1">Perfeito</label>
-              <input type="radio" name="condicao" id="c2"><label class="choice" for="c2">Incompleto</label>
-              <input type="radio" name="condicao" id="c3"><label class="choice" for="c3">Com avaria</label>
+              <input type="radio" name="condicao" id="c1" value="Perfeito" checked><label class="choice" for="c1">Perfeito</label>
+              <input type="radio" name="condicao" id="c2" value="Incompleto"><label class="choice" for="c2">Incompleto</label>
+              <input type="radio" name="condicao" id="c3" value="Com avaria"><label class="choice" for="c3">Com avaria</label>
             </div>
           </div>
 
           <fieldset class="checklist">
             <legend class="sr-only">Conferência</legend>
-            <label class="check"><input type="checkbox" checked> Cabos e acessórios conferidos</label>
-            <label class="check"><input type="checkbox" checked> Equipamento limpo e sem danos visíveis</label>
-            <label class="check"><input type="checkbox"> Pessoa assinou o recebimento</label>
+            <label class="check"><input type="checkbox" id="acessorios-conferidos"> Cabos e acessórios conferidos</label>
+            <label class="check"><input type="checkbox" id="equipamento-conferido"> Equipamento limpo e sem danos visíveis</label>
+            <label class="check"><input type="checkbox" id="assinatura-recebida"> Pessoa assinou o recebimento</label>
           </fieldset>
 
           <div class="field">
@@ -166,9 +117,10 @@
           </div>
 
           <div class="stack-sm">
-            <button class="btn btn-block" type="submit">Confirmar devolução</button>
+            <button class="btn btn-block" id="confirmar-devolucao" type="submit">Revisar devolução</button>
             <a class="btn btn-line btn-block" href="emprestimos.html">Cancelar</a>
           </div>
+          <div id="mensagem-devolucao" class="alert" role="status" hidden></div>
         </form>
       </aside>
     </div></main>
@@ -177,6 +129,7 @@
   <script src="../assets/js/auth.js"></script>
   <script src="../assets/js/layout.js"></script>
   <script src="../assets/js/dados-demo.js"></script>
+  <script src="../assets/js/runtime-config.js"></script>
   <script src="../assets/js/api.js"></script>
   <script src="../assets/js/salz-actions.js"></script><script src="../assets/js/emprestimos-ui.js"></script>
 </body>

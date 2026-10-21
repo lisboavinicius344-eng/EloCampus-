@@ -6,6 +6,8 @@ const DASHBOARD_URL = "pages/dashboard.html";
 const CONTAS_DEMO = [
   { login: "admin", senha: "admin123", nome: "Administrador", perfil: "administrador", email: "admin@instituicao.edu.br", telefone: "(77) 99999-0000", matricula: "ADM-0001", setor: "Direção", instituicao: "Instituição de Ensino", campus: "Campus Lapa" },
   { login: "operador", senha: "operador123", nome: "Operador", perfil: "operador", email: "operador@instituicao.edu.br", telefone: "(77) 98888-1111", matricula: "SRV-0024", setor: "Coordenação de TI", instituicao: "Instituição de Ensino", campus: "Campus Lapa" },
+  { login: "aluno", senha: "aluno123", nome: "Mariana Costa", perfil: "aluno", email: "mariana@lapa.edu.br", matricula: "2024118", instituicao: "Instituição de Ensino", campus: "Campus Lapa" },
+  { login: "professor", senha: "professor123", nome: "Prof. Ricardo Alves", perfil: "professor", email: "ricardo.alves@lapa.edu.br", matricula: "SIAPE 1048873", instituicao: "Instituição de Ensino", campus: "Campus Lapa" },
 ];
 async function autenticar(login, senha) { await new Promise(r => setTimeout(r, 350)); const conta=CONTAS_DEMO.find(c=>c.login===login&&c.senha===senha); if(!conta) throw new Error("Usuário ou senha incorretos. Confira os dados e tente de novo."); return {...conta, token:"demo"}; }
 function salvarSessao(sessao, lembrar=false) { const alvo=lembrar?localStorage:sessionStorage; alvo.setItem(SESSION_KEY, JSON.stringify(sessao)); if(lembrar) sessionStorage.removeItem(SESSION_KEY); else localStorage.removeItem(SESSION_KEY); }

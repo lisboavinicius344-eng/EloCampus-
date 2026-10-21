@@ -114,9 +114,10 @@
 
   // Confirmação vinda do formulário (equipamentos.html?salvo=criado|editado)
   const salvo = new URLSearchParams(window.location.search).get("salvo");
-  if (salvo === "criado" || salvo === "editado" || salvo === "removido") {
+  if (["criado", "editado", "removido", "arquivado"].includes(salvo)) {
+    const mensagem = salvo === "criado" ? "Equipamento salvo localmente." : salvo === "editado" ? "Alterações salvas localmente." : salvo === "arquivado" ? "Equipamento retirado de uso; histórico preservado." : "Equipamento retirado com segurança.";
     $("filtros").insertAdjacentHTML("beforebegin",
-      `<div class="alert alert-ok" role="status" style="margin-bottom:1.25rem">${salvo === "criado" ? "Equipamento salvo." : salvo === "editado" ? "Alterações salvas." : "Equipamento retirado com segurança."}</div>`);
+      `<div class="alert alert-ok" role="status" style="margin-bottom:1.25rem">${mensagem} A alteração está neste navegador e não foi enviada a um servidor.</div>`);
     history.replaceState(null, "", window.location.pathname);
   }
 

@@ -37,6 +37,14 @@ const EloUtil = {
   const publico = document.body.dataset.publico === "true";
   if (!sessao && !publico) { window.location.replace("../index.html"); return; }
   if (!sessao) sessao = { nome: "Consulta pública", perfil: "visitante" };
+  const perfilAtual = String(sessao.perfil || "").toLowerCase();
+  const equipe = ["administrador", "operador"].includes(perfilAtual);
+  const usuarioFinal = ["aluno", "professor"].includes(perfilAtual);
+  const paginaAtual = document.body.dataset.pagina;
+  const arquivoAtual = window.location.pathname.split("/").pop();
+  const paginasRestritas = ["devolucoes.html", "movimentacoes.html", "usuarios.html", "relatorio.html", "servidor.html", "equipamento-form.html", "novo-emprestimo.html"];
+  if (usuarioFinal && paginasRestritas.includes(arquivoAtual)) { window.location.replace("dashboard.html"); return; }
+  document.body.dataset.perfil = perfilAtual;
 
   const ICONES = {
     home: '<path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/>',
@@ -62,30 +70,31 @@ const EloUtil = {
     { grupo: "Acervo", itens: [
       { id: "equipamentos", rotulo: "Equipamentos", icone: "box", href: "equipamentos.html" },
       { id: "consulta-qr", rotulo: "Consulta por QR Code", icone: "box", href: "consulta-qr-interno.html" },
-      { id: "movimentacoes", rotulo: "Histórico de movimentações", icone: "swap", href: "movimentacoes.html" },
     ]},
     { grupo: "Empréstimos e devoluções", itens: [
       { id: "emprestimos", rotulo: "Empréstimos", icone: "swap", href: "emprestimos.html" },
-      { id: "devolucoes", rotulo: "Devoluções", icone: "undo", href: "devolucoes.html" },
+      { id: "devolucoes", rotulo: "Devoluções", icone: "undo", href: "devolucoes.html", admin: true },
     ]},
     { grupo: "Administração", itens: [
-      { id: "solicitantes", rotulo: "Usuarios", icone: "people", href: "usuarios.html" },
-      { id: "relatorios", rotulo: "Relatórios", icone: "chart", href: "relatorio.html" },
-      { id: "servidor", rotulo: "Servidor", icone: "server", href: "servidor.html" }
+      { id: "movimentacoes", rotulo: "Histórico de movimentações", icone: "swap", href: "movimentacoes.html", admin: true },
+      { id: "usuarios", rotulo: "Usuários", icone: "people", href: "usuarios.html", admin: true },
+      { id: "relatorios", rotulo: "Relatórios", icone: "chart", href: "relatorio.html", admin: true },
+      { id: "servidor", rotulo: "Servidor", icone: "server", href: "servidor.html", admin: true }
     ]},
     { id: "perfil", rotulo: "Configuração do perfil", icone: "gear", href: "perfil.html" },
   ];
 
   const atual = document.body.dataset.pagina;
+  const itemPermitido = (i) => (!i.admin || equipe) && (!usuarioFinal || ["painel", "equipamentos", "consulta-qr", "emprestimos", "perfil"].includes(i.id));
   const itemHtml = (i) => {
-    if (i.admin && sessao.perfil !== "administrador") return "";
+    if (!itemPermitido(i)) return "";
     const ativo = i.id === atual;
     const icon = svg(i.icone);
     return `<li><a class="nav-item${ativo ? " is-active" : ""}" href="${i.href}"${ativo ? ' aria-current="page"' : ""}>${icon}<span>${i.rotulo}</span></a></li>`;
   };
   const itens = NAV.map((item) => {
     if (!item.grupo) return itemHtml(item);
-    const visiveis = item.itens.filter((i) => !i.admin || sessao.perfil === "administrador");
+    const visiveis = item.itens.filter(itemPermitido);
     if (!visiveis.length) return "";
     const aberto = visiveis.some((i) => i.id === atual);
     return `<li class="nav-section"><details${aberto ? " open" : ""}><summary><span>${item.grupo}</span><b aria-hidden="true">›</b></summary><ul>${visiveis.map(itemHtml).join("")}</ul></details></li>`;
@@ -110,6 +119,15 @@ const EloUtil = {
   document.getElementById("topbar").innerHTML = `
     <button class="topbar-btn" type="button" id="btn-menu" aria-controls="sidebar" aria-expanded="false" aria-label="Abrir menu">${svg("menu")}</button>
     <span class="topbar-brand"><img src="../assets/img/logo.png" alt="">ELO Campus</span>`;
+
+  if (usuarioFinal) {
+    document.querySelectorAll('a[href="novo-emprestimo.html"], a[href="equipamento-form.html"], a[href="devolucoes.html"], a[href="movimentacoes.html"], a[href="relatorio.html"], a[href="usuarios.html"], a[href="servidor.html"]').forEach((el) => { el.hidden = true; el.style.display = "none"; });
+    document.querySelectorAll('#editar, #retirar, #confirmar-exclusao, [data-editar], #btn-novo-usuario').forEach((el) => { el.hidden = true; el.disabled = true; el.style.display = "none"; });
+    if (paginaAtual === "painel") {
+      const titulo = document.querySelector(".page-head h1");
+      if (titulo) titulo.textContent = "Painel";
+    }
+  }
 
   const scrim = document.createElement("div");
   scrim.className = "scrim";

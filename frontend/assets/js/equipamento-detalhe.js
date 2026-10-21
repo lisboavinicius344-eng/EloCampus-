@@ -45,8 +45,8 @@
       botao.disabled = true;
       botao.textContent = "Retirando…";
       try {
-        await ELO.removerEquipamento(id);
-        location.href = "equipamentos.html?salvo=removido";
+        const resultado = await ELO.removerEquipamento(id);
+        location.href = `equipamentos.html?salvo=${resultado?.arquivado ? "arquivado" : "removido"}`;
       } catch (err) {
         $("modal-exclusao").hidden = true;
         erro.textContent = err.message;

@@ -63,7 +63,7 @@
             return `<tr>
               <td class="cell-main"><strong>${esc(l.equipamento.nome)}</strong><small>${esc(l.equipamento.patrimonio)}</small></td>
               <td>${esc(l.solicitante.nome)}</td>
-              <td>${data(l.prevista)}</td>
+              <td>${dataHora(l.prevista)}</td>
               <td><span class="badge badge-${p.classe}">${p.texto}</span></td>
             </tr>`;
           }).join("")}
@@ -89,20 +89,24 @@
   }
 
   try {
-    let locais = [];
-    try { locais = JSON.parse(localStorage.getItem("elo.demo.movimentacoes") || "[]"); } catch {}
-    const [resumo, emprestimosApi, movsApi] = await Promise.all([
+    const [resumo, todosEmprestimos, todasMovimentacoes] = await Promise.all([
       ELO.resumoDashboard(),
       ELO.emprestimos(),
       ELO.movimentacoes(),
     ]);
-    const extras = Array.isArray(locais) ? locais : [];
-    const emprestimos = [...emprestimosApi, ...extras.filter((x) => x.ativa).map((x, i) => ({ id: `local-${i}`, equipamento: x.equipamento, solicitante: { nome: x.detalhe }, prevista: x.prevista, devolvida: null }))];
-    const movs = [...extras, ...movsApi];
+    const sessao = typeof obterSessao === "function" ? obterSessao() : null;
+    const perfilFinal = ["aluno", "professor"].includes(String(sessao?.perfil || "").toLowerCase());
+    const chaveNome = (s) => String(s || "").toLocaleLowerCase("pt-BR").normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    const emprestimos = perfilFinal ? todosEmprestimos.filter((l) => chaveNome(l.solicitante?.nome) === chaveNome(sessao.nome)) : todosEmprestimos;
+    const movimentacoes = perfilFinal ? todasMovimentacoes.filter((m) => chaveNome(m.detalhe).includes(chaveNome(sessao.nome))) : todasMovimentacoes;
     renderKpis(resumo);
     renderDistribuicao(resumo);
     renderAcompanhar(emprestimos);
-    renderMovimentacoes(movs);
+    renderMovimentacoes(movimentacoes);
+    if (perfilFinal) {
+      const titulo = $("t-acomp"); if (titulo) titulo.textContent = "Meus empréstimos";
+      const tituloMov = $("t-movs"); if (tituloMov) tituloMov.textContent = "Minhas movimentações";
+    }
   } catch (err) {
     ["kpis", "dist", "acompanhar", "movs"].forEach((id) => { const el = $(id); if (el) el.innerHTML = ""; });
     const erro = $("erro");

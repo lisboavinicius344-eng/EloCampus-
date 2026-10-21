@@ -32,9 +32,9 @@
     </header>
  
     <div class="tabs" role="tablist" aria-label="Filtro">
-      <button class="tab" role="tab" aria-selected="true" type="button">Ativos · 17</button>
-      <button class="tab" role="tab" aria-selected="false" type="button">Atrasados · 3</button>
-      <button class="tab" role="tab" aria-selected="false" type="button">Histórico</button>
+      <button class="tab" role="tab" aria-selected="true" type="button" data-filtro="ativos">Ativos</button>
+      <button class="tab" role="tab" aria-selected="false" type="button" data-filtro="atrasados">Atrasados</button>
+      <button class="tab" role="tab" aria-selected="false" type="button" data-filtro="historico">Histórico</button>
     </div>
  
     <div class="split">
@@ -48,44 +48,7 @@
                 <th><span class="sr-only">Ação</span></th>
               </tr>
             </thead>
-            <tbody>
-              <tr class="is-late">
-                <td><strong>Caixa de som JBL</strong><small>AUD-0031</small></td>
-                <td>Grêmio Estudantil</td><td>10/10</td>
-                <td><span class="pill pill-late">Atrasado</span></td>
-                <td><button class="btn btn-sm" type="button">Devolver</button></td>
-              </tr>
-              <tr>
-                <td><strong>Projetor Epson X49</strong><small>PRJ-0017</small></td>
-                <td>Prof. Ricardo Alves</td><td>14/10</td>
-                <td><span class="pill pill-warn">Vence hoje</span></td>
-                <td><button class="btn btn-sm" type="button">Devolver</button></td>
-              </tr>
-              <tr>
-                <td><strong>Notebook Dell Latitude</strong><small>LAP-0142</small></td>
-                <td>Mariana Costa</td><td>15/10</td>
-                <td><span class="pill pill-ok">Em dia</span></td>
-                <td><button class="btn btn-sm" type="button">Devolver</button></td>
-              </tr>
-              <tr>
-                <td><strong>Tablet Samsung Tab A</strong><small>TAB-0008</small></td>
-                <td>Juliana Rocha</td><td>16/10</td>
-                <td><span class="pill pill-ok">Em dia</span></td>
-                <td><button class="btn btn-sm" type="button">Devolver</button></td>
-              </tr>
-              <tr>
-                <td><strong>Câmera Canon T7</strong><small>CAM-0004</small></td>
-                <td>Lucas Ferreira</td><td>17/10</td>
-                <td><span class="pill pill-ok">Em dia</span></td>
-                <td><button class="btn btn-sm" type="button">Devolver</button></td>
-              </tr>
-              <tr>
-                <td><strong>Microfone sem fio</strong><small>AUD-0012</small></td>
-                <td>Coord. de Eventos</td><td>17/10</td>
-                <td><span class="pill pill-ok">Em dia</span></td>
-                <td><button class="btn btn-sm" type="button">Devolver</button></td>
-              </tr>
-            </tbody>
+            <tbody id="lista-emprestimos"><tr><td colspan="5" class="muted">Carregando empréstimos…</td></tr></tbody>
           </table>
         </div>
       </section>
@@ -97,18 +60,14 @@
             <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h12v18H6zM12 14a3 3 0 1 0 0 .01M12 7h.01"/></svg>
           </div>
           <div>
-            <h2 style="font-size:22px">Caixa de som JBL</h2>
-            <div class="muted" style="font-size:14px">AUD-0031 · Grêmio Estudantil</div>
+            <h2 style="font-size:22px" id="detalhe-nome">Selecione um empréstimo</h2>
+            <div class="muted" style="font-size:14px" id="detalhe-sub">Os detalhes aparecerão aqui.</div>
           </div>
         </div>
-        <span class="pill pill-late" style="align-self:flex-start">Atrasado há 4 dias</span>
-        <ol class="timeline">
-          <li><span class="dot dot-purple"></span><div><strong>Retirada registrada</strong><div class="muted">08/10 · 09:15 · por Estagiário TI</div></div></li>
-          <li><span class="dot dot-cyan"></span><div><strong>Devolução prevista</strong><div class="muted">10/10 · 18:00</div></div></li>
-          <li><span class="dot dot-pink"></span><div><strong>Lembrete enviado</strong><div class="muted">11/10 · 08:00 · e-mail automático</div></div></li>
-        </ol>
+        <span class="pill pill-ok" style="align-self:flex-start" id="detalhe-status">—</span>
+        <ol class="timeline" id="detalhe-timeline"><li><div class="muted">Selecione um empréstimo para ver as datas e movimentações.</div></li></ol>
         <div class="stack-sm">
-          <button class="btn btn-block" type="button">Registrar devolução</button>
+          <a class="btn btn-block" id="detalhe-devolver" href="devolucoes.html">Registrar devolução</a>
           <button class="btn btn-line btn-block" type="button">Enviar lembrete por e-mail</button>
         </div>
       </aside>
@@ -118,6 +77,7 @@
   <script src="../assets/js/auth.js"></script>
   <script src="../assets/js/layout.js"></script>
   <script src="../assets/js/dados-demo.js"></script>
+  <script src="../assets/js/runtime-config.js"></script>
   <script src="../assets/js/api.js"></script>
   <script src="../assets/js/salz-actions.js"></script><script src="../assets/js/emprestimos-ui.js"></script>
 </body>

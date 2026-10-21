@@ -47,6 +47,7 @@
             <button class="tab" role="tab" aria-selected="false" type="button" data-filtro="servidor">Servidores</button>
             <button class="tab" role="tab" aria-selected="false" type="button" data-filtro="acesso:Administrador">Administradores</button>
             <button class="tab" role="tab" aria-selected="false" type="button" data-filtro="acesso:Estagiário">Estagiários</button>
+            <button class="tab" role="tab" aria-selected="false" type="button" data-filtro="acesso:Consulta">Consulta</button>
           </div>
         </div>
 
@@ -79,26 +80,26 @@
 
               <!-- Formulário de edição -->
               <form class="stack" id="form-edicao" hidden novalidate>
-                <h2 class="h-sm">Editar usuário</h2>
-                <div class="field"><label for="ed-nome">Nome</label><input class="input input-block" id="ed-nome" name="nome" type="text" required></div>
+                <h2 class="h-sm" id="titulo-form-usuario">Editar usuário</h2>
+                <p class="alert alert-error" id="erro-edicao-usuario" role="alert" hidden></p>
+                <div class="field"><label for="ed-nome">Nome</label><input class="input input-block" id="ed-nome" name="nome" type="text" autocomplete="name" required></div>
                 <div class="field"><label for="ed-email">E-mail</label><input class="input input-block" id="ed-email" name="email" type="email"></div>
-                <div class="field" data-so="solicitante"><label for="ed-tel">Telefone</label><input class="input input-block" id="ed-tel" name="telefone" type="tel"></div>
+                <div class="field" data-so="solicitante"><label for="ed-tel">Telefone</label><input class="input input-block" id="ed-tel" name="telefone" type="tel" autocomplete="tel"></div>
+                <div class="field" data-so="solicitante"><label for="ed-matricula">Matrícula / identificação</label><input class="input input-block" id="ed-matricula" name="matricula" type="text"></div>
                 <div class="field" data-so="solicitante"><label for="ed-vinculo">Vínculo</label>
                   <select class="input input-block" id="ed-vinculo" name="vinculo">
-                    <option>Alunos</option><option>Professores</option><option>Servidores</option><option>Grupo</option><option>Perfil</option>
+                    <option>Aluno</option><option>Aluna</option><option>Professor</option><option>Professora</option><option>Servidor</option><option>Servidora</option><option>Grupo</option><option>Perfil</option>
                   </select></div>
                 <div class="field" data-so="sistema"><label for="ed-perfil">Perfil de acesso</label>
                   <select class="input input-block" id="ed-perfil" name="perfil">
-                    <option>Administrador</option><option>Estagiário</option>
+                    <option>Administrador</option><option>Estagiário</option><option>Consulta</option>
                   </select></div>
                 <div class="field" data-so="sistema"><label for="ed-status">Status</label>
                   <select class="input input-block" id="ed-status" name="status">
-                    <option>Ativo</option><option>Desativado</option>
+                    <option>Ativo</option><option>Convite pendente</option><option>Desativado</option>
                   </select></div>
                 <div class="stack-sm">
                   <button class="btn btn-block" type="submit">Salvar alterações</button>
-                  <button class="btn btn-line btn-block" type="button" id="ed-redefinir-senha" hidden>Redefinir senha</button>
-                  <button class="btn btn-line btn-block" type="button" id="ed-remover-usuario">Remover usuário</button>
                   <button class="btn btn-line btn-block" type="button" id="ed-cancelar">Cancelar</button>
                 </div>
               </form>
@@ -113,6 +114,7 @@
                 </ol>
                 <div class="stack-sm">
                   <a class="btn btn-block" href="novo-emprestimo.html" data-novo-emprestimo>Novo empréstimo para ela</a>
+                  <button class="btn btn-line btn-block" id="editar-selecionado" type="button">Editar cadastro</button>
                 </div>
               </div>
             </aside>
@@ -128,7 +130,9 @@
                 <label class="check"><input type="checkbox" disabled name="permissoes" value="gerenciar-usuarios"> Gerenciar usuários</label>
                 <label class="check"><input type="checkbox" disabled name="permissoes" value="acessar-area-servidor"> Acessar área do servidor</label>
               </div>
-
+              <div class="stack-sm mt-20" id="perm-acoes">
+                <button class="btn btn-line btn-block" type="button" id="btn-senha">Redefinir senha</button>
+              </div>
             </section>
           </div>
 
@@ -213,6 +217,13 @@
                     <td><span class="pill pill-ok">Ativo</span></td>
                     <td><button class="btn btn-sm btn-line" type="button" data-editar>Editar</button></td>
                   </tr>
+                  <tr data-tipo="equipe" data-grupo="sistema" data-nome="Biblioteca" data-sub="biblioteca@lapa.edu.br" data-perfil="Consulta"
+                      data-status="Convite pendente" data-pill="pill-warn" data-ultimo="12/10 · 10:05" data-perm="">
+                    <td><strong>Biblioteca</strong><small>biblioteca@lapa.edu.br</small></td>
+                    <td>Consulta</td><td>12/10 · 10:05</td>
+                    <td><span class="pill pill-warn">Convite pendente</span></td>
+                    <td><button class="btn btn-sm btn-line" type="button" data-editar>Editar</button></td>
+                  </tr>
                   <tr class="is-late" data-tipo="equipe" data-grupo="sistema" data-nome="Rafael Teixeira" data-sub="rafael.teixeira@lapa.edu.br" data-perfil="Estagiário"
                       data-status="Desativado" data-pill="pill-late" data-ultimo="28/09 · 16:20" data-perm="">
                     <td><strong>Rafael Teixeira</strong><small>rafael.teixeira@lapa.edu.br</small></td>
@@ -232,10 +243,28 @@
   <script src="../assets/js/auth.js"></script>
   <script src="../assets/js/layout.js"></script>
   <script src="../assets/js/dados-demo.js"></script>
+  <script src="../assets/js/runtime-config.js"></script>
   <script src="../assets/js/api.js"></script>
   <script src="../assets/js/salz-actions.js"></script>
   <script>
     (function () {
+      var USER_STORAGE_KEY = 'elo.demo.usuarios';
+      var tbody = document.querySelector('#tabela tbody');
+      function escHtml(value) { return String(value == null ? '' : value).replace(/[&<>"']/g, function (c) { return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]); }); }
+      function montarLinha(registro) {
+        var d = registro.dataset || {}, sistema = d.grupo === 'sistema';
+        var attrs = Object.keys(d).map(function (k) { return ' data-' + k + '="' + escHtml(d[k]) + '"'; }).join('');
+        var classe = registro.className || '';
+        var linha2 = sistema ? (d.sub || '') : ((d.sub || '').split(' · ').slice(1).join(' · ') || d.sub || '');
+        var vinculo = sistema ? (d.perfil || '') : (d.vinculo || '');
+        var atividade = d.atividade || (sistema ? (d.ultimo || '—') : 'Nenhum');
+        var status = sistema ? (d.status || 'Ativo') : String(d.status || 'Situação regular').replace(/^Situação /, '');
+        return '<tr class="' + escHtml(classe) + '"' + attrs + '><td><strong>' + escHtml(d.nome || 'Usuário') + '</strong><small>' + escHtml(linha2) + '</small></td><td>' + escHtml(vinculo) + '</td><td>' + escHtml(atividade) + '</td><td><span class="pill ' + escHtml(d.pill || 'pill-ok') + '">' + escHtml(status) + '</span></td><td><button class="btn btn-sm btn-line" type="button" data-editar>Editar</button></td></tr>';
+      }
+      try {
+        var salvos = JSON.parse(localStorage.getItem(USER_STORAGE_KEY) || 'null');
+        if (Array.isArray(salvos) && salvos.length) tbody.innerHTML = salvos.map(montarLinha).join('');
+      } catch (e) { /* mantém os registros iniciais do HTML */ }
       var linhas = Array.prototype.slice.call(document.querySelectorAll('#tabela tbody tr'));
       var abas = Array.prototype.slice.call(document.querySelectorAll('.tabs .tab'));
       var busca = document.getElementById('busca');
@@ -257,6 +286,43 @@
         v = norm(v);
         return v.indexOf('alun') === 0 ? 'aluno' : v.indexOf('prof') === 0 ? 'professor'
              : v.indexOf('serv') === 0 ? 'servidor' : v.indexOf('grupo') === 0 ? 'grupo' : 'perfil';
+      }
+      function persistirLinhas() {
+        try {
+          var dados = linhas.map(function (tr) {
+            if (!tr.dataset.atividade && tr.children[2]) tr.dataset.atividade = tr.children[2].textContent.trim();
+            var dataset = {}; Object.keys(tr.dataset).forEach(function (k) { dataset[k] = tr.dataset[k]; });
+            return { dataset: dataset, className: tr.className };
+          });
+          localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(dados));
+          return true;
+        } catch (e) { return false; }
+      }
+      function salvarAtividade(t, total) {
+        t.dataset.atividade = total ? total + (total === 1 ? ' empréstimo' : ' empréstimos') : 'Nenhum';
+        if (t.children[2]) t.children[2].textContent = t.dataset.atividade;
+      }
+      function atualizarHistoricoSolicitante(tr) {
+        var lista = document.getElementById('movs');
+        lista.innerHTML = '<li><div class="muted">Carregando movimentações registradas…</div></li>';
+        ELO.emprestimos().then(function (registros) {
+          if (atual !== tr || ehSistema(tr)) return;
+          var nomeNormalizado = norm(tr.dataset.nome);
+          var emprestimos = registros.filter(function (l) { return norm(l.solicitante && l.solicitante.nome) === nomeNormalizado; });
+          f('v3').textContent = emprestimos.length;
+          var eventos = [];
+          emprestimos.forEach(function (l) {
+            eventos.push({ quando: l.retirada, tipo: 'Retirou ' + l.equipamento.nome, detalhe: EloUtil.dataHora(l.retirada) + ' · ' + l.equipamento.patrimonio, classe: 'purple' });
+            if (l.devolvida) eventos.push({ quando: l.devolvida, tipo: 'Devolveu ' + l.equipamento.nome, detalhe: EloUtil.dataHora(l.devolvida) + ' · ' + l.equipamento.patrimonio + (l.condicaoDevolucao ? ' · ' + l.condicaoDevolucao : ''), classe: 'cyan' });
+          });
+          eventos.sort(function (a,b) { return new Date(b.quando) - new Date(a.quando); });
+          lista.innerHTML = eventos.length ? '' : '<li><div class="muted">Sem movimentações registradas para este solicitante.</div></li>';
+          eventos.forEach(function (m) {
+            var li = document.createElement('li'), dot = document.createElement('span'), box = document.createElement('div'), strong = document.createElement('strong'), detail = document.createElement('div');
+            dot.className = 'dot dot-' + m.classe; strong.textContent = m.tipo; detail.className = 'muted'; detail.textContent = m.detalhe;
+            box.appendChild(strong); box.appendChild(detail); li.appendChild(dot); li.appendChild(box); lista.appendChild(li);
+          });
+        }).catch(function () { if (atual === tr) lista.innerHTML = '<li><div class="muted">Não foi possível carregar as movimentações locais.</div></li>'; });
       }
 
       /* ---------- painel de detalhe ---------- */
@@ -286,17 +352,9 @@
           var marcadas = (tr.dataset.perm || '').split(',');
           permissoes.querySelectorAll('input[name="permissoes"]').forEach(function (c) { c.checked = marcadas.indexOf(c.value) !== -1; });
         } else {
-          var lista = document.getElementById('movs'); lista.textContent = '';
-          var movs = []; try { movs = JSON.parse(tr.dataset.mov || '[]'); } catch (e) {}
-          if (!movs.length) { var l0 = document.createElement('li'); l0.innerHTML = '<div class="muted">Sem movimentações recentes.</div>'; lista.appendChild(l0); }
-          movs.forEach(function (m) {
-            var li = document.createElement('li'), dot = document.createElement('span'), box = document.createElement('div'),
-                s = document.createElement('strong'), d = document.createElement('div');
-            dot.className = 'dot dot-' + m[0]; s.textContent = m[1]; d.className = 'muted'; d.textContent = m[2];
-            box.appendChild(s); box.appendChild(d); li.appendChild(dot); li.appendChild(box); lista.appendChild(li);
-          });
+          atualizarHistoricoSolicitante(tr);
           var link = painel.querySelector('[data-novo-emprestimo]');
-          link.textContent = 'Novo empréstimo para ' + (tr.dataset.vinculo === 'Grupo' || tr.dataset.vinculo === 'Perfil' ? 'este cadastro' : 'esta pessoa');
+          link.textContent = 'Novo empréstimo para ' + tr.dataset.nome;
           link.dataset.nome = tr.dataset.nome; link.dataset.matricula = tr.dataset.matricula || ''; link.dataset.vinculo = tr.dataset.vinculo || '';
         }
       }
@@ -310,37 +368,62 @@
         vistaSol.hidden = true;
         form.hidden = false;
         form.querySelectorAll('[data-so]').forEach(function (e) { e.hidden = (e.dataset.so === 'sistema') !== sistema; });
-        document.getElementById('ed-nome').value = atual.dataset.nome;
+        document.getElementById('titulo-form-usuario').textContent = atual.dataset.novo === 'true' ? 'Novo usuário' : 'Editar usuário';
+        document.getElementById('erro-edicao-usuario').hidden = true;
+        document.getElementById('ed-nome').value = atual.dataset.nome || '';
         document.getElementById('ed-email').value = sistema ? atual.dataset.sub : (atual.dataset.email || '');
-        document.getElementById('ed-redefinir-senha').hidden = false;
         if (sistema) {
           document.getElementById('ed-perfil').value = atual.dataset.perfil;
           document.getElementById('ed-status').value = atual.dataset.status;
           permissoes.querySelectorAll('input[name="permissoes"]').forEach(function (c) { c.disabled = false; });
           document.getElementById('perm-dica').textContent = 'Marque o que este perfil pode fazer e salve.';
+          document.getElementById('perm-acoes').hidden = true;
         } else {
           document.getElementById('ed-tel').value = atual.dataset.telefone || '';
-          document.getElementById('ed-vinculo').value = atual.dataset.vinculo || 'Alunos';
+          document.getElementById('ed-matricula').value = atual.dataset.matricula || '';
+          document.getElementById('ed-vinculo').value = atual.dataset.vinculo || 'Aluno';
         }
         document.getElementById('ed-nome').focus();
       }
 
       function sairEdicao(semRestaurar) {
         if (!editando) return;
+        var linhaEditada = atual;
         editando = false;
         form.hidden = true;
         vistaCampos.forEach(function (e) { e.hidden = false; });
+        document.getElementById('erro-edicao-usuario').hidden = true;
         permissoes.querySelectorAll('input[name="permissoes"]').forEach(function (c) { c.disabled = true; });
         document.getElementById('perm-dica').textContent = 'Use “Editar” para alterar as permissões.';
+        document.getElementById('perm-acoes').hidden = false;
+        if (linhaEditada && linhaEditada.dataset.novo === 'true') {
+          linhas = linhas.filter(function (l) { return l !== linhaEditada; });
+          linhaEditada.remove();
+          atual = null;
+          persistirLinhas();
+          contar(); aplicar();
+          if (!semRestaurar) {
+            var primeira = linhas.filter(function (l) { return !l.hidden; })[0] || linhas[0];
+            if (primeira) selecionar(primeira);
+          }
+          return;
+        }
         if (!semRestaurar && atual) selecionar(atual);
       }
 
       function salvar(e) {
         e.preventDefault();
-        var nome = document.getElementById('ed-nome').value.trim();
-        if (!nome) { document.getElementById('ed-nome').focus(); return; }
+        var nomeEl = document.getElementById('ed-nome');
+        var emailEl = document.getElementById('ed-email');
+        var erro = document.getElementById('erro-edicao-usuario');
+        var nome = nomeEl.value.trim();
+        erro.hidden = true;
+        nomeEl.removeAttribute('aria-invalid'); emailEl.removeAttribute('aria-invalid');
+        if (!nome) { erro.textContent = 'Informe o nome completo.'; erro.hidden = false; nomeEl.setAttribute('aria-invalid', 'true'); nomeEl.focus(); return; }
+        if (emailEl.value.trim() && emailEl.validity.typeMismatch) { erro.textContent = 'Informe um endereço de e-mail válido.'; erro.hidden = false; emailEl.setAttribute('aria-invalid', 'true'); emailEl.focus(); return; }
         var tr = atual, tds = tr.children, sistema = ehSistema(tr);
-        var email = document.getElementById('ed-email').value.trim();
+        var backup = { dataset: Object.assign({}, tr.dataset), html: tr.innerHTML, classe: tr.className };
+        var email = emailEl.value.trim();
         tr.dataset.nome = nome;
 
         if (sistema) {
@@ -353,18 +436,36 @@
           tr.classList.toggle('is-late', status === 'Desativado');
         } else {
           var vinc = document.getElementById('ed-vinculo').value;
-          var resto = (tr.dataset.sub.split('·').slice(1).join('·') || '').trim();
+          var matricula = document.getElementById('ed-matricula').value.trim();
+          var identificadorAnterior = (tr.dataset.sub.split('·').slice(1).join('·') || '').trim();
+          var resto = matricula ? ((tipoDe(vinc) === 'professor' || tipoDe(vinc) === 'servidor' ? 'Identificação ' : 'Matrícula ') + matricula) : (tr.dataset.novo === 'true' ? '' : identificadorAnterior);
           tr.dataset.email = email; tr.dataset.telefone = document.getElementById('ed-tel').value.trim();
-          tr.dataset.vinculo = vinc; tr.dataset.tipo = tipoDe(vinc);
+          tr.dataset.matricula = matricula; tr.dataset.vinculo = vinc; tr.dataset.tipo = tipoDe(vinc);
           tr.dataset.sub = vinc + (resto ? ' · ' + resto : '');
-          tds[0].children[0].textContent = nome; tds[0].children[1].textContent = (tr.dataset.matricula ? 'Matrícula ' + tr.dataset.matricula : (tr.dataset.email || 'Cadastro atualizado'));
+          tds[0].innerHTML = '<strong></strong><small></small>'; tds[0].children[0].textContent = nome;
+          tds[0].children[1].textContent = resto;
           tds[1].textContent = vinc;
+          tds[2].textContent = tr.dataset.atividade || 'Nenhum';
+          tds[3].innerHTML = '<span class="pill pill-ok">Regular</span>';
+          tr.dataset.status = 'Situação regular'; tr.dataset.pill = 'pill-ok';
+        }
+        delete tr.dataset.novo;
+        if (!persistirLinhas()) {
+          Object.keys(tr.dataset).forEach(function (k) { delete tr.dataset[k]; });
+          Object.keys(backup.dataset).forEach(function (k) { tr.dataset[k] = backup.dataset[k]; });
+          tr.innerHTML = backup.html; tr.className = backup.classe;
+          erro.textContent = 'Não foi possível salvar no armazenamento local. Verifique o espaço disponível e tente novamente.';
+          erro.hidden = false;
+          return;
         }
         editando = false; form.hidden = true;
         vistaCampos.forEach(function (x) { x.hidden = false; });
         permissoes.querySelectorAll('input[name="permissoes"]').forEach(function (c) { c.disabled = true; });
         document.getElementById('perm-dica').textContent = 'Use “Editar” para alterar as permissões.';
+        document.getElementById('perm-acoes').hidden = false;
+        document.getElementById('titulo-form-usuario').textContent = 'Editar usuário';
         selecionar(tr); contar(); aplicar();
+        if (window.ELOAviso) window.ELOAviso('Cadastro salvo nesta sessão local.', 'success');
       }
 
       /* ---------- filtros e busca ---------- */
@@ -397,92 +498,31 @@
       abas.forEach(function (a) { a.addEventListener('click', function () { escolherAba(a.dataset.filtro); }); });
       busca.addEventListener('input', aplicar);
 
-      linhas.forEach(function (tr) {
+      function vincularLinha(tr) {
         tr.addEventListener('click', function (e) {
           selecionar(tr);
           if (e.target.closest('[data-editar]')) entrarEdicao();
         });
-      });
+      }
+      linhas.forEach(vincularLinha);
       form.addEventListener('submit', salvar);
-      document.getElementById('ed-cancelar').addEventListener('click', function () { sairEdicao(); });
-
-
-      /* ---------- criar usuário ---------- */
-      var criando = false;
+      document.getElementById('editar-selecionado').addEventListener('click', entrarEdicao);
       document.getElementById('btn-novo-usuario').addEventListener('click', function () {
+        if (fluxo || editando) return;
         var tr = document.createElement('tr');
-        tr.dataset.tipo = 'aluno'; tr.dataset.grupo = 'solicitante';
-        tr.dataset.nome = ''; tr.dataset.sub = 'Alunos'; tr.dataset.vinculo = 'Alunos';
+        tr.dataset.tipo = 'aluno'; tr.dataset.grupo = 'solicitante'; tr.dataset.novo = 'true';
+        tr.dataset.nome = ''; tr.dataset.sub = 'Aluno'; tr.dataset.vinculo = 'Aluno'; tr.dataset.matricula = '';
         tr.dataset.status = 'Situação regular'; tr.dataset.pill = 'pill-ok';
-        tr.dataset.email = ''; tr.dataset.telefone = ''; tr.dataset.total = '0'; tr.dataset.mov = '[]';
-        tr.innerHTML = '<td><strong>Novo usuário</strong><small>Cadastro em edição</small></td><td>Alunos</td><td>Nenhum</td><td><span class="pill pill-ok">Regular</span></td><td><button class="btn btn-sm btn-line" type="button" data-editar>Editar</button></td>';
-        document.querySelector('#tabela tbody').appendChild(tr);
-        linhas.push(tr); criando = true;
-        escolherAba('todos'); selecionar(tr); entrarEdicao();
-        document.getElementById('ed-nome').value = '';
-        document.getElementById('ed-email').value = '';
-        document.getElementById('ed-tel').value = '';
-        document.getElementById('ed-nome').focus();
+        tr.dataset.email = ''; tr.dataset.telefone = ''; tr.dataset.total = '0'; tr.dataset.atividade = 'Nenhum'; tr.dataset.mov = '[]';
+        tr.innerHTML = '<td><strong>Novo usuário</strong><small>Cadastro não salvo</small></td><td>Aluno</td><td>Nenhum</td><td><span class="pill pill-ok">Regular</span></td><td><button class="btn btn-sm btn-line" type="button" data-editar>Editar</button></td>';
+        tbody.appendChild(tr); linhas.push(tr); vincularLinha(tr); contar(); aplicar(); selecionar(tr); entrarEdicao();
       });
-
-      document.getElementById('ed-remover-usuario').addEventListener('click', function () {
-        if (!atual) return;
-        if (!confirm('Tem certeza de que deseja remover este usuário?')) return;
-        var removida = atual;
-        linhas = linhas.filter(function (l) { return l !== removida; });
-        removida.remove(); atual = null; editando = false; form.hidden = true;
-        vistaCampos.forEach(function (e) { e.hidden = false; });
-        permissoes.hidden = true; vistaSol.hidden = true;
-        if (linhas.length) selecionar(linhas.filter(function (l) { return !l.hidden; })[0] || linhas[0]);
-        contar(); aplicar();
-      });
-
-      document.getElementById('ed-redefinir-senha').addEventListener('click', function () {
-        if (!atual) {
-          alert('Selecione um usuário antes de redefinir a senha.');
-          return;
-        }
-
-        var email = (document.getElementById('ed-email').value || atual.dataset.email || (atual.dataset.sub && atual.dataset.sub.indexOf('@') !== -1 ? atual.dataset.sub : '') || '').trim().toLowerCase();
-        var login = email.indexOf('@') > 0 ? email.split('@')[0] : '';
-        var identificador = email || (atual.dataset.matricula || '').trim() || (atual.dataset.sub || '').trim() || (atual.dataset.nome || '').trim().toLowerCase();
-        if (!identificador) {
-          alert('Não foi possível identificar este usuário. Preencha o e-mail ou nome no cadastro.');
-          return;
-        }
-
-        var nova = prompt('Digite a nova senha para ' + (atual.dataset.nome || email) + ':');
-        if (nova === null) return;
-        nova = nova.trim();
-        if (nova.length < 6) {
-          alert('A senha deve ter pelo menos 6 caracteres.');
-          return;
-        }
-
-        var confirmar = prompt('Digite novamente a nova senha para confirmar:');
-        if (confirmar === null) return;
-        if (nova !== confirmar) {
-          alert('As senhas não coincidem. Nenhuma alteração foi feita.');
-          return;
-        }
-
-        try {
-          var chave = 'elo.senhas.demo';
-          var senhas = JSON.parse(localStorage.getItem(chave) || '{}');
-          if (login) senhas[login] = nova;
-          if (email) senhas[email] = nova;
-          senhas['usuario:' + identificador] = nova;
-          localStorage.setItem(chave, JSON.stringify(senhas));
-          alert('Senha de demonstração redefinida neste navegador para ' + (atual.dataset.nome || identificador) + '.');
-        } catch (erro) {
-          alert('Não foi possível salvar a senha neste navegador. Verifique se o armazenamento local está habilitado.');
-        }
-      });
+      document.getElementById('ed-cancelar').addEventListener('click', function () { sairEdicao(); });
 
       /* ---------- etapa 1 do novo empréstimo ---------- */
       if (fluxo) {
         document.getElementById('aviso-fluxo').hidden = false;
-        document.getElementById('filtros-acesso').hidden = true;
+        abas.filter(function (a) { return a.dataset.filtro.indexOf('acesso:') === 0; }).forEach(function (a) { a.hidden = true; });
       }
       document.addEventListener('click', function (e) {
         var link = e.target.closest('[data-novo-emprestimo]');
@@ -494,8 +534,24 @@
         }).toString();
       });
 
+      linhas.forEach(function (tr) { if (!tr.dataset.atividade && tr.children[2]) tr.dataset.atividade = tr.children[2].textContent.trim(); });
       contar(); aplicar();
       selecionar(linhas.filter(function (l) { return !l.hidden; })[0] || linhas[0]);
+      ELO.emprestimos().then(function (registros) {
+        linhas.filter(function (tr) { return tr.dataset.grupo === 'solicitante'; }).forEach(function (tr) {
+          var nome = norm(tr.dataset.nome);
+          var proprios = registros.filter(function (l) { return norm(l.solicitante && l.solicitante.nome) === nome; });
+          var ativos = proprios.filter(function (l) { return !l.devolvida; });
+          var atrasados = ativos.some(function (l) { return EloUtil.diasAtraso(l.prevista) > 0; });
+          salvarAtividade(tr, proprios.length);
+          if (atrasados) { tr.dataset.status = 'Em atraso'; tr.dataset.pill = 'pill-late'; }
+          else if (ativos.length) { tr.dataset.status = 'Devolução pendente'; tr.dataset.pill = 'pill-warn'; }
+          else { tr.dataset.status = 'Situação regular'; tr.dataset.pill = 'pill-ok'; }
+          tr.children[3].innerHTML = '<span class="pill ' + tr.dataset.pill + '"></span>'; tr.children[3].firstChild.textContent = String(tr.dataset.status).replace(/^Situação /, '');
+        });
+        persistirLinhas();
+        if (atual) selecionar(atual);
+      }).catch(function () {});
     })();
   </script>
 </body>

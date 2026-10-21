@@ -1,1 +1,15 @@
-(()=>{const toast=t=>{let e=document.getElementById("elo-toast");if(!e){e=document.createElement("div");e.id="elo-toast";e.style="position:fixed;right:1rem;bottom:1rem;z-index:100;padding:.85rem 1rem;border:1px solid var(--border,#29344D);border-radius:12px;background:var(--surface,#11182B);color:var(--text,#fff);box-shadow:0 12px 40px #0008";document.body.append(e)}e.textContent=t;e.hidden=false;clearTimeout(e._t);e._t=setTimeout(()=>e.hidden=true,2800)};document.querySelectorAll(".export button").forEach((b,i)=>b.addEventListener("click",()=>{if(i===1){window.print();return}const rows=[...document.querySelectorAll("table tr")].map(r=>[...r.querySelectorAll("th,td")].map(c=>`"${c.innerText.replaceAll('"','""')}"`).join(","));const blob=new Blob([rows.join("\n")],{type:"text/csv;charset=utf-8"}),a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="relatorio-elocampus.csv";a.click();URL.revokeObjectURL(a.href)}));document.querySelectorAll("button").forEach(b=>{const t=b.textContent.trim();if(t==="Devolver")b.addEventListener("click",()=>{if(confirm("Confirmar que este equipamento será encaminhado para devolução?"))location.href="devolucoes.html"});if(t==="Receber")b.addEventListener("click",()=>{if(confirm("Confirmar o recebimento deste equipamento?")){b.closest("li, tr")?.remove();toast("Equipamento recebido com sucesso.")}});if(t==="Registrar devolução")b.addEventListener("click",()=>{if(confirm("Confirmar o registro desta devolução?"))location.href="devolucoes.html"});if(t==="Enviar lembrete por e-mail")b.addEventListener("click",()=>toast("Lembrete preparado para envio pelo servidor."));if(t==="Aplicar filtros")b.closest("form")?.addEventListener("submit",e=>{e.preventDefault();toast("Filtros aplicados.")})});document.querySelectorAll(".tabs .tab").forEach(b=>b.addEventListener("click",()=>{b.parentElement.querySelectorAll(".tab").forEach(x=>x.setAttribute("aria-selected","false"));b.setAttribute("aria-selected","true")}));})();
+/* Utilitários visuais compartilhados. Os botões de operação são tratados
+ * nas suas páginas próprias para evitar mensagens de sucesso sem gravação real.
+ */
+window.ELOAviso = function (texto, tipo = "info") {
+  let el = document.getElementById("elo-toast");
+  if (!el) {
+    el = document.createElement("div");
+    el.id = "elo-toast";
+    el.setAttribute("role", "status");
+    el.style.cssText = "position:fixed;right:1rem;bottom:1rem;z-index:100;padding:.85rem 1rem;border:1px solid var(--border,#29344D);border-radius:12px;background:var(--surface,#11182B);color:var(--text,#fff);box-shadow:0 12px 40px #0008;max-width:min(28rem,calc(100vw - 2rem))";
+    document.body.appendChild(el);
+  }
+  el.dataset.tipo = tipo;
+  el.textContent = texto;
+};

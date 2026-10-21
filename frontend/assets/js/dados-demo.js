@@ -36,18 +36,18 @@ const DEMO = (() => {
 
   const emprestimos = [
     // ativos
-    { id: 1,  equipamentoId: 1,  solicitante: "Grêmio Estudantil",  retirada: dia(-6, 9, 15), prevista: dia(-4, 18), devolvida: null, por: "Estagiário TI" },
-    { id: 2,  equipamentoId: 12, solicitante: "Prof. Tiago Nunes",  retirada: dia(-9, 8, 40), prevista: dia(-2, 18), devolvida: null, por: "Estagiário TI" },
-    { id: 3,  equipamentoId: 13, solicitante: "Ana Beatriz Lima",   retirada: dia(-5, 14, 5), prevista: dia(-1, 18), devolvida: null, por: "Operador" },
-    { id: 4,  equipamentoId: 2,  solicitante: "Prof. Ricardo Alves", retirada: dia(-3, 10, 20), prevista: dia(0, 18), devolvida: null, por: "Estagiário TI" },
-    { id: 5,  equipamentoId: 3,  solicitante: "Mariana Costa",      retirada: dia(-2, 9, 0),  prevista: dia(1, 18),  devolvida: null, por: "Operador" },
-    { id: 6,  equipamentoId: 4,  solicitante: "Juliana Rocha",      retirada: dia(-1, 13, 30), prevista: dia(2, 18), devolvida: null, por: "Estagiário TI" },
-    { id: 7,  equipamentoId: 5,  solicitante: "Lucas Ferreira",     retirada: dia(-1, 8, 10), prevista: dia(3, 18),  devolvida: null, por: "Operador" },
-    { id: 8,  equipamentoId: 6,  solicitante: "Coord. de Eventos",  retirada: dia(-1, 15, 45), prevista: dia(3, 18), devolvida: null, por: "Estagiário TI" },
+    { id: 1,  equipamentoId: 1,  solicitante: "Grêmio Estudantil",  vinculo: "Grupo", retirada: dia(-6, 9, 15), prevista: dia(-4, 18), devolvida: null, por: "Estagiário TI" },
+    { id: 2,  equipamentoId: 12, solicitante: "Prof. Tiago Nunes",  vinculo: "Professor", retirada: dia(-9, 8, 40), prevista: dia(-2, 18), devolvida: null, por: "Estagiário TI" },
+    { id: 3,  equipamentoId: 13, solicitante: "Ana Beatriz Lima",   vinculo: "Aluna", retirada: dia(-5, 14, 5), prevista: dia(-1, 18), devolvida: null, por: "Operador" },
+    { id: 4,  equipamentoId: 2,  solicitante: "Prof. Ricardo Alves", vinculo: "Professor", retirada: dia(-3, 10, 20), prevista: dia(0, 18), devolvida: null, por: "Estagiário TI" },
+    { id: 5,  equipamentoId: 3,  solicitante: "Mariana Costa",      vinculo: "Aluna", retirada: dia(-2, 9, 0),  prevista: dia(1, 18),  devolvida: null, por: "Operador" },
+    { id: 6,  equipamentoId: 4,  solicitante: "Juliana Rocha",      vinculo: "Aluna", retirada: dia(-1, 13, 30), prevista: dia(2, 18), devolvida: null, por: "Estagiário TI" },
+    { id: 7,  equipamentoId: 5,  solicitante: "Lucas Ferreira",     vinculo: "Aluno", retirada: dia(-1, 8, 10), prevista: dia(3, 18),  devolvida: null, por: "Operador" },
+    { id: 8,  equipamentoId: 6,  solicitante: "Coord. de Eventos",  vinculo: "Perfil", retirada: dia(-1, 15, 45), prevista: dia(3, 18), devolvida: null, por: "Estagiário TI" },
     // encerrados (histórico)
-    { id: 9,  equipamentoId: 7,  solicitante: "Prof. Tiago Nunes",  retirada: dia(-6, 9, 0),  prevista: dia(-2, 18), devolvida: dia(-1, 14, 20), por: "Operador" },
-    { id: 10, equipamentoId: 10, solicitante: "Ana Beatriz Lima",   retirada: dia(-5, 11, 0), prevista: dia(-2, 18), devolvida: dia(-2, 16, 5),  por: "Estagiário TI" },
-    { id: 11, equipamentoId: 16, solicitante: "Mariana Costa",      retirada: dia(-7, 10, 0), prevista: dia(-3, 18), devolvida: dia(-3, 9, 30),  por: "Operador" },
+    { id: 9,  equipamentoId: 7,  solicitante: "Prof. Tiago Nunes",  vinculo: "Professor", retirada: dia(-6, 9, 0),  prevista: dia(-2, 18), devolvida: dia(-1, 14, 20), por: "Operador" },
+    { id: 10, equipamentoId: 10, solicitante: "Ana Beatriz Lima",   vinculo: "Aluna", retirada: dia(-5, 11, 0), prevista: dia(-2, 18), devolvida: dia(-2, 16, 5),  por: "Estagiário TI" },
+    { id: 11, equipamentoId: 16, solicitante: "Mariana Costa",      vinculo: "Aluna", retirada: dia(-7, 10, 0), prevista: dia(-3, 18), devolvida: dia(-3, 9, 30),  por: "Operador" },
   ];
 
   const manutencoes = [
@@ -69,29 +69,149 @@ try {
   }
 } catch { /* sem armazenamento: segue com os dados originais */ }
 
+// Em modo de demonstração, operações novas são mantidas neste navegador.
+// A camada é local e não representa uma gravação oficial no servidor.
+const CHAVE_EMPRESTIMOS = "elo.demo.emprestimos";
+try {
+  const salvo = localStorage.getItem(CHAVE_EMPRESTIMOS);
+  if (salvo) {
+    const carregados = JSON.parse(salvo);
+    if (Array.isArray(carregados)) DEMO.emprestimos = carregados.filter((l) => l && l.id != null && l.equipamentoId != null);
+  }
+} catch { /* mantém a base de demonstração */ }
+
+function demoPersistirEmprestimos() {
+  try { localStorage.setItem(CHAVE_EMPRESTIMOS, JSON.stringify(DEMO.emprestimos)); }
+  catch { throw new Error("Não foi possível salvar a operação neste navegador. Verifique o espaço disponível e as permissões de armazenamento."); }
+}
+
+function demoDiasAtraso(prevista) {
+  const a = new Date(prevista), hoje = new Date();
+  a.setHours(0, 0, 0, 0); hoje.setHours(0, 0, 0, 0);
+  return Math.round((hoje - a) / 86400000);
+}
+
 function demoEquipamentos() {
   return DEMO.equipamentos.filter((e) => e && e.id != null).map((e) => {
-    const ativo = DEMO.emprestimos.find((l) => l.equipamentoId === e.id && !l.devolvida);
+    const ativo = DEMO.emprestimos.find((l) => String(l.equipamentoId) === String(e.id) && !l.devolvida);
     let situacao = e.base === "ativo" ? "disponivel" : e.base;
-    if (ativo) situacao = EloUtil.diasAtraso(ativo.prevista) > 0 ? "atrasado" : "emprestado";
+    if (ativo) situacao = demoDiasAtraso(ativo.prevista) > 0 ? "atrasado" : "emprestado";
     return { ...e, situacao };
   });
 }
 
 function demoEmprestimos() {
-  const porId = new Map(DEMO.equipamentos.map((e) => [e.id, e]));
-  return DEMO.emprestimos.filter((l) => porId.has(l.equipamentoId)).map((l) => {
-    const e = porId.get(l.equipamentoId);
+  const porId = new Map(DEMO.equipamentos.map((e) => [String(e.id), e]));
+  return DEMO.emprestimos.filter((l) => porId.has(String(l.equipamentoId))).map((l) => {
+    const e = porId.get(String(l.equipamentoId));
     return {
       id: l.id,
-      equipamento: { id: e.id, nome: e.nome, patrimonio: e.patrimonio, categoria: e.categoria },
-      solicitante: { nome: l.solicitante },
+      emprestimoId: l.emprestimoId ?? l.id,
+      equipamento: { id: e.id, nome: e.nome, patrimonio: e.patrimonio, categoria: e.categoria, setor: e.setor, condicao: e.condicao },
+      solicitante: { nome: l.solicitante, vinculo: l.vinculo || "", matricula: l.matricula || "" },
       retirada: l.retirada,
       prevista: l.prevista,
-      devolvida: l.devolvida,
-      registradoPor: l.por,
+      devolvida: l.devolvida || null,
+      registradoPor: l.por || "—",
+      finalidade: l.finalidade || "",
+      observacoes: l.observacoes || "",
+      condicaoDevolucao: l.condicaoDevolucao || "",
+      observacoesDevolucao: l.observacoesDevolucao || "",
+      responsavelDevolucao: l.responsavelDevolucao || "",
+      situacao: l.devolvida ? "devolvido" : (demoDiasAtraso(l.prevista) > 0 ? "atrasado" : "emprestado"),
     };
+  }).sort((a, b) => new Date(b.retirada) - new Date(a.retirada));
+}
+
+function demoRegistrarEmprestimo(dados) {
+  const solicitante = String(dados?.solicitante || "").trim();
+  const equipamentosIds = [...new Set((dados?.equipamentos || []).map(String))];
+  const retirada = dados?.retirada ? new Date(dados.retirada) : new Date();
+  const prevista = dados?.prevista ? new Date(dados.prevista) : null;
+  if (!solicitante) throw new Error("Selecione um solicitante.");
+  if (!equipamentosIds.length) throw new Error("Adicione pelo menos um equipamento.");
+  if (!Number.isFinite(retirada.getTime()) || !prevista || !Number.isFinite(prevista.getTime())) throw new Error("Informe as datas de retirada e devolução prevista.");
+  if (prevista <= retirada) throw new Error("A devolução prevista deve ocorrer depois da retirada.");
+
+  const disponibilidade = demoEquipamentos();
+  const indisponiveis = equipamentosIds.map((id) => disponibilidade.find((e) => String(e.id) === id)).filter((e) => !e || e.situacao !== "disponivel");
+  if (indisponiveis.length) throw new Error(`Os seguintes equipamentos não estão disponíveis: ${indisponiveis.map((e) => e?.nome || "equipamento não encontrado").join(", ")}.`);
+
+  const sessao = typeof obterSessao === "function" ? obterSessao() : null;
+  const maxId = Math.max(0, ...DEMO.emprestimos.map((l) => Number(l.id) || 0));
+  const maxGrupo = Math.max(0, ...DEMO.emprestimos.map((l) => Number(l.emprestimoId || l.id) || 0));
+  const emprestimoId = maxGrupo + 1;
+  const novos = equipamentosIds.map((equipamentoId, i) => ({
+    id: maxId + i + 1,
+    emprestimoId,
+    equipamentoId: Number.isNaN(Number(equipamentoId)) ? equipamentoId : Number(equipamentoId),
+    solicitante,
+    vinculo: String(dados.vinculo || "").trim(),
+    matricula: String(dados.matricula || "").trim(),
+    retirada: retirada.toISOString(),
+    prevista: prevista.toISOString(),
+    devolvida: null,
+    finalidade: String(dados.finalidade || "").trim(),
+    observacoes: String(dados.observacoes || "").trim(),
+    por: sessao?.nome || "Usuário da sessão local",
+  }));
+  const tamanhoAnterior = DEMO.emprestimos.length;
+  DEMO.emprestimos.push(...novos);
+  try {
+    demoPersistirEmprestimos();
+  } catch (erro) {
+    DEMO.emprestimos.splice(tamanhoAnterior, novos.length);
+    throw erro;
+  }
+  return { id: emprestimoId, itens: novos.length, registradoEm: retirada.toISOString(), local: true };
+}
+
+function demoRegistrarDevolucao(dados) {
+  const ids = [...new Set((dados?.itens || []).map(String))];
+  if (!ids.length) throw new Error("Selecione pelo menos um equipamento para devolver.");
+  const encontrados = ids.map((id) => DEMO.emprestimos.find((l) => String(l.id) === id));
+  if (encontrados.some((l) => !l)) throw new Error("Um ou mais itens não foram encontrados. Atualize a página e tente novamente.");
+  if (encontrados.some((l) => l.devolvida)) throw new Error("Um ou mais itens já foram devolvidos. Atualize a página para conferir a situação atual.");
+
+  const sessao = typeof obterSessao === "function" ? obterSessao() : null;
+  const agora = new Date().toISOString();
+  const camposDevolucao = ["devolvida", "condicaoDevolucao", "observacoesDevolucao", "acessoriosConferidos", "equipamentoConferido", "assinaturaRecebida", "responsavelDevolucao"];
+  const anteriores = encontrados.map((l) => Object.fromEntries(camposDevolucao.map((campo) => [campo, l[campo]])));
+  encontrados.forEach((l) => {
+    l.devolvida = agora;
+    l.condicaoDevolucao = String(dados.condicao || "Perfeito");
+    l.observacoesDevolucao = String(dados.observacoes || "").trim();
+    l.acessoriosConferidos = Boolean(dados.acessoriosConferidos);
+    l.equipamentoConferido = Boolean(dados.equipamentoConferido);
+    l.assinaturaRecebida = Boolean(dados.assinaturaRecebida);
+    l.responsavelDevolucao = sessao?.nome || "Usuário da sessão local";
   });
+  try {
+    demoPersistirEmprestimos();
+  } catch (erro) {
+    encontrados.forEach((l, i) => camposDevolucao.forEach((campo) => {
+      if (anteriores[i][campo] === undefined) delete l[campo];
+      else l[campo] = anteriores[i][campo];
+    }));
+    throw erro;
+  }
+  return { itens: encontrados.length, devolvidoEm: agora, local: true };
+}
+
+function demoConsultaQr(codigo) {
+  let bruto = String(codigo || "").trim();
+  if (!bruto) throw new Error("Informe o patrimônio, identificador ou QR Code.");
+  // QR Codes podem conter o patrimônio diretamente ou uma URL da própria consulta.
+  try {
+    const url = new URL(bruto);
+    bruto = url.searchParams.get("codigo") || url.searchParams.get("patrimonio") || url.searchParams.get("qr") || url.searchParams.get("id") || url.pathname.split("/").filter(Boolean).pop() || bruto;
+  } catch { /* identificador simples: mantém o valor informado */ }
+  const termo = bruto.trim().toLocaleLowerCase("pt-BR");
+  const encontrados = demoEquipamentos();
+  const e = encontrados.find((item) => [item.patrimonio, item.id, item.nome].some((v) => String(v ?? "").trim().toLocaleLowerCase("pt-BR") === termo));
+  if (!e) throw new Error("Nenhum equipamento corresponde a esse código na fonte de dados local.");
+  const ativo = demoEmprestimos().find((l) => String(l.equipamento.id) === String(e.id) && !l.devolvida);
+  return { equipamento: e, emprestimo: ativo || null, fonte: "local" };
 }
 
 function demoResumo() {
@@ -112,7 +232,7 @@ function demoMovimentacoes() {
   demoEmprestimos().forEach((l) => {
     eventos.push({ classe: "retirada", tipo: "Retirada registrada", quando: l.retirada, equipamento: l.equipamento, detalhe: l.solicitante.nome, por: l.registradoPor });
     if (l.devolvida) {
-      eventos.push({ classe: "devolucao", tipo: "Devolução registrada", quando: l.devolvida, equipamento: l.equipamento, detalhe: l.solicitante.nome, por: l.registradoPor });
+      eventos.push({ classe: "devolucao", tipo: "Devolução registrada", quando: l.devolvida, equipamento: l.equipamento, detalhe: `${l.solicitante.nome}${l.condicaoDevolucao ? ` · condição: ${l.condicaoDevolucao}` : ""}${l.observacoesDevolucao ? ` · ${l.observacoesDevolucao}` : ""}`, por: l.responsavelDevolucao || l.registradoPor });
     }
   });
   DEMO.manutencoes.forEach((m) => {
@@ -130,6 +250,7 @@ function demoEquipamento(id) {
 }
 
 function demoSalvarEquipamento(d, id) {
+  const anteriores = DEMO.equipamentos.slice();
   const pat = d.patrimonio.trim().toUpperCase();
   const duplicado = DEMO.equipamentos.find((e) => e.patrimonio.toUpperCase() === pat && String(e.id) !== String(id));
   if (duplicado) {
@@ -159,7 +280,12 @@ function demoSalvarEquipamento(d, id) {
     DEMO.equipamentos.push(salvo);
   }
 
-  try { localStorage.setItem(CHAVE_DEMO, JSON.stringify(DEMO.equipamentos)); } catch { /* ignora */ }
+  try {
+    localStorage.setItem(CHAVE_DEMO, JSON.stringify(DEMO.equipamentos));
+  } catch {
+    DEMO.equipamentos.splice(0, DEMO.equipamentos.length, ...anteriores);
+    throw new Error("Não foi possível salvar o cadastro neste navegador. Verifique o espaço disponível e as permissões de armazenamento.");
+  }
   return salvo;
 }
 
@@ -168,7 +294,17 @@ function demoRemoverEquipamento(id) {
   if (i < 0) throw new Error("Equipamento não encontrado.");
   const emprestado = DEMO.emprestimos.some(l => String(l.equipamentoId) === String(id) && !l.devolvida);
   if (emprestado) throw new Error("Não é possível retirar um equipamento que está emprestado.");
-  DEMO.equipamentos.splice(i, 1);
-  try { localStorage.setItem(CHAVE_DEMO, JSON.stringify(DEMO.equipamentos)); } catch {}
-  return true;
+
+  // Se existe histórico, desativa o bem em vez de apagá-lo e perder a trilha de movimentações.
+  const temHistorico = DEMO.emprestimos.some(l => String(l.equipamentoId) === String(id));
+  const anteriores = DEMO.equipamentos.slice();
+  if (temHistorico) DEMO.equipamentos[i] = { ...DEMO.equipamentos[i], base: "inativo" };
+  else DEMO.equipamentos.splice(i, 1);
+  try {
+    localStorage.setItem(CHAVE_DEMO, JSON.stringify(DEMO.equipamentos));
+  } catch {
+    DEMO.equipamentos.splice(0, DEMO.equipamentos.length, ...anteriores);
+    throw new Error("Não foi possível atualizar o cadastro neste navegador. Verifique o espaço disponível e as permissões de armazenamento.");
+  }
+  return { arquivado: temHistorico, removido: !temHistorico };
 }
