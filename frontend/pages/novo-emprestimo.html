@@ -17,11 +17,11 @@
   <script>
     // Sem solicitante escolhido, volta para a etapa 1 (lista de solicitantes).
     if (!new URLSearchParams(location.search).get('nome')) {
-      location.replace('solicitantes.html?origem=novo-emprestimo');
+      location.replace('usuarios.html?origem=novo-emprestimo');
     }
   </script>
 </head>
-<body data-pagina="solicitantes">
+<body data-pagina="usuarios">
   <div class="app">
     <aside class="sidebar" id="sidebar"></aside>
     <div class="content">
@@ -54,7 +54,7 @@
                 <option value="Juliana Rocha · 2023076">
                 <option value="Lucas Ferreira · 2024203">
               </datalist>
-              <span class="hint">Definido na etapa anterior. <a href="solicitantes.html?origem=novo-emprestimo">Alterar solicitante</a></span>
+              <span class="hint">Definido na etapa anterior. <a href="usuarios.html?origem=novo-emprestimo">Alterar solicitante</a></span>
             </div>
             <div class="field">
               <label for="vinculo">Vínculo</label>
