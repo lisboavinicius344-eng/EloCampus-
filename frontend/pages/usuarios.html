@@ -128,9 +128,7 @@
                 <label class="check"><input type="checkbox" disabled name="permissoes" value="gerenciar-usuarios"> Gerenciar usuários</label>
                 <label class="check"><input type="checkbox" disabled name="permissoes" value="acessar-area-servidor"> Acessar área do servidor</label>
               </div>
-              <div class="stack-sm mt-20" id="perm-acoes">
-                <button class="btn btn-line btn-block" type="button" id="btn-senha">Redefinir senha</button>
-              </div>
+
             </section>
           </div>
 
@@ -314,13 +312,12 @@
         form.querySelectorAll('[data-so]').forEach(function (e) { e.hidden = (e.dataset.so === 'sistema') !== sistema; });
         document.getElementById('ed-nome').value = atual.dataset.nome;
         document.getElementById('ed-email').value = sistema ? atual.dataset.sub : (atual.dataset.email || '');
-        document.getElementById('ed-redefinir-senha').hidden = !sistema;
+        document.getElementById('ed-redefinir-senha').hidden = false;
         if (sistema) {
           document.getElementById('ed-perfil').value = atual.dataset.perfil;
           document.getElementById('ed-status').value = atual.dataset.status;
           permissoes.querySelectorAll('input[name="permissoes"]').forEach(function (c) { c.disabled = false; });
           document.getElementById('perm-dica').textContent = 'Marque o que este perfil pode fazer e salve.';
-          document.getElementById('perm-acoes').hidden = true;
         } else {
           document.getElementById('ed-tel').value = atual.dataset.telefone || '';
           document.getElementById('ed-vinculo').value = atual.dataset.vinculo || 'Alunos';
@@ -335,7 +332,6 @@
         vistaCampos.forEach(function (e) { e.hidden = false; });
         permissoes.querySelectorAll('input[name="permissoes"]').forEach(function (c) { c.disabled = true; });
         document.getElementById('perm-dica').textContent = 'Use “Editar” para alterar as permissões.';
-        document.getElementById('perm-acoes').hidden = false;
         if (!semRestaurar && atual) selecionar(atual);
       }
 
@@ -368,7 +364,6 @@
         vistaCampos.forEach(function (x) { x.hidden = false; });
         permissoes.querySelectorAll('input[name="permissoes"]').forEach(function (c) { c.disabled = true; });
         document.getElementById('perm-dica').textContent = 'Use “Editar” para alterar as permissões.';
-        document.getElementById('perm-acoes').hidden = false;
         selecionar(tr); contar(); aplicar();
       }
 
@@ -443,12 +438,16 @@
       });
 
       document.getElementById('ed-redefinir-senha').addEventListener('click', function () {
-        if (!atual || !ehSistema(atual)) return;
+        if (!atual) {
+          alert('Selecione um usuário antes de redefinir a senha.');
+          return;
+        }
 
-        var email = (atual.dataset.sub || '').trim().toLowerCase();
+        var email = (document.getElementById('ed-email').value || atual.dataset.email || (atual.dataset.sub && atual.dataset.sub.indexOf('@') !== -1 ? atual.dataset.sub : '') || '').trim().toLowerCase();
         var login = email.indexOf('@') > 0 ? email.split('@')[0] : '';
-        if (!login) {
-          alert('Este usuário não possui um e-mail/login identificável para associar à senha local.');
+        var identificador = email || (atual.dataset.matricula || '').trim() || (atual.dataset.sub || '').trim() || (atual.dataset.nome || '').trim().toLowerCase();
+        if (!identificador) {
+          alert('Não foi possível identificar este usuário. Preencha o e-mail ou nome no cadastro.');
           return;
         }
 
@@ -470,10 +469,11 @@
         try {
           var chave = 'elo.senhas.demo';
           var senhas = JSON.parse(localStorage.getItem(chave) || '{}');
-          senhas[login] = nova;
-          senhas[email] = nova;
+          if (login) senhas[login] = nova;
+          if (email) senhas[email] = nova;
+          senhas['usuario:' + identificador] = nova;
           localStorage.setItem(chave, JSON.stringify(senhas));
-          alert('Senha redefinida neste navegador para ' + (atual.dataset.nome || email) + '.');
+          alert('Senha de demonstração redefinida neste navegador para ' + (atual.dataset.nome || identificador) + '.');
         } catch (erro) {
           alert('Não foi possível salvar a senha neste navegador. Verifique se o armazenamento local está habilitado.');
         }
