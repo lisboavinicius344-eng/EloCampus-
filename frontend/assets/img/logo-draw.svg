@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 416" role="img" aria-labelledby="eloTitle eloDesc">
+  <title id="eloTitle">ELO Campus</title>
+  <desc id="eloDesc">Marca ELO desenhada por contorno e preenchida com degradê violeta e rosa.</desc>
+  <defs>
+    <linearGradient id="eloGradient" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#4B0FF0"/>
+      <stop offset="34%" stop-color="#9500F4"/>
+      <stop offset="64%" stop-color="#E71BE7"/>
+      <stop offset="100%" stop-color="#FF60B5"/>
+    </linearGradient>
+    <filter id="eloGlow" x="-25%" y="-25%" width="150%" height="150%">
+      <feGaussianBlur stdDeviation="8" result="blur"/>
+      <feColorMatrix in="blur" type="matrix" values="0.55 0 0 0 0.2  0 0.25 0 0 0  0 0 1 0 0.9  0 0 0 .45 0" result="coloredGlow"/>
+      <feMerge><feMergeNode in="coloredGlow"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <style>
+      .logo-fill { fill: url(#eloGradient); fill-rule: evenodd; opacity: 1; filter: url(#eloGlow); animation: elo-fill-build .62s cubic-bezier(.2,.75,.25,1) 1.18s both; }
+      .logo-trace { fill: none; stroke: #E7D9FF; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 1500; stroke-dashoffset: 1500; opacity: 0; animation: elo-line-build 1.55s cubic-bezier(.65,0,.35,1) .05s both; }
+      .logo-trace-hole { animation-delay: .14s; }
+      @keyframes elo-line-build {
+        0% { stroke-dashoffset: 1500; opacity: 0; }
+        8% { opacity: .95; }
+        70% { stroke-dashoffset: 0; opacity: 1; }
+        88% { stroke-dashoffset: 0; opacity: .9; }
+        100% { stroke-dashoffset: 0; opacity: 0; }
+      }
+      @keyframes elo-fill-build {
+        from { opacity: 0; }
+        55% { opacity: .9; }
+        to { opacity: 1; }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .logo-fill { animation: none; opacity: 1; }
+        .logo-trace { animation: none; opacity: 0; }
+      }
+    </style>
+  </defs>
+  <path class="logo-fill" d="M 182 31 L 169 38 L 150 52 L 70 129 L 58 142 L 46 160 L 37 179 L 31 200 L 31 228 L 33 231 L 32 233 L 36 249 L 43 265 L 55 285 L 72 304 L 91 319 L 117 332 L 155 341 L 187 341 L 213 338 L 226 357 L 243 371 L 262 382 L 281 388 L 292 390 L 318 390 L 331 388 L 350 382 L 369 372 L 383 362 L 447 301 L 460 283 L 473 254 L 478 232 L 478 202 L 469 169 L 460 151 L 451 138 L 432 119 L 420 111 L 405 104 L 388 99 L 337 98 L 329 81 L 316 61 L 297 42 L 273 28 L 246 21 L 219 21 L 199 25 Z M 203 94 L 220 88 L 233 88 L 248 94 L 259 104 L 269 122 L 201 184 L 176 209 L 171 218 L 169 227 L 171 242 L 175 250 L 180 255 L 190 261 L 191 260 L 192 262 L 208 262 L 225 255 L 300 184 L 311 176 L 330 168 L 342 165 L 366 165 L 373 167 L 387 175 L 402 193 L 408 210 L 408 227 L 405 238 L 398 252 L 384 268 L 333 315 L 320 321 L 301 322 L 287 317 L 280 311 L 348 249 L 355 237 L 357 229 L 356 216 L 348 203 L 334 194 L 314 194 L 300 201 L 238 260 L 224 268 L 209 273 L 200 273 L 190 276 L 171 276 L 148 271 L 133 263 L 125 255 L 123 255 L 109 236 L 103 220 L 103 202 L 110 184 L 114 178 L 194 100 Z"/>
+  <path class="logo-trace" d="M 182 31 L 169 38 L 150 52 L 70 129 L 58 142 L 46 160 L 37 179 L 31 200 L 31 228 L 33 231 L 32 233 L 36 249 L 43 265 L 55 285 L 72 304 L 91 319 L 117 332 L 155 341 L 187 341 L 213 338 L 226 357 L 243 371 L 262 382 L 281 388 L 292 390 L 318 390 L 331 388 L 350 382 L 369 372 L 383 362 L 447 301 L 460 283 L 473 254 L 478 232 L 478 202 L 469 169 L 460 151 L 451 138 L 432 119 L 420 111 L 405 104 L 388 99 L 337 98 L 329 81 L 316 61 L 297 42 L 273 28 L 246 21 L 219 21 L 199 25 Z"/>
+  <path class="logo-trace logo-trace-hole" d="M 203 94 L 220 88 L 233 88 L 248 94 L 259 104 L 269 122 L 201 184 L 176 209 L 171 218 L 169 227 L 171 242 L 175 250 L 180 255 L 190 261 L 191 260 L 192 262 L 208 262 L 225 255 L 300 184 L 311 176 L 330 168 L 342 165 L 366 165 L 373 167 L 387 175 L 402 193 L 408 210 L 408 227 L 405 238 L 398 252 L 384 268 L 333 315 L 320 321 L 301 322 L 287 317 L 280 311 L 348 249 L 355 237 L 357 229 L 356 216 L 348 203 L 334 194 L 314 194 L 300 201 L 238 260 L 224 268 L 209 273 L 200 273 L 190 276 L 171 276 L 148 271 L 133 263 L 125 255 L 123 255 L 109 236 L 103 220 L 103 202 L 110 184 L 114 178 L 194 100 Z"/>
+</svg>

@@ -1,156 +1,126 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="utf-8">
+  <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#174b3a">
-  <meta name="description" content="ELO Campus — sistema de gestão de equipamentos e empréstimos do Campus Lapa.">
-  <title>ELO Campus | Entrar</title>
-  <link rel="icon" type="image/svg+xml" href="assets/img/gestta-logo.svg">
+  <meta name="theme-color" content="#0B1020">
+  <title>Entrar — ELO Campus</title>
+  <meta name="description" content="Sistema de controle de equipamentos e empréstimos — Instituição - Campus Lapa.">
+  <link rel="icon" type="image/png" href="assets/img/logo.png">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
   <link rel="stylesheet" href="assets/css/style.css">
-  <script src="assets/js/login.js" defer></script>
+  <link rel="stylesheet" href="assets/css/login.css">
 </head>
-<body class="login-page">
-  <div class="ambient-shape ambient-shape--left" aria-hidden="true"></div>
-  <div class="ambient-shape ambient-shape--right" aria-hidden="true"></div>
+<body>
+  <main class="login">
 
-  <main class="login-shell">
-    <p class="corner-note corner-note--top-left" aria-hidden="true">
-      EQUIPAMENTOS<br>
-      EM BOAS MÃOS<br>
-      PARA UM CAMPUS<br>
-      AINDA MAIS FORTE
-      <span></span>
-    </p>
-    <p class="corner-note corner-note--top-right" aria-hidden="true">
-      PESSOAS<br>
-      RECURSOS<br>
-      CONHECIMENTO<br>
-      MAIS POSSIBILIDADES
-      <span></span>
-    </p>
+    <!-- Lado da marca (somente em telas largas) -->
+    <section class="brand-side" aria-label="Apresentação do sistema">
+      <div class="brand">
+        <img src="assets/img/logo.png" alt="">
+          <span class="brand-name">ELO Campus
+          <span class="brand-sub">Instituição - Campus Lapa</span>
+        </span>
+      </div>
 
-    <header class="brand-header">
-      <a class="brand" href="index.html" aria-label="ELO Campus — página inicial">
-        <img class="brand-mark" src="assets/img/gestta-logo.svg" alt="">
-        <span class="brand-name">ELO <span>Campus</span></span>
-      </a>
-      <p class="brand-subtitle">Gestão de equipamentos e empréstimos</p>
-    </header>
+      <div class="hero">
+        <img class="interlace-mark" src="assets/img/logo-draw.svg" alt="Logo ELO Campus, marca em degradê violeta e rosa">
 
-    <section class="login-card" aria-labelledby="login-title">
-      <div class="login-form-panel">
-        <div class="form-heading">
-          <p class="eyebrow">ÁREA RESTRITA</p>
-          <h1 id="login-title">Entrar no sistema</h1>
-          <p class="form-description">Acesse sua conta para gerenciar os equipamentos do campus.</p>
+        <h1>Conexões organizadas. Equipamentos sob controle.</h1>
+        <p>Consulte a disponibilidade, registre empréstimos e devoluções e acompanhe os prazos em um só lugar.</p>
+
+        <ul class="legend" aria-label="Situações possíveis de um equipamento">
+          <li class="badge badge-ok">Disponível</li>
+          <li class="badge badge-loan">Emprestado</li>
+          <li class="badge badge-late">Atrasado</li>
+          <li class="badge badge-maint">Em manutenção</li>
+          <li class="badge badge-off">Inativo</li>
+        </ul>
+      </div>
+
+      <p class="brand-foot">Projeto de estágio — Desenvolvimento de Sistemas</p>
+    </section>
+
+    <!-- Lado do formulário -->
+    <section class="form-side" aria-labelledby="titulo-login">
+      <div class="mobile-brand">
+        <img src="assets/img/logo-draw.svg" alt="">
+        <strong>ELO Campus</strong>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <span class="auth-kicker"><span aria-hidden="true"></span> Acesso institucional</span>
+          <h2 id="titulo-login">Acesse sua conta</h2>
+          <p>Escolha sua área de acesso e informe suas credenciais.</p>
         </div>
 
-        <form id="login-form" class="login-form" autocomplete="on">
-          <div class="form-field">
-            <label for="email">E-mail institucional</label>
+        <div id="login-erro" class="alert alert-error" role="alert" aria-live="polite" hidden></div>
+
+        <form id="login-form" novalidate>
+          <fieldset class="access-picker" aria-describedby="acesso-ajuda">
+            <legend>Como deseja entrar?</legend>
+            <div class="access-options">
+              <label class="access-option">
+                <input type="radio" name="tipo-acesso" value="usuario" checked>
+                <span class="access-option-card">
+                  <span class="access-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.5"/><path d="M4.5 20a7.5 7.5 0 0 1 15 0"/></svg>
+                  </span>
+                  <span class="access-copy"><strong>Discente, docente ou servidor</strong><small>Solicitar empréstimos, devolver itens e consultar meus registros</small></span>
+                  <span class="access-check" aria-hidden="true"></span>
+                </span>
+              </label>
+              <label class="access-option">
+                <input type="radio" name="tipo-acesso" value="administracao">
+                <span class="access-option-card">
+                  <span class="access-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 4.5 6v5.5c0 4.4 3 7.5 7.5 9.5 4.5-2 7.5-5.1 7.5-9.5V6z"/><path d="m9 12 2 2 4-4"/></svg>
+                  </span>
+                  <span class="access-copy"><strong>Administrador / TI</strong><small>Gerenciar acervo, empréstimos e cadastros</small></span>
+                  <span class="access-check" aria-hidden="true"></span>
+                </span>
+              </label>
+            </div>
+            <p class="access-hint" id="acesso-ajuda">A área de acesso deve corresponder ao perfil vinculado à sua conta.</p>
+          </fieldset>
+
+          <div class="field">
+            <label for="login">Usuário ou matrícula</label>
+            <input class="input" id="login" name="login" type="text"
+                   autocomplete="username" placeholder="Digite seu usuário ou matrícula" required autofocus>
+          </div>
+
+          <div class="field">
+            <label for="senha">Senha</label>
             <div class="input-wrap">
-              <svg class="field-icon" viewBox="0 0 24 24" aria-hidden="true">
-                <rect x="3.5" y="5.5" width="17" height="13" rx="2"></rect>
-                <path d="m4.5 7 7.5 5.5L19.5 7"></path>
-              </svg>
-              <input
-                id="email"
-                name="email"
-                type="email"
-                inputmode="email"
-                placeholder="seu.nome@instituicao.edu.br"
-                autocomplete="username"
-                required
-              >
+              <input class="input" id="senha" name="senha" type="password"
+                     autocomplete="current-password" placeholder="Sua senha" required>
+              <button class="input-toggle" id="senha-toggle" type="button"
+                      aria-controls="senha" aria-pressed="false">Mostrar</button>
             </div>
           </div>
 
-          <div class="form-field">
-            <label for="password">Senha</label>
-            <div class="input-wrap">
-              <svg class="field-icon" viewBox="0 0 24 24" aria-hidden="true">
-                <rect x="5" y="10" width="14" height="10" rx="2"></rect>
-                <path d="M8 10V7a4 4 0 0 1 8 0v3"></path>
-                <path d="M12 14v2"></path>
-              </svg>
-              <input
-                id="password"
-                name="password"
-                type="password"
-                placeholder="Digite sua senha"
-                autocomplete="current-password"
-                required
-              >
-              <button class="password-toggle" id="toggle-password" type="button" aria-label="Mostrar senha" aria-pressed="false">
-                <svg class="eye-icon" viewBox="0 0 24 24" aria-hidden="true">
-                  <path d="M2.5 12s3.4-6 9.5-6 9.5 6 9.5 6-3.4 6-9.5 6-9.5-6-9.5-6Z"></path>
-                  <circle cx="12" cy="12" r="2.5"></circle>
-                </svg>
-              </button>
-            </div>
-          </div>
-
-          <button class="submit-button" type="submit">
-            <span>Entrar</span>
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M4.5 12h14M12.5 5.5 19 12l-6.5 6.5"></path>
-            </svg>
-          </button>
-
-          <button class="forgot-button" id="forgot-password" type="button">Esqueci minha senha</button>
-          <p class="form-message" id="form-message" role="status" aria-live="polite" hidden></p>
+          <label class="remember-row"><input id="lembrar" type="checkbox"><span>Lembrar de mim neste dispositivo</span></label>
+          <button class="btn btn-primary" id="login-btn" type="submit">Entrar</button>
         </form>
-      </div>
-
-      <div class="login-art-panel" aria-label="Ilustração de equipamentos de uso acadêmico">
-        <div class="art-caption">
-          <span class="art-caption-line"></span>
-          <p>Recursos compartilhados.<br><strong>Conhecimento em movimento.</strong></p>
-        </div>
-        <img class="login-illustration" src="assets/img/login-illustration.svg" alt="Ilustração de notebook, projetor, livros e planta em um ambiente de estudo">
-        <div class="art-bottom-note">
-          <span class="art-status-dot" aria-hidden="true"></span>
-          Organização para cuidar melhor do que é de todos.
-        </div>
+        <button class="link-button" id="esqueci-senha" type="button">Esqueci minha senha</button>
+        <p class="card-foot qr-login-link">
+          <span class="login-note">A autenticação institucional será conectada ao servidor na etapa de integração.</span>
+          Só precisa consultar um equipamento?
+          <a href="pages/consulta-qr.html">Abrir consulta por QR Code sem entrar</a>
+        </p>
       </div>
     </section>
 
-    <section class="principles" aria-label="Princípios do ELO Campus">
-      <article class="principle-item">
-        <span class="principle-icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24"><path d="M12 3 19 6v5.5c0 4.2-2.8 7.5-7 9.5-4.2-2-7-5.3-7-9.5V6l7-3Z"></path><path d="m8.5 12 2.2 2.2 4.8-5"></path></svg>
-        </span>
-        <span class="principle-copy"><strong>Uso responsável</strong><small>Mais vida útil para os equipamentos</small></span>
-      </article>
-      <article class="principle-item">
-        <span class="principle-icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"></circle><path d="M3 19v-1.5A4.5 4.5 0 0 1 7.5 13h3A4.5 4.5 0 0 1 15 17.5V19"></path><path d="M16 5.5a3 3 0 0 1 0 5.8M17 13.5a4.5 4.5 0 0 1 4 4.5V19"></path></svg>
-        </span>
-        <span class="principle-copy"><strong>Comunidade acadêmica</strong><small>Recursos compartilhados para ir mais longe</small></span>
-      </article>
-      <article class="principle-item">
-        <span class="principle-icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24"><path d="M20.5 3.5C12 3.5 6 7 6 13a5.5 5.5 0 0 0 5.5 5.5c6 0 9-7 9-15Z"></path><path d="M3.5 21c2.5-6 6-9 11-12"></path></svg>
-        </span>
-        <span class="principle-copy"><strong>Campus sustentável</strong><small>Aproveitamento inteligente para um futuro melhor</small></span>
-      </article>
-    </section>
-
-    <p class="page-footer">ELO Campus <span aria-hidden="true">·</span> IF Baiano — Campus Lapa</p>
-
-    <p class="corner-note corner-note--bottom-left" aria-hidden="true">
-      CONEXÕES<br>
-      QUE IMPULSIONAM<br>
-      A EDUCAÇÃO
-      <span></span>
-    </p>
-    <p class="corner-note corner-note--bottom-right" aria-hidden="true">
-      HOJE<br>
-      UM CAMPUS<br>
-      MAIS AMANHÃ
-      <span></span>
-    </p>
   </main>
+
+  <script src="assets/js/runtime-config.js"></script>
+  <script src="assets/js/api.js"></script>
+  <script src="assets/js/auth.js"></script>
 </body>
 </html>

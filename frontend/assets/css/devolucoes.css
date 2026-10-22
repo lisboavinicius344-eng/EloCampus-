@@ -1,0 +1,64 @@
+/* ==========================================================
+   ELO Campus — Devoluções
+   Complementa o emprestimos.css (carregue DEPOIS dele).
+   Usa as mesmas variáveis (--surface, --line, --grad-main...).
+   ========================================================== */
+
+/* ---------- cards de resumo ---------- */
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; }
+.stat { display: flex; align-items: center; gap: 18px; padding: 22px 24px; }
+.stat-icon {
+  width: 56px; height: 56px; border-radius: 18px; flex: none;
+  display: flex; align-items: center; justify-content: center; color: #fff;
+}
+.stat-icon svg { width: 26px; height: 26px; }
+.stat-icon.main { background: var(--grad-main); }
+.stat-icon.cool { background: var(--grad-cool); }
+.stat-icon.warm { background: var(--grad-warm); }
+.stat-value { font-family: var(--font-title); font-size: 38px; font-weight: 600; line-height: 1; }
+.stat-label { color: var(--text-2); font-size: 15px; margin-top: 6px; }
+
+/* ---------- título de card ---------- */
+.card-title { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 16px; }
+
+/* ---------- formulário de devolução ---------- */
+.form { display: flex; flex-direction: column; gap: 20px; }
+.field { display: flex; flex-direction: column; gap: 8px; }
+.field > label, .field > .label { font-weight: 600; font-size: 15px; }
+.input-block { width: 100%; border-radius: 16px; padding: 14px 18px; font-size: 16px; }
+textarea.input-block { resize: vertical; min-height: 88px; font-family: var(--font-body); }
+
+/* equipamento selecionado */
+.picked { display: flex; align-items: center; gap: 14px; padding: 14px 18px; border-radius: 20px; background: var(--surface-2); }
+.picked .item-icon { width: 48px; height: 48px; border-radius: 16px; background: var(--grad-cool); }
+.picked-info { flex: 1 1 auto; min-width: 0; }
+.picked > .pill { flex: none; }
+.picked .item-icon { flex: none; }
+.stat { min-width: 0; }
+
+/* condição do equipamento (radio em formato de chip) */
+.choices { display: flex; flex-wrap: wrap; gap: 10px; }
+.choices { position: relative; }
+.choices input { position: absolute; opacity: 0; width: 1px; height: 1px; pointer-events: none; }
+.choice {
+  border: 2px solid var(--line); background: var(--surface-2); color: var(--text-2);
+  border-radius: var(--radius-pill); padding: 10px 18px; font-weight: 600; font-size: 15px; cursor: pointer;
+}
+.choice:hover { border-color: var(--violet); }
+.choices input:checked + .choice { background: var(--grad-main); border-color: transparent; color: #fff; }
+.choices input:focus-visible + .choice { outline: 3px solid var(--cyan); outline-offset: 2px; }
+
+/* checklist de conferência */
+.checklist { min-width: 0; border: 0; margin: 0; display: flex; flex-direction: column; gap: 10px; padding: 16px 18px; border-radius: 20px; background: var(--surface-2); }
+.check { display: flex; align-items: center; gap: 12px; font-size: 15px; cursor: pointer; }
+.check input { width: 20px; height: 20px; accent-color: var(--violet); flex: none; }
+
+/* ---------- fila de pendentes ---------- */
+.queue { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+.queue li { display: flex; align-items: center; gap: 14px; }
+.queue-time {
+  width: 64px; padding: 8px 0; text-align: center; border-radius: 14px;
+  background: var(--surface-2); font-family: var(--font-title); font-weight: 600; flex: none;
+}
+.queue-info { flex: 1 1 auto; min-width: 0; }
+.queue .btn { flex: none; }

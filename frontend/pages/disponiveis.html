@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0B1020">
+  <title>Ver os equipamentos — ELO Campus</title>
+  <link rel="icon" type="image/png" href="../assets/img/logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="stylesheet" href="../assets/css/layout.css">
+  <link rel="stylesheet" href="../assets/css/disponiveis.css">
+</head>
+<body data-pagina="disponiveis">
+  <div class="app">
+    <aside class="sidebar" id="sidebar"></aside>
+    <div class="content">
+      <header class="topbar" id="topbar"></header>
+      <main class="main">
+        <header class="page-head self-catalog-head">
+          <div>
+            <p class="self-kicker">CATÁLOGO</p>
+            <h1>Ver os equipamentos</h1>
+            <p>Consulte os equipamentos disponíveis e escolha o que precisa.</p>
+          </div>
+          <a class="btn btn-ghost" href="novo-emprestimo.html">Pedir empréstimo</a>
+        </header>
+
+        <section class="catalog-tools" aria-label="Buscar equipamentos">
+          <label class="catalog-search" for="busca-disponivel">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.8"/><path d="m16 16 5 5"/></svg>
+            <input id="busca-disponivel" type="search" placeholder="Buscar pelo nome do equipamento" autocomplete="off">
+          </label>
+          <label class="catalog-category" for="categoria-disponivel">
+            <span>Tipo</span>
+            <select id="categoria-disponivel"><option value="">Todos</option></select>
+          </label>
+          <span id="contagem-disponivel" class="catalog-count" aria-live="polite">Carregando…</span>
+        </section>
+
+        <div id="erro-disponiveis" class="alert alert-error" role="alert" hidden></div>
+        <section id="grade-disponiveis" class="available-grid" aria-label="Equipamentos disponíveis" aria-live="polite">
+          <p class="muted">Carregando equipamentos…</p>
+        </section>
+        <p class="self-demo-note">As informações exibidas pertencem à versão de demonstração local.</p>
+      </main>
+    </div>
+  </div>
+  <script src="../assets/js/auth.js"></script>
+  <script src="../assets/js/layout.js"></script>
+  <script src="../assets/js/dados-demo.js"></script>
+  <script src="../assets/js/visuais.js"></script>
+  <script src="../assets/js/runtime-config.js"></script>
+  <script src="../assets/js/api.js"></script>
+  <script src="../assets/js/disponiveis.js"></script>
+</body>
+</html>

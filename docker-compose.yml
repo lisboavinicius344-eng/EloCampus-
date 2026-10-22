@@ -1,0 +1,12 @@
+services:
+  elo-campus-frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: elo-campus-frontend
+    ports:
+      - "${ELO_PORT:-8080}:80"
+    environment:
+      ELO_API_BASE_URL: "${ELO_API_BASE_URL:-}"
+      ELO_DATA_MODE: "${ELO_DATA_MODE:-demo}"
+    restart: unless-stopped

@@ -1,0 +1,42 @@
+/* ==========================================================
+   ELO Campus — Usuários (solicitantes + equipe do sistema)
+   Complementa o emprestimos.css (carregue DEPOIS dele).
+   ========================================================== */
+.pills { display: flex; flex-wrap: wrap; gap: 8px; }
+.pills [hidden], [data-so][hidden], #permissoes[hidden], #aviso-fluxo[hidden] { display: none; }
+.mb-16 { margin-bottom: 16px; }
+.mt-20 { margin-top: 20px; }
+
+/* checkbox de permissão */
+.check { display: flex; align-items: center; gap: 12px; font-size: 15px; cursor: pointer; }
+.check input { width: 20px; height: 20px; accent-color: var(--violet); flex: none; margin: 0; }
+
+/* linhas clicáveis da tabela */
+#tabela tbody tr { cursor: pointer; }
+#tabela tbody tr:hover td { background: var(--surface-2); }
+#tabela tbody tr[aria-selected="true"] td { background: var(--surface-3); }
+#tabela tbody tr[aria-selected="true"] td:first-child { box-shadow: inset 4px 0 0 var(--violet); }
+#tabela tbody tr[hidden] { display: none; }
+#aviso-fluxo { border-left: 4px solid var(--cyan); }
+
+#tabela { min-width: 520px; }
+#tabela td:nth-child(3) { white-space: nowrap; }
+#tabela th, #tabela td { padding-left: 8px; padding-right: 8px; }
+#tabela td:last-child { white-space: nowrap; }
+#tabela td { font-size: 14px; }
+#tabela .pill { padding: 5px 10px; font-size: 12px; }
+#tabela .btn-sm { padding: 8px 14px; }
+.split > .grow-1 { flex-basis: 280px; }
+.split > .grow-2 { flex-basis: 640px; }
+
+/* ---------- filtros em duas linhas ---------- */
+.filter-row { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+.filter-row [hidden] { display: none; }
+
+/* ---------- formulário de edição ---------- */
+.field { display: flex; flex-direction: column; gap: 8px; }
+.field[hidden] { display: none; }
+.field > label { font-weight: 600; font-size: 15px; }
+.input-block { width: 100%; border-radius: 16px; padding: 14px 18px; font-size: 16px; }
+#form-edicao[hidden], .pills[hidden], .stack-sm[hidden], #perm-acoes[hidden] { display: none; }
+#permissoes .check input:disabled { opacity: .7; cursor: default; }

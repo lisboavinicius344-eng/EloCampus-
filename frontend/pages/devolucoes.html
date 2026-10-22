@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0B1020">
+  <title>Devoluções — ELO Campus</title>
+  <link rel="icon" type="image/png" href="../assets/img/logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/emprestimos.css">
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="stylesheet" href="../assets/css/devolucoes.css">
+  <link rel="stylesheet" href="../assets/css/layout.css">
+  <link rel="stylesheet" href="../assets/css/salz-bridge.css">
+</head>
+<body data-pagina="devolucoes">
+  <div class="app">
+    <aside class="sidebar" id="sidebar"></aside>
+    <div class="content">
+      <header class="topbar" id="topbar"></header>
+      <main class="main"><header class="page-head">
+      <div>
+        <h1>Devoluções</h1>
+        <p>Registre o retorno dos equipamentos e confira o estado de cada item.</p>
+      </div>
+      <div class="toolbar">
+        <label for="busca" class="sr-only">Buscar</label>
+        <input class="input" id="busca" type="search" placeholder="Buscar por patrimônio ou pessoa">
+        <a class="btn" href="emprestimos.html">Ver empréstimos ativos</a>
+      </div>
+    </header>
+
+    <!-- Resumo do dia -->
+    <section class="stats" aria-label="Resumo de hoje">
+      <div class="card stat">
+        <div class="stat-icon main"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l3 3 5-6"/></svg>
+        </div>
+        <div><div class="stat-value" id="devolvidos-hoje">0</div><div class="stat-label">Devolvidos hoje</div></div>
+      </div>
+      <div class="card stat">
+        <div class="stat-icon cool"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+        </div>
+        <div><div class="stat-value" id="aguardando-hoje">0</div><div class="stat-label">Aguardando hoje</div></div>
+      </div>
+      <div class="card stat">
+        <div class="stat-icon warm"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 9v4M12 17h.01M10.3 3.9L1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg>
+        </div>
+        <div><div class="stat-value" id="com-avaria">0</div><div class="stat-label">Com avaria</div></div>
+      </div>
+    </section>
+
+    <div class="split">
+      <!-- Histórico + fila -->
+      <div class="grow-2 stack">
+        <section class="card" aria-label="Devoluções recentes">
+          <div class="card-title">
+            <h2>Devoluções recentes</h2>
+            <div class="tabs" role="tablist" aria-label="Período">
+              <button class="tab" role="tab" aria-selected="true" type="button" data-periodo="hoje">Hoje</button>
+              <button class="tab" role="tab" aria-selected="false" type="button" data-periodo="semana">Semana</button>
+              <button class="tab" role="tab" aria-selected="false" type="button" data-periodo="mes">Mês</button>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Equipamento</th><th>Devolvido por</th><th>Data e hora</th><th>Condição</th>
+                </tr>
+              </thead>
+              <tbody id="lista-devolucoes-recentes"><tr><td colspan="4" class="muted">Carregando devoluções…</td></tr></tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="card" aria-label="Aguardando devolução hoje">
+          <div class="card-title"><h2>Aguardando hoje</h2></div>
+          <ul class="queue" id="fila-devolucao"><li class="muted">Carregando itens com devolução prevista para hoje…</li></ul>
+        </section>
+      </div>
+
+      <!-- Formulário -->
+      <aside class="card grow-1" aria-label="Registrar devolução">
+        <form class="form" id="form-devolucao">
+          <h2>Registrar devolução</h2>
+
+          <div class="field">
+            <label for="patrimonio">Patrimônio ou QR Code</label>
+            <input class="input input-block" id="patrimonio" type="search" placeholder="Use o botão Devolver na lista de empréstimos" autocomplete="off" readonly>
+          </div>
+
+          <div class="picked-list" id="itens-devolucao" aria-live="polite">
+            <p class="muted">Acesse esta página para selecionar os itens que está devolvendo.</p>
+          </div>
+
+          <div class="field" role="radiogroup" aria-labelledby="cond-label">
+            <span class="label" id="cond-label">Condição do equipamento</span>
+            <div class="choices">
+              <input type="radio" name="condicao" id="c1" value="Perfeito" checked><label class="choice" for="c1">Perfeito</label>
+              <input type="radio" name="condicao" id="c2" value="Incompleto"><label class="choice" for="c2">Incompleto</label>
+              <input type="radio" name="condicao" id="c3" value="Com avaria"><label class="choice" for="c3">Com avaria</label>
+            </div>
+          </div>
+
+          <fieldset class="checklist">
+            <legend class="sr-only">Conferência</legend>
+            <label class="check"><input type="checkbox" id="acessorios-conferidos"> Cabos e acessórios conferidos</label>
+            <label class="check"><input type="checkbox" id="equipamento-conferido"> Equipamento limpo e sem danos visíveis</label>
+            <label class="check"><input type="checkbox" id="assinatura-recebida"> <span>Pessoa assinou o recebimento</span></label>
+          </fieldset>
+
+          <div class="field">
+            <label for="obs">Observações</label>
+            <textarea class="input input-block" id="obs" placeholder="Descreva avarias ou itens faltantes, se houver"></textarea>
+          </div>
+
+          <div class="stack-sm">
+            <button class="btn btn-block" id="confirmar-devolucao" type="submit">Revisar devolução</button>
+            <a class="btn btn-line btn-block" href="emprestimos.html">Cancelar</a>
+          </div>
+          <div id="mensagem-devolucao" class="alert" role="status" hidden></div>
+        </form>
+      </aside>
+    </div></main>
+    </div>
+  </div>
+  <script src="../assets/js/auth.js"></script>
+  <script src="../assets/js/layout.js"></script>
+  <script src="../assets/js/dados-demo.js"></script>
+  <script src="../assets/js/runtime-config.js"></script>
+  <script src="../assets/js/api.js"></script>
+  <script src="../assets/js/salz-actions.js"></script><script src="../assets/js/emprestimos-ui.js"></script>
+</body>
+</html>

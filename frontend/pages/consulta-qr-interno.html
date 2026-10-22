@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Consulta por QR Code — ELO Campus</title>
+    <link rel="icon" href="../assets/img/logo.png">
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="../assets/css/layout.css">
+    <link rel="stylesheet" href="../assets/css/qr.css">
+    <link rel="stylesheet" href="../assets/css/salz-bridge.css">
+</head>
+
+<body data-pagina="consulta-qr">
+    <div class="app">
+        <aside class="sidebar" id="sidebar"></aside>
+
+        <div class="content">
+            <header class="topbar" id="topbar"></header>
+
+            <main class="main qr-integrated">
+                <section class="qr-card" aria-labelledby="titulo-consulta">
+                    <div class="qr-heading">
+                        <div class="qr-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h6v6H3zM15 3h6v6h-6zM3 15h6v6H3zM15 15h2v2h-2zM19 15h2v6h-6v-2M11 3v2M11 9v2M3 11h2M9 11v2M11 15v2M11 21h2M15 11h2M21 11v2"/></svg></div>
+                        <div>
+                            <h1 id="titulo-consulta">Consultar equipamento</h1>
+                            <p>Leia o QR Code ou informe o patrimônio para ver os dados do equipamento.</p>
+                        </div>
+                    </div>
+
+                    <div class="qr-reader" id="qr-reader">
+                        <video id="qr-video" playsinline muted></video>
+                        <div class="qr-frame" aria-hidden="true"></div>
+                        <p class="qr-reader-hint" id="qr-reader-hint">Aponte a câmera para o QR Code.</p>
+                    </div>
+
+                    <div class="qr-actions">
+                        <button class="btn btn-primary" type="button" id="abrir-camera">Abrir câmera</button>
+                        <label class="btn btn-ghost qr-file-btn" for="qr-arquivo">
+                            Usar galeria
+                            <input id="qr-arquivo" type="file" accept="image/*">
+                        </label>
+                    </div>
+
+                    <p id="qr-permission" class="qr-permission" role="status"></p>
+
+                    <div class="qr-divider">
+                        <span>ou informe o identificador</span>
+                    </div>
+
+                    <form id="consulta-form" class="qr-form">
+                        <div class="field">
+                            <label for="codigo">Identificador do QR Code</label>
+                            <input class="input" id="codigo" type="text" placeholder="Ex.: PRJ-0017" required>
+                        </div>
+                        <button class="btn btn-primary" type="submit">Consultar</button>
+                    </form>
+
+                    <div id="consulta-status" class="qr-status" role="status"></div>
+
+                    <section id="resultado" class="qr-result" hidden></section>
+                </section>
+            </main>
+        </div>
+    </div>
+
+    <script src="../assets/js/auth.js"></script>
+    <script src="../assets/js/layout.js"></script>
+    <script src="../assets/js/dados-demo.js"></script>
+    <script src="../assets/js/runtime-config.js"></script>
+  <script src="../assets/js/api.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
+    <script src="../assets/js/qr.js"></script>
+</body>
+
+</html>
