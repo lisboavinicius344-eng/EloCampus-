@@ -28,8 +28,31 @@
     const busca = $("busca");
     const abas = [...document.querySelectorAll("[data-filtro]")];
     const sessao = typeof obterSessao === "function" ? obterSessao() : null;
-    const usuarioFinal = ["aluno", "professor"].includes(String(sessao?.perfil || "").toLowerCase());
+    const usuarioFinal = ["aluno", "professor", "servidor"].includes(String(sessao?.perfil || "").toLowerCase());
     const chaveNome = (valor) => norm(valor).replace(/\s+/g, " ").trim();
+    const pertenceAoUsuario = (l) => {
+      if (!usuarioFinal) return true;
+      const nomeIgual = chaveNome(l.solicitante?.nome) === chaveNome(sessao?.nome);
+      const matriculaSessao = chaveNome(sessao?.matricula);
+      const matriculaRegistro = chaveNome(l.solicitante?.matricula);
+      return nomeIgual || Boolean(matriculaSessao && matriculaRegistro && matriculaSessao === matriculaRegistro);
+    };
+    if (usuarioFinal) {
+      const titulo = document.querySelector(".page-head h1");
+      const descricao = document.querySelector(".page-head p");
+      if (titulo) titulo.textContent = "Meus empréstimos";
+      if (descricao) descricao.textContent = "Veja o prazo dos itens que estão com você e acompanhe as devoluções.";
+      if (busca) busca.placeholder = "Buscar meus equipamentos";
+      const acao = document.querySelector('.page-head a[href="novo-emprestimo.html"]');
+      if (acao) acao.textContent = "Pedir empréstimo";
+      const cabecalhos = document.querySelectorAll(".table-wrap thead th");
+      if (cabecalhos[1]) cabecalhos[1].hidden = true;
+      if (cabecalhos[2]) cabecalhos[2].textContent = "Prazo / devolução";
+      const detalhes = document.querySelector('aside.card[aria-label="Detalhe do empréstimo"]');
+      if (detalhes) detalhes.hidden = true;
+      const rotulosUsuario = { ativos: "Comigo", atrasados: "Atrasados", historico: "Devolvidos" };
+      abas.forEach((aba) => { if (rotulosUsuario[aba.dataset.filtro]) aba.dataset.rotuloUsuario = rotulosUsuario[aba.dataset.filtro]; });
+    }
     let registros = [], filtro = "ativos", selecionado = null;
 
     const grupoDa = (l) => registros.filter((x) => String(x.emprestimoId) === String(l.emprestimoId));
@@ -74,23 +97,32 @@
       abas.forEach((aba) => {
         const chave = aba.dataset.filtro;
         const total = registros.filter((l) => chave === "ativos" ? !l.devolvida : chave === "atrasados" ? (!l.devolvida && EloUtil.diasAtraso(l.prevista) > 0) : Boolean(l.devolvida)).length;
-        const rotulos = { ativos: "Ativos", atrasados: "Atrasados", historico: "Histórico" };
+        const rotulos = usuarioFinal ? { ativos: "Comigo", atrasados: "Atrasados", historico: "Devolvidos" } : { ativos: "Ativos", atrasados: "Atrasados", historico: "Histórico" };
         aba.textContent = `${rotulos[chave] || aba.textContent} · ${total}`;
         aba.setAttribute("aria-selected", String(chave === filtro));
       });
       if (!filtrados.length) {
-        corpo.innerHTML = `<tr><td colspan="5" class="muted">${registros.length ? "Nenhum empréstimo corresponde ao filtro selecionado." : "Não há empréstimos disponíveis na fonte de dados local."}</td></tr>`;
+        corpo.innerHTML = `<tr><td colspan="5" class="muted">${registros.length ? "Nenhum item corresponde a este filtro." : usuarioFinal ? 'Você ainda não tem empréstimos. <a href="disponiveis.html">Ver o que pode solicitar</a>.' : "Não há empréstimos disponíveis na fonte de dados local."}</td></tr>`;
         desenharDetalhe(null);
         return;
       }
       corpo.innerHTML = filtrados.map((l) => {
         const status = statusEmprestimo(l);
+        if (usuarioFinal) {
+          return `<tr data-item-id="${esc(l.id)}"${status.classe === "pill-late" ? ' class="is-late"' : ""}>
+            <td><strong>${esc(l.equipamento.nome)}</strong><small>${esc(l.equipamento.patrimonio)}</small></td>
+            <td hidden></td>
+            <td>${dataHora(l.devolvida || l.prevista)}</td>
+            <td><span class="pill ${status.classe}">${esc(status.texto)}</span></td>
+            <td>${l.devolvida ? '<span class="muted small">Devolvido</span>' : `<button class="btn btn-sm" type="button" data-devolver="${esc(l.id)}">Devolver</button>`}</td>
+          </tr>`;
+        }
         return `<tr data-item-id="${esc(l.id)}"${status.classe === "pill-late" ? ' class="is-late"' : ""}>
           <td><strong>${esc(l.equipamento.nome)}</strong><small>${esc(l.equipamento.patrimonio)}${grupoDa(l).length > 1 ? ` · ${grupoDa(l).length} itens no empréstimo` : ""}</small></td>
           <td>${esc(l.solicitante.nome)}<small>por ${esc(l.registradoPor || "—")}</small></td>
           <td>${dataHora(l.devolvida || l.prevista)}</td>
           <td><span class="pill ${status.classe}">${esc(status.texto)}</span></td>
-          <td>${l.devolvida ? '<span class="muted small">Concluído</span>' : usuarioFinal ? '<span class="muted small">Em aberto</span>' : `<button class="btn btn-sm" type="button" data-devolver="${esc(l.id)}">Devolver</button>`}</td>
+          <td>${l.devolvida ? '<span class="muted small">Concluído</span>' : `<button class="btn btn-sm" type="button" data-devolver="${esc(l.id)}">Devolver</button>`}</td>
         </tr>`;
       }).join("");
       const activeSelection = filtrados.find((l) => String(l.id) === String(selecionado?.id)) || filtrados[0];
@@ -114,7 +146,7 @@
     });
     try {
       const carregados = await ELO.emprestimos();
-      registros = usuarioFinal ? carregados.filter((l) => chaveNome(l.solicitante?.nome) === chaveNome(sessao?.nome)) : carregados;
+      registros = carregados.filter(pertenceAoUsuario);
       if (usuarioFinal) {
         const titulo = document.querySelector(".page-head h1");
         const descricao = document.querySelector(".page-head p");
@@ -148,7 +180,47 @@
     const inputPatrimonio = $("patrimonio");
     const itensContainer = $("itens-devolucao");
     const mensagem = $("mensagem-devolucao");
+    const sessao = typeof obterSessao === "function" ? obterSessao() : null;
+    const perfil = String(sessao?.perfil || "").toLowerCase();
+    const usuarioFinal = ["aluno", "professor", "servidor"].includes(perfil);
+    const chaveNome = (valor) => norm(valor).replace(/\s+/g, " ").trim();
+    const pertenceAoUsuario = (l) => {
+      if (!usuarioFinal) return true;
+      const nomeIgual = chaveNome(l.solicitante?.nome) === chaveNome(sessao?.nome);
+      const matriculaSessao = chaveNome(sessao?.matricula);
+      const matriculaRegistro = chaveNome(l.solicitante?.matricula);
+      return nomeIgual || Boolean(matriculaSessao && matriculaRegistro && matriculaSessao === matriculaRegistro);
+    };
     let registros = [], periodo = "hoje", itensDoGrupo = [], revisar = false;
+
+    if (usuarioFinal) {
+      const titulo = document.querySelector(".page-head h1");
+      const descricao = document.querySelector(".page-head p");
+      if (titulo) titulo.textContent = "Devolver equipamentos";
+      if (descricao) descricao.textContent = "Marque os itens que está entregando e confira antes de confirmar.";
+      const tituloFormulario = form.querySelector("h2");
+      if (tituloFormulario) tituloFormulario.textContent = "O que você vai devolver?";
+      const campoPatrimonio = inputPatrimonio.closest(".field");
+      if (campoPatrimonio) campoPatrimonio.hidden = true;
+      const labelAssinatura = form.querySelector("#assinatura-recebida")?.closest("label");
+      if (labelAssinatura) labelAssinatura.hidden = true;
+      const tituloCondicao = $("cond-label");
+      if (tituloCondicao) tituloCondicao.textContent = "Como está o equipamento?";
+      const labelsCondicao = { c1: "Tudo certo", c2: "Falta algum acessório", c3: "Há algum problema" };
+      Object.entries(labelsCondicao).forEach(([id, texto]) => { const label = document.querySelector(`label[for="${id}"]`); if (label) label.textContent = texto; });
+      const checklist = form.querySelector(".checklist"); if (checklist) checklist.hidden = true;
+      const labelObs = $("obs")?.closest(".field")?.querySelector("label");
+      if (labelObs) labelObs.textContent = "Observação (opcional) — informe se falta algo ou se há algum problema";
+      const cancel = form.querySelector('a[href="emprestimos.html"]');
+      if (cancel) { cancel.href = "dashboard.html"; cancel.textContent = "Voltar ao início"; }
+      document.querySelector(".stats")?.setAttribute("hidden", "");
+      document.querySelector('.split > .grow-2.stack')?.setAttribute("hidden", "");
+      document.querySelector('.card[aria-label="Devoluções recentes"]')?.setAttribute("hidden", "");
+      document.querySelector('.card[aria-label="Aguardando devolução hoje"]')?.setAttribute("hidden", "");
+      document.querySelector(".page-head .toolbar")?.setAttribute("hidden", "");
+      const textoVazio = itensContainer.querySelector(".muted");
+      if (textoVazio) textoVazio.textContent = "Seus equipamentos emprestados aparecerão aqui para você escolher o que vai devolver.";
+    }
 
     function noPeriodo(data) {
       const dt = new Date(data); const hoje = new Date();
@@ -169,13 +241,16 @@
       corpoRecentes.innerHTML = devolvidos.length ? devolvidos.map((l) => {
         const cond = l.condicaoDevolucao || "Não informada";
         const pill = cond === "Com avaria" ? "pill-late" : cond === "Incompleto" ? "pill-warn" : "pill-ok";
-        return `<tr><td><strong>${esc(l.equipamento.nome)}</strong><small>${esc(l.equipamento.patrimonio)}</small></td><td>${esc(l.solicitante.nome)}<small>recebido por ${esc(l.responsavelDevolucao || "—")}</small></td><td>${dataHora(l.devolvida)}</td><td><span class="pill ${pill}">${esc(cond)}</span></td></tr>`;
+        const pessoa = usuarioFinal
+          ? `<td>${esc(l.solicitante.nome)}<small>registrado no seu perfil</small></td>`
+          : `<td>${esc(l.solicitante.nome)}<small>recebido por ${esc(l.responsavelDevolucao || "—")}</small></td>`;
+        return `<tr><td><strong>${esc(l.equipamento.nome)}</strong><small>${esc(l.equipamento.patrimonio)}</small></td>${pessoa}<td>${dataHora(l.devolvida)}</td><td><span class="pill ${pill}">${esc(cond)}</span></td></tr>`;
       }).join("") : `<tr><td colspan="4" class="muted">${registros.some((l) => l.devolvida) ? "Nenhuma devolução corresponde ao período ou à pesquisa." : "Nenhuma devolução registrada na fonte local."}</td></tr>`;
     }
     function desenharFila() {
       const hoje = new Date();
       const aguardando = registros.filter((l) => !l.devolvida && mesmoDia(l.prevista, hoje)).sort((a,b) => new Date(a.prevista) - new Date(b.prevista));
-      fila.innerHTML = aguardando.length ? aguardando.map((l) => `<li><div class="queue-time">${new Date(l.prevista).toLocaleTimeString("pt-BR", {hour:"2-digit",minute:"2-digit"})}</div><div class="queue-info"><strong>${esc(l.equipamento.nome)}</strong><div class="muted small">${esc(l.solicitante.nome)} · ${esc(l.equipamento.patrimonio)}</div></div><button class="btn btn-sm" type="button" data-receber="${esc(l.id)}">Receber</button></li>`).join("") : '<li class="muted">Nenhum equipamento com devolução prevista para hoje.</li>';
+      fila.innerHTML = aguardando.length ? aguardando.map((l) => `<li><div class="queue-time">${new Date(l.prevista).toLocaleTimeString("pt-BR", {hour:"2-digit",minute:"2-digit"})}</div><div class="queue-info"><strong>${esc(l.equipamento.nome)}</strong><div class="muted small">${esc(l.solicitante.nome)} · ${esc(l.equipamento.patrimonio)}</div></div><button class="btn btn-sm" type="button" data-receber="${esc(l.id)}">${usuarioFinal ? "Registrar" : "Receber"}</button></li>`).join("") : '<li class="muted">Nenhum equipamento com devolução prevista para hoje.</li>';
       $("devolvidos-hoje").textContent = registros.filter((l) => l.devolvida && mesmoDia(l.devolvida, hoje)).length;
       $("aguardando-hoje").textContent = aguardando.length;
       $("com-avaria").textContent = registros.filter((l) => l.devolvida && l.condicaoDevolucao === "Com avaria").length;
@@ -183,14 +258,17 @@
     function desenharItensRetorno(prefill) {
       itensContainer.innerHTML = "";
       if (!prefill.length) {
-        itensContainer.innerHTML = '<p class="muted">Abra uma devolução pela página de Empréstimos para carregar os dados do registro.</p>';
+        itensDoGrupo = [];
+        itensContainer.innerHTML = usuarioFinal
+          ? '<p class="muted">Não há equipamentos emprestados vinculados ao seu cadastro.</p>'
+          : '<p class="muted">Abra uma devolução pela página de Empréstimos para carregar os dados do registro.</p>';
         inputPatrimonio.value = "";
         return;
       }
       itensDoGrupo = prefill;
       inputPatrimonio.value = prefill.map((l) => l.equipamento.patrimonio).join(", ");
-      itensContainer.innerHTML = `<div class="stack-sm">${prefill.map((l) => `<label class="picked" style="cursor:pointer;gap:.75rem"><input type="checkbox" name="itens-devolucao" value="${esc(l.id)}" ${String(l.id) === String(itemInicial) || (!itemInicial && prefill.length === 1) ? "checked" : ""}><span class="item-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16v11H4zM2 20h20M8 16v4m8-4v4"/></svg></span><span class="picked-info"><strong>${esc(l.equipamento.nome)}</strong><small>${esc(l.equipamento.patrimonio)} · ${esc(l.solicitante.nome)} · retirada ${dataHora(l.retirada)}</small></span><span class="pill ${EloUtil.prazo(l.prevista).classe === "late" ? "pill-late" : "pill-ok"}">${esc(l.situacao === "atrasado" ? "Atrasado" : "Emprestado")}</span></label>`).join("")}</div>`;
-      if (!itemInicial && prefill.length > 1) itensContainer.querySelectorAll('input[name="itens-devolucao"]').forEach((c) => { c.checked = true; });
+      itensContainer.innerHTML = `<div class="stack-sm">${prefill.map((l) => `<label class="picked self-return-item" style="cursor:pointer;gap:.75rem"><input type="checkbox" name="itens-devolucao" value="${esc(l.id)}" ${String(l.id) === String(itemInicial) || (!usuarioFinal && !itemInicial && prefill.length === 1) ? "checked" : ""}><span class="item-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16v11H4zM2 20h20M8 16v4m8-4v4"/></svg></span><span class="picked-info"><strong>${esc(l.equipamento.nome)}</strong><small>${esc(l.equipamento.patrimonio)}${usuarioFinal ? ` · Devolver até ${esc(new Date(l.prevista).toLocaleDateString("pt-BR", {day:"2-digit", month:"2-digit", year:"numeric"}))}` : ` · ${esc(l.solicitante.nome)} · retirada ${dataHora(l.retirada)}`}</small></span><span class="pill ${EloUtil.prazo(l.prevista).classe === "late" ? "pill-late" : "pill-ok"}">${esc(l.situacao === "atrasado" ? "Prazo passou" : usuarioFinal ? "Com você" : "Emprestado")}</span></label>`).join("")}</div>`;
+      if (!itemInicial && !usuarioFinal && prefill.length > 1) itensContainer.querySelectorAll('input[name="itens-devolucao"]').forEach((c) => { c.checked = true; });
     }
     function mostrarRevisao(selecionados) {
       const div = $("revisao-devolucao");
@@ -232,13 +310,13 @@
           equipamentoConferido: $("equipamento-conferido").checked,
           assinaturaRecebida: $("assinatura-recebida").checked,
         });
-        registros = await ELO.emprestimos();
+        registros = (await ELO.emprestimos()).filter(pertenceAoUsuario);
         desenharRecentes(); desenharFila();
-        aviso(mensagem, `${result.itens} equipamento(s) devolvido(s) às ${new Date(result.devolvidoEm).toLocaleTimeString("pt-BR", {hour:"2-digit",minute:"2-digit"})}. Alteração salva localmente neste navegador; não é um registro oficial do servidor.`, "ok");
+        aviso(mensagem, `${result.itens} ${result.itens === 1 ? "equipamento devolvido" : "equipamentos devolvidos"} às ${new Date(result.devolvidoEm).toLocaleTimeString("pt-BR", {hour:"2-digit",minute:"2-digit"})}. Alteração salva nesta demonstração local; não é um registro oficial do servidor.`, "ok");
         history.replaceState(null, "", location.pathname);
         revisar = false;
-        desenharItensRetorno([]);
         form.reset();
+        desenharItensRetorno(usuarioFinal ? registros.filter((l) => !l.devolvida) : []);
         $("confirmar-devolucao").textContent = "Revisar devolução";
         $("revisao-devolucao")?.remove();
       } catch (error) { aviso(mensagem, error.message || "Não foi possível registrar a devolução.", "error"); }
@@ -246,7 +324,7 @@
     });
 
     try {
-      registros = await ELO.emprestimos();
+      registros = (await ELO.emprestimos()).filter(pertenceAoUsuario);
       desenharRecentes(); desenharFila();
       let prefill = [];
       if (itemInicial) {
@@ -254,6 +332,8 @@
         if (item) prefill = registros.filter((l) => String(l.emprestimoId) === String(item.emprestimoId) && !l.devolvida);
       } else if (emprestimoInicial) {
         prefill = registros.filter((l) => String(l.emprestimoId) === String(emprestimoInicial) && !l.devolvida);
+      } else if (usuarioFinal) {
+        prefill = registros.filter((l) => !l.devolvida);
       }
       desenharItensRetorno(prefill);
     } catch (error) {

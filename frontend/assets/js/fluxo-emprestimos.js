@@ -4,6 +4,16 @@
   if (!form || document.body.dataset.pagina !== "emprestimos") return;
   const $ = (id) => document.getElementById(id);
   const esc = (value) => EloUtil.esc(value ?? "");
+  const sessaoAtual = typeof obterSessao === "function" ? obterSessao() : null;
+  const perfilAtual = String(sessaoAtual?.perfil || "").toLowerCase();
+  const usuarioFinal = ["aluno", "professor", "servidor"].includes(perfilAtual);
+  const parametrosIniciais = new URLSearchParams(location.search);
+  if (!sessaoAtual) return; // layout.js já redireciona para o login se não houver sessão.
+  if (!parametrosIniciais.get("nome") && ["administrador", "operador"].includes(perfilAtual)) {
+    location.replace("usuarios.html?origem=novo-emprestimo");
+    return;
+  }
+  if (!parametrosIniciais.get("nome") && !usuarioFinal) return;
   const mensagem = $("emprestimo-mensagem");
   const campoSolicitante = $("solicitante");
   const campoVinculo = $("vinculo");
@@ -28,6 +38,57 @@
   };
   const formatarCampoData = (valor) => valor ? EloUtil.dataHora(new Date(valor)) : "—";
   const nomeData = (e) => `${e.nome} — ${e.patrimonio}`;
+  const vinculosPerfil = { aluno: "Aluno", professor: "Professor", servidor: "Servidor" };
+
+  if (usuarioFinal) {
+    const nomeSessao = String(sessaoAtual?.nome || "").trim();
+    campoSolicitante.value = nomeSessao + (sessaoAtual?.matricula ? ` · ${sessaoAtual.matricula}` : "");
+    campoSolicitante.readOnly = true;
+    campoVinculo.value = vinculosPerfil[perfilAtual] || "Servidor";
+    campoVinculo.disabled = true;
+
+    // Modo de autoatendimento: o usuário informa apenas o que precisa, não dados
+    // administrativos do solicitante ou da rotina interna do acervo.
+    const sectionSolicitante = document.querySelector('section[aria-labelledby="t-solicitante"]');
+    if (sectionSolicitante) sectionSolicitante.hidden = true;
+    const retiradaInterna = $("retirada")?.closest(".field");
+    if (retiradaInterna) retiradaInterna.hidden = true;
+    document.querySelectorAll("[data-resumo-interno]").forEach((linha) => { linha.hidden = true; });
+    const h1 = document.querySelector(".page-head h1");
+    const intro = document.querySelector(".page-head p");
+    if (h1) h1.textContent = "Pedir empréstimo";
+    if (intro) intro.textContent = "Escolha os equipamentos e diga até quando precisa deles.";
+    const tituloEquipamentos = $("t-equip"); if (tituloEquipamentos) tituloEquipamentos.textContent = "O que você precisa?";
+    const labelEquipamento = document.querySelector('label[for="equip"]');
+    if (labelEquipamento) labelEquipamento.textContent = "Buscar pelo nome ou código do item";
+    campoEquipamento.placeholder = "Digite o nome ou código do equipamento";
+    const tituloPrazo = $("t-prazo"); if (tituloPrazo) tituloPrazo.textContent = "Prazo e finalidade";
+    const labelObs = document.querySelector('label[for="obs"]');
+    if (labelObs) labelObs.textContent = "Observação (opcional)";
+    const resumoTitulo = document.querySelector(".summary h2");
+    if (resumoTitulo) resumoTitulo.textContent = "Seu pedido";
+    const resumoDevolucao = document.querySelector('[data-resumo-prazo] span');
+    if (resumoDevolucao) resumoDevolucao.textContent = "Preciso devolver até";
+    const termos = document.querySelector(".summary .terms");
+    if (termos) termsText(termos, "Confirmo que vou cuidar dos equipamentos e devolver até o prazo informado.");
+    const submit = form.querySelector('button[type="submit"]');
+    if (submit) submit.textContent = "Revisar pedido";
+    const cancelar = form.querySelector("a.cancel");
+    if (cancelar) cancelar.href = "dashboard.html";
+    const tituloRevisao = $("titulo-revisao"); if (tituloRevisao) tituloRevisao.textContent = "Confirmar solicitação";
+    const passos = [...document.querySelectorAll(".steps .step-label")];
+    ["Pedido", "Escolha os itens", "Confirmação"].forEach((texto, indice) => { if (passos[indice]) passos[indice].textContent = texto; });
+    const textoRevisao = $("texto-revisao-pedido");
+    if (textoRevisao) textoRevisao.textContent = "Confira os itens e o prazo antes de enviar sua solicitação.";
+    const confirmar = $("confirmar-emprestimo"); if (confirmar) confirmar.textContent = "Confirmar solicitação";
+  }
+
+  function termsText(label, text) {
+    const input = label.querySelector("input");
+    label.textContent = "";
+    if (input) label.appendChild(input);
+    label.append(document.createTextNode(` ${text}`));
+  }
 
   function desenharSelecionados() {
     const vazio = $("nenhum-equipamento");
@@ -63,6 +124,16 @@
       equipamentos = await ELO.equipamentos();
       const disponiveis = equipamentos.filter((e) => e.situacao === "disponivel");
       $("lista-equipamentos").innerHTML = disponiveis.map((e) => `<option value="${esc(e.patrimonio)}" label="${esc(e.nome)}"></option><option value="${esc(nomeData(e))}"></option>`).join("");
+      const itemInicial = parametrosIniciais.get("equipamentoId");
+      if (itemInicial) {
+        const escolhido = disponiveis.find((e) => String(e.id) === String(itemInicial));
+        if (escolhido) {
+          selecionados.push(escolhido);
+          desenharSelecionados();
+        } else {
+          mostrarMensagem("Esse equipamento não está disponível neste momento. Escolha outro item do catálogo.", "info");
+        }
+      }
     } catch (error) {
       mostrarMensagem(`Não foi possível carregar os equipamentos: ${error.message}`);
     }
@@ -94,16 +165,16 @@
     const devolucao = new Date($("devolucao").value);
     if (!Number.isFinite(retirada.getTime()) || !Number.isFinite(devolucao.getTime()) || devolucao <= retirada) return mostrarMensagem("A devolução prevista deve ocorrer depois da retirada.");
     dadosParaConfirmar = {
-      solicitante: campoSolicitante.value.split(" · ")[0].trim(),
-      matricula: new URLSearchParams(location.search).get("matricula") || "",
-      vinculo: campoVinculo.value,
+      solicitante: usuarioFinal ? String(sessaoAtual?.nome || "").trim() : campoSolicitante.value.split(" · ")[0].trim(),
+      matricula: usuarioFinal ? String(sessaoAtual?.matricula || "") : (parametrosIniciais.get("matricula") || ""),
+      vinculo: usuarioFinal ? vinculosPerfil[perfilAtual] : campoVinculo.value,
       equipamentos: selecionados.map((e) => e.id),
       retirada: retirada.toISOString(),
       prevista: devolucao.toISOString(),
       finalidade: $("finalidade").value,
       observacoes: $("obs").value.trim(),
     };
-    resumoReview.innerHTML = `<div class="stack-sm"><div class="summary-row"><span>Solicitante</span><strong>${esc(dadosParaConfirmar.solicitante)}</strong></div><div class="summary-row"><span>Vínculo</span><strong>${esc(dadosParaConfirmar.vinculo)}</strong></div><div class="summary-row"><span>Retirada</span><strong>${esc(formatarCampoData($("retirada").value))}</strong></div><div class="summary-row"><span>Devolução prevista</span><strong>${esc(formatarCampoData($("devolucao").value))}</strong></div><div><strong>Equipamentos</strong><ul>${selecionados.map((e) => `<li>${esc(e.nome)} · ${esc(e.patrimonio)}</li>`).join("")}</ul></div>${dadosParaConfirmar.observacoes ? `<p><strong>Observações:</strong> ${esc(dadosParaConfirmar.observacoes)}</p>` : ""}</div><p class="muted">A confirmação registrará a operação apenas na fonte local deste navegador até a integração com o servidor.</p>`;
+    resumoReview.innerHTML = `<div class="stack-sm">${usuarioFinal ? "" : `<div class="summary-row"><span>Solicitante</span><strong>${esc(dadosParaConfirmar.solicitante)}</strong></div><div class="summary-row"><span>Vínculo</span><strong>${esc(dadosParaConfirmar.vinculo)}</strong></div><div class="summary-row"><span>Retirada</span><strong>${esc(formatarCampoData($("retirada").value))}</strong></div>`}<div class="summary-row"><span>Devolução prevista</span><strong>${esc(formatarCampoData($("devolucao").value))}</strong></div><div><strong>Equipamentos</strong><ul>${selecionados.map((e) => `<li>${esc(e.nome)} · ${esc(e.patrimonio)}</li>`).join("")}</ul></div>${dadosParaConfirmar.observacoes ? `<p><strong>Observações:</strong> ${esc(dadosParaConfirmar.observacoes)}</p>` : ""}</div><p class="muted">${usuarioFinal ? "Esta demonstração salva o pedido apenas neste navegador; ele ainda não é um registro oficial." : "A confirmação registrará a operação apenas na fonte local deste navegador até a integração com o servidor."}</p>`;
     form.hidden = true;
     formReview.hidden = false;
     $("confirmar-emprestimo").focus();
@@ -115,7 +186,7 @@
     const botao = $("confirmar-emprestimo"); botao.disabled = true;
     try {
       await ELO.registrarEmprestimo(dadosParaConfirmar);
-      location.href = "emprestimos.html?salvo=registrado";
+      location.href = usuarioFinal ? "emprestimos.html?salvo=registrado" : "emprestimos.html?salvo=registrado";
     } catch (error) {
       formReview.hidden = true; form.hidden = false;
       mostrarMensagem(error.message || "Não foi possível registrar o empréstimo.");

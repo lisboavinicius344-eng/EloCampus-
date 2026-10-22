@@ -179,10 +179,27 @@ a:hover { color: #67E8F9; }
   white-space: nowrap;
 }
 
+/* Microinterações compartilhadas: feedback visual sem atrasar operações. */
+.btn:hover:not([disabled]) { transform: translateY(-1px); }
+.btn:active:not([disabled]) { transform: translateY(0); }
+.btn:focus-visible,
+button:focus-visible,
+a:focus-visible,
+input[type="checkbox"]:focus-visible,
+input[type="radio"]:focus-visible { outline: 2px solid var(--cyan); outline-offset: 3px; }
+
+@keyframes elo-page-enter {
+  from { opacity: 0; transform: translateY(5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+body:not(.qr-page) .main { animation: elo-page-enter .24s ease-out both; }
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: .01ms !important;
     animation-delay: 0s !important;
     transition-duration: .01ms !important;
+    scroll-behavior: auto !important;
   }
+  body:not(.qr-page) .main { animation: none; }
 }

@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#0B1020">
   <title>Painel — ELO Campus</title>
-  <link rel="icon" type="image/svg+xml" href="../assets/img/logo.png">
+  <link rel="icon" type="image/png" href="../assets/img/logo.png">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -24,13 +24,53 @@
 
       <main class="main">
         <div class="page-head">
-          <div>
+          <div class="dashboard-heading-copy">
+            <span class="self-greeting-label">SEU ESPAÇO</span>
             <h1>Painel</h1>
-            <p>Veja como estão os equipamentos e o que precisa de atenção hoje.</p>
+            <p>Veja o que você precisa e resolva tudo em poucos passos.</p>
           </div>
           <a class="btn btn-primary" href="equipamento-form.html">+ Cadastrar equipamento</a>
         </div>
         <div class="alert alert-error aviso-demo" id="erro" role="alert" hidden></div>
+
+        <section id="inicio-usuario" class="self-home" hidden aria-label="Seu espaço">
+          <div class="self-actions" aria-label="O que você quer fazer?">
+            <a class="self-action self-action-browse" href="disponiveis.html">
+              <span class="self-action-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m3 7 9-4 9 4v10l-9 4-9-4z"/><path d="m3 7 9 4 9-4M12 11v10"/></svg></span>
+              <span class="self-action-copy"><strong>Ver os equipamentos</strong><small>Consulte os itens disponíveis para empréstimo.</small></span>
+              <span class="self-action-arrow" aria-hidden="true">→</span>
+            </a>
+            <a class="self-action self-action-request" href="novo-emprestimo.html">
+              <span class="self-action-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg></span>
+              <span class="self-action-copy"><strong>Pedir empréstimo</strong><small>Escolha os itens e informe quando vai devolvê-los.</small></span>
+              <span class="self-action-arrow" aria-hidden="true">→</span>
+            </a>
+            <a class="self-action self-action-return" href="devolucoes.html">
+              <span class="self-action-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14 4 9l5-5"/><path d="M4 9h10a6 6 0 0 1 0 12h-3"/></svg></span>
+              <span class="self-action-copy"><strong>Devolver equipamentos</strong><small>Marque os itens que está entregando.</small></span>
+              <span class="self-action-arrow" aria-hidden="true">→</span>
+            </a>
+            <a class="self-action self-action-qr" href="consulta-qr-interno.html">
+              <span class="self-action-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h6v6H3zM15 3h6v6h-6zM3 15h6v6H3z"/><path d="M15 15h2v2h-2zM19 15h2v6h-6v-2M11 3v2M11 9v2M3 11h2M9 11v2M11 15v2M11 21h2M15 11h2M21 11v2"/></svg></span>
+              <span class="self-action-copy"><strong>Consultar QR Code</strong><small>Leia a etiqueta para consultar um equipamento.</small></span>
+              <span class="self-action-arrow" aria-hidden="true">→</span>
+            </a>
+          </div>
+
+          <div class="self-home-grid">
+            <section class="self-panel" aria-labelledby="titulo-itens-comigo">
+              <header class="self-panel-head"><h2 id="titulo-itens-comigo">O que está comigo</h2><a href="emprestimos.html">Ver meus empréstimos</a></header>
+              <div id="itens-comigo" aria-live="polite"><p class="muted">Carregando…</p></div>
+            </section>
+            <section class="self-panel self-available-panel" aria-labelledby="titulo-disponiveis-agora">
+              <span class="self-panel-symbol" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5 10 17l9-10"/><circle cx="12" cy="12" r="10"/></svg></span>
+              <h2 id="titulo-disponiveis-agora">Equipamentos disponíveis</h2>
+              <p><strong id="quantidade-disponivel">—</strong> equipamentos disponíveis agora.</p>
+              <a class="btn btn-primary" href="disponiveis.html">Ver equipamentos</a>
+            </section>
+          </div>
+          <p class="self-demo-note">Esta é uma versão de demonstração. As operações ainda não são registros oficiais do servidor.</p>
+        </section>
 
         <section aria-label="Indicadores">
           <div class="kpis" id="kpis" aria-live="polite">

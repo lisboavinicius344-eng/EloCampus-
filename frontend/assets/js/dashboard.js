@@ -88,30 +88,73 @@
       </li>`).join("")}</ul>`;
   }
 
+  function nomeNormalizado(valor) {
+    return String(valor || "").toLocaleLowerCase("pt-BR").normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, " ").trim();
+  }
+
+  function renderInicioUsuario(equipamentos, todosEmprestimos, sessao) {
+    const nome = String(sessao?.nome || "").trim();
+    const primeiroNome = nome.split(/\s+/)[0] || "bem-vindo(a)";
+    const h1 = document.querySelector(".page-head h1");
+    const intro = document.querySelector(".page-head p");
+    const botaoCadastro = document.querySelector(".page-head > .btn");
+    if (h1) h1.textContent = `Olá, ${primeiroNome}`;
+    if (intro) intro.textContent = "O que você precisa fazer hoje?";
+    if (botaoCadastro) botaoCadastro.hidden = true;
+    const indicadores = document.querySelector('section[aria-label="Indicadores"]');
+    const distribuicao = document.querySelector('section[aria-labelledby="t-dist"]');
+    const painelEquipe = document.querySelector(".dash-grid");
+    if (indicadores) indicadores.hidden = true;
+    if (distribuicao) distribuicao.hidden = true;
+    if (painelEquipe) painelEquipe.hidden = true;
+
+    const area = $("inicio-usuario");
+    area.hidden = false;
+    const matriculaSessao = nomeNormalizado(sessao?.matricula);
+    const meus = (Array.isArray(todosEmprestimos) ? todosEmprestimos : []).filter((l) => {
+      const porNome = nomeNormalizado(l.solicitante?.nome) === nomeNormalizado(nome);
+      const matriculaRegistro = nomeNormalizado(l.solicitante?.matricula);
+      return porNome || Boolean(matriculaSessao && matriculaRegistro && matriculaSessao === matriculaRegistro);
+    });
+    const ativos = meus.filter((l) => !l.devolvida).sort((a, b) => new Date(a.prevista) - new Date(b.prevista));
+    const disponiveis = (Array.isArray(equipamentos) ? equipamentos : []).filter((e) => e.situacao === "disponivel");
+    $("quantidade-disponivel").textContent = disponiveis.length;
+
+    if (!ativos.length) {
+      $("itens-comigo").innerHTML = '<div class="self-empty">Você não tem equipamentos emprestados no momento.<br><a href="disponiveis.html">Ver o que está disponível</a></div>';
+      return;
+    }
+    $("itens-comigo").innerHTML = `<div class="self-loan-list">${ativos.slice(0, 5).map((l) => {
+      const prazoItem = prazo(l.prevista);
+      const situacao = prazoItem.classe === "late" ? `<span class="badge badge-late">${esc(prazoItem.texto)}</span>` : `<span class="badge badge-ok">Devolver até ${esc(new Date(l.prevista).toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" }))}</span>`;
+      return `<article class="self-loan"><div class="self-loan-main"><strong>${esc(l.equipamento?.nome || "Equipamento")}</strong><small>${esc(l.equipamento?.patrimonio || "")}</small></div><div class="self-loan-meta">${situacao}<a href="devolucoes.html?itemId=${encodeURIComponent(l.id)}&emprestimoId=${encodeURIComponent(l.emprestimoId)}">Devolver</a></div></article>`;
+    }).join("")}${ativos.length > 5 ? `<a href="emprestimos.html">Ver os ${ativos.length} itens</a>` : ""}</div>`;
+  }
+
   try {
-    const [resumo, todosEmprestimos, todasMovimentacoes] = await Promise.all([
-      ELO.resumoDashboard(),
-      ELO.emprestimos(),
-      ELO.movimentacoes(),
-    ]);
     const sessao = typeof obterSessao === "function" ? obterSessao() : null;
-    const perfilFinal = ["aluno", "professor"].includes(String(sessao?.perfil || "").toLowerCase());
-    const chaveNome = (s) => String(s || "").toLocaleLowerCase("pt-BR").normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-    const emprestimos = perfilFinal ? todosEmprestimos.filter((l) => chaveNome(l.solicitante?.nome) === chaveNome(sessao.nome)) : todosEmprestimos;
-    const movimentacoes = perfilFinal ? todasMovimentacoes.filter((m) => chaveNome(m.detalhe).includes(chaveNome(sessao.nome))) : todasMovimentacoes;
+    const perfilFinal = ["aluno", "professor", "servidor"].includes(String(sessao?.perfil || "").toLowerCase());
+    if (perfilFinal) {
+      const [equipamentos, todosEmprestimos] = await Promise.all([ELO.equipamentos(), ELO.emprestimos()]);
+      renderInicioUsuario(equipamentos, todosEmprestimos, sessao);
+      return;
+    }
+
+    const [resumo, todosEmprestimos, todasMovimentacoes] = await Promise.all([
+      ELO.resumoDashboard(), ELO.emprestimos(), ELO.movimentacoes(),
+    ]);
     renderKpis(resumo);
     renderDistribuicao(resumo);
-    renderAcompanhar(emprestimos);
-    renderMovimentacoes(movimentacoes);
-    if (perfilFinal) {
-      const titulo = $("t-acomp"); if (titulo) titulo.textContent = "Meus empréstimos";
-      const tituloMov = $("t-movs"); if (tituloMov) tituloMov.textContent = "Minhas movimentações";
-    }
+    renderAcompanhar(todosEmprestimos);
+    renderMovimentacoes(todasMovimentacoes);
   } catch (err) {
-    ["kpis", "dist", "acompanhar", "movs"].forEach((id) => { const el = $(id); if (el) el.innerHTML = ""; });
+    ["kpis", "dist", "acompanhar", "movs", "itens-comigo"].forEach((id) => { const el = $(id); if (el) el.innerHTML = ""; });
     const erro = $("erro");
-    erro.innerHTML = `${esc(err.message)} <button class="btn btn-primary" type="button" id="tentar">Tentar de novo</button>`;
+    erro.textContent = `Não foi possível carregar as informações. ${err.message || "Tente novamente."}`;
     erro.hidden = false;
-    $("tentar").addEventListener("click", () => window.location.reload());
+    const tentar = document.createElement("button");
+    tentar.type = "button"; tentar.className = "btn btn-primary"; tentar.textContent = "Tentar novamente";
+    tentar.addEventListener("click", () => window.location.reload());
+    erro.appendChild(tentar);
   }
 })();

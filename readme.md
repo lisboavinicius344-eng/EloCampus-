@@ -11,7 +11,11 @@ Este repositório mantém a estrutura original da interface web em `frontend/`. 
 - Histórico de retiradas/devoluções e filtros por texto, tipo e período.
 - Relatórios baseados nos registros carregados, filtros e exportação CSV.
 - Consulta local por patrimônio, identificador ou URL codificada no QR Code.
-- Contas de demonstração para administrador, operador, aluno e professor.
+- Tela de login com seleção explícita de acesso para Discente/Docente/Servidor ou Administração/TI, validada contra o perfil da conta de demonstração.
+- Área de autoatendimento separada para discente, docente e servidor, com acesso direto a Ver os equipamentos, Pedir empréstimo, Devolver equipamentos e Consultar QR Code.
+- A página Ver os equipamentos apresenta os itens disponíveis para empréstimo e pode abrir a solicitação com um item previamente selecionado. A consulta por QR Code também fica disponível para os perfis de autoatendimento.
+- Empréstimos e devoluções dos usuários comuns mostram apenas registros vinculados à própria conta, com menos campos administrativos; páginas de gestão permanecem separadas.
+- Contas de demonstração para administrador, operador, aluno, professor e servidor (perfil comum).
 - Docker/Nginx para servir apenas arquivos estáticos do front-end.
 
 **Importante:** os registros feitos nesta versão são locais a este navegador e não são dados oficiais nem são sincronizados entre dispositivos. A camada `api.js` preserva um ponto de integração futuro; o modo inicial continua sendo `demo`.
@@ -36,8 +40,9 @@ Este repositório mantém a estrutura original da interface web em `frontend/`. 
 | Operador | `operador` | `operador123` |
 | Aluno | `aluno` | `aluno123` |
 | Professor | `professor` | `professor123` |
+| Servidor (usuário comum) | `servidor` | `servidor123` |
 
-Essas credenciais existem apenas para demonstrar a navegação por perfil. Não devem ser usadas em produção.
+Essas credenciais existem apenas para demonstrar a navegação por perfil. Não devem ser usadas em produção. A separação de telas e rotas é um controle de interface, não uma barreira de segurança: autenticação e autorização reais precisam ser aplicadas no back-end antes da publicação oficial.
 
 ## Docker
 
@@ -69,10 +74,16 @@ Com Node.js instalado, execute na raiz do repositório:
 
 ```powershell
 node tests/test-local-data.cjs
+node tests/test-login-auth.cjs
+node tests/test-profile-routes.cjs
+node tests/test-self-service.cjs
+node tests/test-self-service-ui.cjs
+node tests/test-ui-access.cjs
 ```
 
-O teste verifica consulta de QR local, empréstimo com vários itens, prevenção de empréstimo duplicado/indisponível, devolução parcial/final, atualização do histórico, persistência após recriar a camada de dados e rollback em caso de falha de armazenamento.
+O primeiro teste verifica consulta de QR local, empréstimo com vários itens, prevenção de empréstimo duplicado/indisponível, devolução parcial/final, atualização do histórico, persistência após recriar a camada de dados e rollback em caso de falha de armazenamento. O segundo testa o login de demonstração, a correspondência entre área escolhida e perfil, e a rejeição de senhas incorretas. O terceiro testa a separação entre páginas administrativas e páginas de autoatendimento. O quarto testa empréstimos e devoluções no próprio cadastro e rejeita operações locais em nome de terceiros. O quinto verifica a estrutura própria do autoatendimento, o catálogo de disponíveis, os atalhos de solicitação, a consulta por QR Code e a simplificação de empréstimos. O sexto verifica os acessos de autoatendimento e a animação de desenho progressivo da logo vetorial no login.
 
 ## Relógio e horário das operações
 
 Não há relógio ou temporizador permanente adicionado à interface. As operações registram a data e a hora local no momento em que o empréstimo ou a devolução são confirmados; esse horário aparece nos respectivos registros e no histórico. Sem uma referência confiável de servidor, uma aplicação exclusivamente front-end não consegue garantir a hora real se o relógio do dispositivo estiver incorreto, especialmente sem conexão.
+

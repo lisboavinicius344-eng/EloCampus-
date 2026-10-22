@@ -123,8 +123,23 @@ function demoEmprestimos() {
   }).sort((a, b) => new Date(b.retirada) - new Date(a.retirada));
 }
 
+function demoTextoNormalizado(valor) {
+  return String(valor ?? "").toLocaleLowerCase("pt-BR").normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, " ").trim();
+}
+
+function demoPerfilFinal(perfil) {
+  return ["aluno", "professor", "servidor"].includes(String(perfil || "").toLowerCase());
+}
+
 function demoRegistrarEmprestimo(dados) {
-  const solicitante = String(dados?.solicitante || "").trim();
+  const sessao = typeof obterSessao === "function" ? obterSessao() : null;
+  const usuarioFinal = demoPerfilFinal(sessao?.perfil);
+  const solicitanteInformado = String(dados?.solicitante || "").trim();
+  if (usuarioFinal && demoTextoNormalizado(solicitanteInformado) !== demoTextoNormalizado(sessao?.nome)) {
+    throw new Error("Você só pode solicitar empréstimos em seu próprio nome.");
+  }
+  const solicitante = usuarioFinal ? String(sessao?.nome || "").trim() : solicitanteInformado;
+  const vinculoConta = { aluno: "Aluno", professor: "Professor", servidor: "Servidor" }[String(sessao?.perfil || "").toLowerCase()] || "";
   const equipamentosIds = [...new Set((dados?.equipamentos || []).map(String))];
   const retirada = dados?.retirada ? new Date(dados.retirada) : new Date();
   const prevista = dados?.prevista ? new Date(dados.prevista) : null;
@@ -137,7 +152,6 @@ function demoRegistrarEmprestimo(dados) {
   const indisponiveis = equipamentosIds.map((id) => disponibilidade.find((e) => String(e.id) === id)).filter((e) => !e || e.situacao !== "disponivel");
   if (indisponiveis.length) throw new Error(`Os seguintes equipamentos não estão disponíveis: ${indisponiveis.map((e) => e?.nome || "equipamento não encontrado").join(", ")}.`);
 
-  const sessao = typeof obterSessao === "function" ? obterSessao() : null;
   const maxId = Math.max(0, ...DEMO.emprestimos.map((l) => Number(l.id) || 0));
   const maxGrupo = Math.max(0, ...DEMO.emprestimos.map((l) => Number(l.emprestimoId || l.id) || 0));
   const emprestimoId = maxGrupo + 1;
@@ -146,8 +160,8 @@ function demoRegistrarEmprestimo(dados) {
     emprestimoId,
     equipamentoId: Number.isNaN(Number(equipamentoId)) ? equipamentoId : Number(equipamentoId),
     solicitante,
-    vinculo: String(dados.vinculo || "").trim(),
-    matricula: String(dados.matricula || "").trim(),
+    vinculo: usuarioFinal ? vinculoConta : String(dados.vinculo || "").trim(),
+    matricula: usuarioFinal ? String(sessao?.matricula || "").trim() : String(dados.matricula || "").trim(),
     retirada: retirada.toISOString(),
     prevista: prevista.toISOString(),
     devolvida: null,
@@ -174,6 +188,16 @@ function demoRegistrarDevolucao(dados) {
   if (encontrados.some((l) => l.devolvida)) throw new Error("Um ou mais itens já foram devolvidos. Atualize a página para conferir a situação atual.");
 
   const sessao = typeof obterSessao === "function" ? obterSessao() : null;
+  if (demoPerfilFinal(sessao?.perfil)) {
+    const nomeSessao = demoTextoNormalizado(sessao?.nome);
+    const matriculaSessao = demoTextoNormalizado(sessao?.matricula);
+    const deOutraPessoa = encontrados.some((l) => {
+      const mesmoNome = demoTextoNormalizado(l.solicitante) === nomeSessao;
+      const mesmaMatricula = Boolean(matriculaSessao && demoTextoNormalizado(l.matricula) && demoTextoNormalizado(l.matricula) === matriculaSessao);
+      return !mesmoNome && !mesmaMatricula;
+    });
+    if (deOutraPessoa) throw new Error("Você só pode registrar devoluções de equipamentos vinculados ao seu cadastro.");
+  }
   const agora = new Date().toISOString();
   const camposDevolucao = ["devolvida", "condicaoDevolucao", "observacoesDevolucao", "acessoriosConferidos", "equipamentoConferido", "assinaturaRecebida", "responsavelDevolucao"];
   const anteriores = encontrados.map((l) => Object.fromEntries(camposDevolucao.map((campo) => [campo, l[campo]])));

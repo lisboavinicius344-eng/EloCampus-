@@ -14,12 +14,6 @@
   <link rel="stylesheet" href="../assets/css/novo-emprestimo.css">
   <link rel="stylesheet" href="../assets/css/layout.css">
   <link rel="stylesheet" href="../assets/css/salz-bridge.css">
-  <script>
-    // Sem solicitante escolhido, volta para a etapa 1 (lista de solicitantes).
-    if (!new URLSearchParams(location.search).get('nome')) {
-      location.replace('usuarios.html?origem=novo-emprestimo');
-    }
-  </script>
 </head>
 <body data-pagina="emprestimos">
   <div class="app">
@@ -29,14 +23,14 @@
       <main class="main"><header class="page-head">
       <div>
         <h1>Novo empréstimo</h1>
-        <p>Registre a retirada de equipamentos em três passos.</p>
+        <p>Escolha os equipamentos que precisa e informe quando pretende devolvê-los.</p>
       </div>
     </header>
 
     <ol class="steps" aria-label="Etapas">
-      <li class="step done"><span class="step-num">✓</span>Solicitante</li>
-      <li class="step current" aria-current="step"><span class="step-num">2</span>Equipamentos</li>
-      <li class="step"><span class="step-num">3</span>Confirmação</li>
+      <li class="step done"><span class="step-num">✓</span><span class="step-label">Solicitante</span></li>
+      <li class="step current" aria-current="step"><span class="step-num">2</span><span class="step-label">Equipamentos</span></li>
+      <li class="step"><span class="step-num">3</span><span class="step-label">Confirmação</span></li>
     </ol>
 
     <form class="split" action="#" method="post">
@@ -61,6 +55,7 @@
               <select class="input input-block" id="vinculo" name="vinculo">
                 <option>Aluno</option>
                 <option>Professor</option>
+                <option>Servidor</option>
                 <option>Perfil</option>
                 <option>Grupo ou setor</option>
               </select>
@@ -118,14 +113,14 @@
       <aside class="grow-1 summary" aria-label="Resumo do empréstimo">
         <h2>Resumo</h2>
         <div class="stack-sm">
-          <div class="summary-row"><span>Solicitante</span><strong id="resumo-solicitante">—</strong></div>
+          <div class="summary-row" data-resumo-interno><span>Solicitante</span><strong id="resumo-solicitante">—</strong></div>
           <div class="summary-row"><span>Itens</span><strong id="resumo-itens">0 equipamentos</strong></div>
-          <div class="summary-row"><span>Retirada</span><strong id="resumo-retirada">—</strong></div>
-          <div class="summary-row"><span>Devolução</span><strong id="resumo-devolucao">—</strong></div>
+          <div class="summary-row" data-resumo-interno><span>Retirada</span><strong id="resumo-retirada">—</strong></div>
+          <div class="summary-row" data-resumo-prazo><span>Devolução</span><strong id="resumo-devolucao">—</strong></div>
         </div>
         <label class="terms">
           <input type="checkbox" required>
-          Li e aceito o termo de responsabilidade de uso do equipamento.
+          Confirmo que vou cuidar dos equipamentos e respeitar o prazo de devolução.
         </label>
         <button class="btn btn-white btn-block" type="submit">Revisar empréstimo</button>
         <a class="cancel" href="emprestimos.html">Cancelar</a>
@@ -134,7 +129,7 @@
     <div id="emprestimo-mensagem" class="alert" role="status" hidden style="margin-top:1rem"></div>
     <section class="card stack" id="revisao-emprestimo" hidden aria-labelledby="titulo-revisao" style="margin-top:1rem">
       <h2 id="titulo-revisao">Confirmar empréstimo</h2>
-      <p class="muted">Confira os dados antes de registrar a retirada neste navegador.</p>
+      <p class="muted" id="texto-revisao-pedido">Confira os dados antes de confirmar.</p>
       <div id="resumo-revisao"></div>
       <div class="stack-sm">
         <button class="btn btn-block" type="button" id="confirmar-emprestimo">Confirmar empréstimo</button>
@@ -158,7 +153,7 @@
 
       var v = (p.get('vinculo') || '').toLowerCase();
       var alvo = v.indexOf('alun') === 0 ? 'Aluno' : v.indexOf('prof') === 0 ? 'Professor'
-               : v.indexOf('grupo') === 0 ? 'Grupo ou setor' : v.indexOf('perfil') === 0 ? 'Perfil' : '';
+               : v.indexOf('serv') === 0 ? 'Servidor' : v.indexOf('grupo') === 0 ? 'Grupo ou setor' : v.indexOf('perfil') === 0 ? 'Perfil' : '';
       var sel = document.getElementById('vinculo');
       for (var i = 0; alvo && i < sel.options.length; i++) {
         if (sel.options[i].text === alvo) { sel.selectedIndex = i; break; }

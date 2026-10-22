@@ -35,20 +35,43 @@ const EloUtil = {
 (function () {
   let sessao = obterSessao();
   const publico = document.body.dataset.publico === "true";
+  const perfisValidos = new Set(["administrador", "operador", "aluno", "professor", "servidor"]);
   if (!sessao && !publico) { window.location.replace("../index.html"); return; }
   if (!sessao) sessao = { nome: "Consulta pública", perfil: "visitante" };
   const perfilAtual = String(sessao.perfil || "").toLowerCase();
   const equipe = ["administrador", "operador"].includes(perfilAtual);
-  const usuarioFinal = ["aluno", "professor"].includes(perfilAtual);
+  const usuarioFinal = ["aluno", "professor", "servidor"].includes(perfilAtual);
   const paginaAtual = document.body.dataset.pagina;
   const arquivoAtual = window.location.pathname.split("/").pop();
-  const paginasRestritas = ["devolucoes.html", "movimentacoes.html", "usuarios.html", "relatorio.html", "servidor.html", "equipamento-form.html", "novo-emprestimo.html"];
-  if (usuarioFinal && paginasRestritas.includes(arquivoAtual)) { window.location.replace("dashboard.html"); return; }
+  const paginasRestritas = ["movimentacoes.html", "usuarios.html", "relatorio.html", "servidor.html", "equipamento-form.html"];
+  const paginasUsuario = ["dashboard.html", "disponiveis.html", "consulta-qr-interno.html", "emprestimos.html", "novo-emprestimo.html", "devolucoes.html", "perfil.html"];
+
+  // O controle de navegação evita acessos acidentais pela URL; segurança real
+  // precisa ser aplicada no backend quando a autenticação institucional existir.
+  if (!publico && !perfisValidos.has(perfilAtual)) {
+    try { sessionStorage.removeItem("elo.sessao"); localStorage.removeItem("elo.sessao"); } catch {}
+    window.location.replace("../index.html");
+    return;
+  }
+  if (usuarioFinal && ["equipamentos.html", "equipamento-detalhe.html"].includes(arquivoAtual)) {
+    window.location.replace("disponiveis.html");
+    return;
+  }
+  if (usuarioFinal && !paginasUsuario.includes(arquivoAtual)) {
+    window.location.replace("dashboard.html");
+    return;
+  }
+  if (!publico && paginasRestritas.includes(arquivoAtual) && !equipe) {
+    window.location.replace("dashboard.html");
+    return;
+  }
   document.body.dataset.perfil = perfilAtual;
+  if (usuarioFinal) document.body.classList?.add("self-service-user");
 
   const ICONES = {
     home: '<path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/>',
     box: '<path d="M21 8 12 3 3 8v8l9 5 9-5z"/><path d="m3 8 9 5 9-5M12 13v8"/>',
+    qr: '<path d="M3 3h6v6H3zM15 3h6v6h-6zM3 15h6v6H3z"/><path d="M15 15h2v2h-2zM19 15h2v6h-6v-2M11 3v2M11 9v2M3 11h2M9 11v2M11 15v2M11 21h2M15 11h2M21 11v2"/>',
     swap: '<path d="M7 7h13l-4-4M17 17H4l4 4"/>',
     undo: '<path d="M9 14 4 9l5-5"/><path d="M4 9h10a6 6 0 0 1 0 12h-3"/>',
     users: '<circle cx="9" cy="8" r="4"/><path d="M2 21a7 7 0 0 1 14 0M16 4a4 4 0 0 1 0 8M22 21a7 7 0 0 0-4-6"/>',
@@ -65,15 +88,15 @@ const EloUtil = {
   const svg = (n) => `<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONES[n]}</svg>`;
 
   // Sem href = ainda não implementado (aparece desabilitado).
-  const NAV = [
+  const NAV_EQUIPE = [
     { id: "painel", rotulo: "Painel", icone: "home", href: "dashboard.html" },
     { grupo: "Acervo", itens: [
       { id: "equipamentos", rotulo: "Equipamentos", icone: "box", href: "equipamentos.html" },
-      { id: "consulta-qr", rotulo: "Consulta por QR Code", icone: "box", href: "consulta-qr-interno.html" },
+      { id: "consulta-qr", rotulo: "Consulta por QR Code", icone: "qr", href: "consulta-qr-interno.html" },
     ]},
     { grupo: "Empréstimos e devoluções", itens: [
       { id: "emprestimos", rotulo: "Empréstimos", icone: "swap", href: "emprestimos.html" },
-      { id: "devolucoes", rotulo: "Devoluções", icone: "undo", href: "devolucoes.html", admin: true },
+      { id: "devolucoes", rotulo: "Devoluções", icone: "undo", href: "devolucoes.html" },
     ]},
     { grupo: "Administração", itens: [
       { id: "movimentacoes", rotulo: "Histórico de movimentações", icone: "swap", href: "movimentacoes.html", admin: true },
@@ -84,8 +107,20 @@ const EloUtil = {
     { id: "perfil", rotulo: "Configuração do perfil", icone: "gear", href: "perfil.html" },
   ];
 
-  const atual = document.body.dataset.pagina;
-  const itemPermitido = (i) => (!i.admin || equipe) && (!usuarioFinal || ["painel", "equipamentos", "consulta-qr", "emprestimos", "perfil"].includes(i.id));
+  // Para discentes, docentes e servidores, o menu é uma área de autoatendimento:
+  // sem termos administrativos, cadastro interno ou informações de operação.
+  const NAV_USUARIO = [
+    { id: "painel", rotulo: "Início", icone: "home", href: "dashboard.html" },
+    { id: "disponiveis", rotulo: "Ver os equipamentos", icone: "box", href: "disponiveis.html" },
+    { id: "consulta-qr", rotulo: "Consultar QR Code", icone: "qr", href: "consulta-qr-interno.html" },
+    { id: "pedir", rotulo: "Pedir empréstimo", icone: "swap", href: "novo-emprestimo.html" },
+    { id: "devolucoes", rotulo: "Devolver equipamentos", icone: "undo", href: "devolucoes.html" },
+    { id: "emprestimos", rotulo: "Meus empréstimos", icone: "box", href: "emprestimos.html" },
+  ];
+  const NAV = usuarioFinal ? NAV_USUARIO : NAV_EQUIPE;
+
+  const atual = usuarioFinal && arquivoAtual === "novo-emprestimo.html" ? "pedir" : document.body.dataset.pagina;
+  const itemPermitido = (i) => !i.admin || equipe;
   const itemHtml = (i) => {
     if (!itemPermitido(i)) return "";
     const ativo = i.id === atual;
@@ -102,12 +137,14 @@ const EloUtil = {
 
   const nome = EloUtil.esc(sessao.nome || "Usuário");
   const iniciais = (sessao.nome || "U").split(" ").slice(0, 2).map((p) => p[0]).join("").toUpperCase();
-  const perfil = sessao.perfil ? sessao.perfil[0].toUpperCase() + sessao.perfil.slice(1) : "";
+  const ROTULOS_PERFIL = { administrador: "Administrador · TI", operador: "Equipe operacional", aluno: "Discente", professor: "Docente", servidor: "Servidor" };
+  const perfil = usuarioFinal ? "Minha conta" : (ROTULOS_PERFIL[perfilAtual] || (sessao.perfil ? sessao.perfil[0].toUpperCase() + sessao.perfil.slice(1) : ""));
+  const subtituloMarca = usuarioFinal ? "" : "<small>Instituição - Campus Lapa</small>";
 
   document.getElementById("sidebar").innerHTML = `
     <a class="side-brand" href="dashboard.html">
       <img src="../assets/img/logo.png" alt="">
-      <span>ELO Campus<small>Instituição - Campus Lapa</small></span>
+      <span>ELO Campus${subtituloMarca}</span>
     </a>
     <nav aria-label="Principal"><ul class="nav">${itens}</ul></nav>
     <div class="user">
@@ -121,12 +158,8 @@ const EloUtil = {
     <span class="topbar-brand"><img src="../assets/img/logo.png" alt="">ELO Campus</span>`;
 
   if (usuarioFinal) {
-    document.querySelectorAll('a[href="novo-emprestimo.html"], a[href="equipamento-form.html"], a[href="devolucoes.html"], a[href="movimentacoes.html"], a[href="relatorio.html"], a[href="usuarios.html"], a[href="servidor.html"]').forEach((el) => { el.hidden = true; el.style.display = "none"; });
+    document.querySelectorAll('a[href="equipamento-form.html"], a[href="movimentacoes.html"], a[href="relatorio.html"], a[href="usuarios.html"], a[href="servidor.html"]').forEach((el) => { el.hidden = true; el.style.display = "none"; });
     document.querySelectorAll('#editar, #retirar, #confirmar-exclusao, [data-editar], #btn-novo-usuario').forEach((el) => { el.hidden = true; el.disabled = true; el.style.display = "none"; });
-    if (paginaAtual === "painel") {
-      const titulo = document.querySelector(".page-head h1");
-      if (titulo) titulo.textContent = "Painel";
-    }
   }
 
   const scrim = document.createElement("div");
