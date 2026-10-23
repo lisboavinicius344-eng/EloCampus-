@@ -20,10 +20,33 @@ const CONTAS_DEMO = [
   { login: "servidor", senha: "servidor123", nome: "Servidor de demonstração", perfil: "servidor", email: "servidor@lapa.edu.br", matricula: "SRV-DEMO-01", setor: "Campus Lapa", instituicao: "Instituição de Ensino", campus: "Campus Lapa" },
 ];
 
+const CONTAS_KEY = "elo.contas.cadastradas";
+
+// Contas criadas na tela de cadastro (somente demonstração, salvas neste navegador).
+// Com o backend conectado, o cadastro deve ser enviado à API e este armazenamento removido.
+function contasCadastradas() {
+  try {
+    const lista = JSON.parse(localStorage.getItem(CONTAS_KEY) || "[]");
+    return Array.isArray(lista) ? lista : [];
+  } catch { return []; }
+}
+
+function loginEmUso(login) {
+  const alvo = String(login || "").trim().toLowerCase();
+  return [...CONTAS_DEMO, ...contasCadastradas()].some((c) => String(c.login).toLowerCase() === alvo);
+}
+
+function cadastrarConta(dados) {
+  if (loginEmUso(dados.login)) throw new Error("Este usuário já está em uso. Escolha outro.");
+  const lista = contasCadastradas();
+  lista.push({ ...dados, instituicao: "Instituição de Ensino", campus: "Campus Lapa" });
+  localStorage.setItem(CONTAS_KEY, JSON.stringify(lista));
+}
+
 async function autenticar(login, senha) {
   // Simula apenas latência visual; não representa autenticação institucional.
   await new Promise((resolve) => setTimeout(resolve, 250));
-  const conta = CONTAS_DEMO.find((item) => item.login === login && item.senha === senha);
+  const conta = [...CONTAS_DEMO, ...contasCadastradas()].find((item) => item.login === login && item.senha === senha);
   if (!conta) throw new Error("Usuário ou senha incorretos. Confira os dados e tente novamente.");
   const { senha: _senhaDaConta, ...dadosDaConta } = conta;
   return { ...dadosDaConta, token: "demo" };
@@ -72,13 +95,23 @@ function sair() {
 
   const mostrarMensagem = (texto, tipo = "error") => {
     erro.textContent = texto;
-    erro.className = `alert ${tipo === "info" ? "alert-info" : "alert-error"}`;
+    erro.className = `alert ${tipo === "info" ? "alert-info" : tipo === "ok" ? "alert-ok" : "alert-error"}`;
     erro.hidden = false;
   };
   const tipoSelecionado = () => form.querySelector('input[name="tipo-acesso"]:checked')?.value || "usuario";
   const acessoCombina = (perfil, tipo) => tipo === "administracao"
     ? PERFIS_EQUIPE.has(String(perfil || "").toLowerCase())
     : PERFIS_USUARIO.has(String(perfil || "").toLowerCase());
+
+  try {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("cadastro") === "ok") {
+      mostrarMensagem("Conta criada com sucesso! Entre com seu usuário e senha.", "ok");
+      const novo = sessionStorage.getItem("elo.cadastro.login");
+      if (novo) { login.value = novo; sessionStorage.removeItem("elo.cadastro.login"); }
+      window.history.replaceState(null, "", window.location.pathname);
+    }
+  } catch { /* a mensagem de boas-vindas é opcional */ }
 
   const sessaoAtual = obterSessao();
   if (sessaoAtual && PERFIS_VALIDOS.has(String(sessaoAtual.perfil || "").toLowerCase())) {
