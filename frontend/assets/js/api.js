@@ -12,7 +12,7 @@ async function requisitar(caminho,opcoes={}){
  if(sessao?.token)headers.Authorization=`Bearer ${sessao.token}`;
  let resposta;try{resposta=await fetch(`${API_BASE_URL}${caminho}`,{method:opcoes.metodo||"GET",headers,body:opcoes.corpo==null?undefined:JSON.stringify(opcoes.corpo)});}catch{throw new Error("Não foi possível conectar ao servidor. Verifique a conexão e tente novamente.");}
  const corpo=await resposta.json().catch(()=>null);
- if(!resposta.ok){const msg=resposta.status===500?"Ocorreu um erro interno. Tente novamente em instantes.":(corpo?.erro||corpo?.mensagem||(resposta.status===401?"Sua sessão expirou. Entre novamente.":"Não foi possível concluir a solicitação."));if(resposta.status===401&&!opcoes.naoRedirecionar401){try{sessionStorage.removeItem("elo.sessao");localStorage.removeItem("elo.sessao");}catch{}if(!/\/(index\.html)?$/.test(location.pathname))location.href="../index.html?sessao=expirada";}const e=new Error(msg);e.status=resposta.status;e.campo=corpo?.campo;throw e;}
+ if(!resposta.ok){if(resposta.status===403&&corpo?.codigo==="TROCA_DE_SENHA_OBRIGATORIA"&&!location.pathname.endsWith("trocar-senha.html")){location.href=location.pathname.includes("/pages/")?"trocar-senha.html":"pages/trocar-senha.html";}const msg=resposta.status===500?"Ocorreu um erro interno. Tente novamente em instantes.":(corpo?.erro||corpo?.mensagem||(resposta.status===401?"Sua sessão expirou. Entre novamente.":"Não foi possível concluir a solicitação."));if(resposta.status===401&&!opcoes.naoRedirecionar401){try{sessionStorage.removeItem("elo.sessao");localStorage.removeItem("elo.sessao");}catch{}if(!/\/(index\.html)?$/.test(location.pathname))location.href="../index.html?sessao=expirada";}const e=new Error(msg);e.status=resposta.status;e.campo=corpo?.campo;throw e;}
  return corpo;
 }
 async function origem(demo,caminho,opcoes){if(MODO_DADOS==="demo"){await new Promise(r=>setTimeout(r,25));return demo();}return requisitar(caminho,opcoes);}
@@ -43,7 +43,10 @@ const ELO={
  manutencoes:async()=>MODO_DADOS==="demo"?[]:(await requisitar("/manutencoes")).manutencoes,
  abrirManutencao:d=>requisitar("/manutencoes",{metodo:"POST",corpo:d}),
  finalizarManutencao:(id,d)=>requisitar(`/manutencoes/${encodeURIComponent(id)}/finalizar`,{metodo:"PATCH",corpo:d}),
+ cadastroAluno:d=>requisitar("/auth/cadastro-aluno",{metodo:"POST",corpo:{nome:String(d.nome||"").trim(),email:String(d.email||"").trim().toLowerCase(),solicitante_id:Number(d.solicitante_id)}}),
+ trocarSenha:d=>requisitar("/auth/trocar-senha",{metodo:"POST",corpo:{senha_atual:d.senha_atual,nova_senha:d.nova_senha}}),
  usuarios:async()=>MODO_DADOS==="demo"?[]:(await requisitar("/usuarios")).usuarios,
- criarUsuario:d=>requisitar("/usuarios",{metodo:"POST",corpo:d}),
+ criarUsuario:d=>requisitar("/usuarios",{metodo:"POST",corpo:{nome:String(d.nome||"").trim(),email:String(d.email||"").trim().toLowerCase(),papel:d.papel}}),
+ reenviarSenha:id=>requisitar(`/usuarios/${encodeURIComponent(id)}/reenviar-senha`,{metodo:"PATCH"}),
  desativarUsuario:id=>requisitar(`/usuarios/${encodeURIComponent(id)}/desativar`,{metodo:"PATCH"})
 };

@@ -4,7 +4,7 @@
  */
 "use strict";
 
-const AUTH_MODE = String(window.ELO_DATA_MODE || "api").toLowerCase() === "api" ? "api" : "demo";
+const AUTH_MODE = String(window.ELO_DATA_MODE || "demo").toLowerCase() === "api" ? "api" : "demo";
 const SESSION_KEY = "elo.sessao";
 const REMEMBER_KEY = "elo.sessao.lembrar";
 const DASHBOARD_URL = "pages/dashboard.html";
@@ -114,6 +114,11 @@ function sair() {
     if (label) label.textContent = "E-mail institucional";
     const ajuda = form.querySelector(".field small, .hint");
     if (ajuda) ajuda.textContent = "Use o e-mail cadastrado pela instituição.";
+    const cartaoLogin = typeof form.closest === "function" ? form.closest(".card") : null;
+    const cabecalho = cartaoLogin?.querySelector(".card-head p");
+    if (cabecalho) cabecalho.textContent = "Entre com seu e-mail institucional e sua senha.";
+    const notaLogin = typeof document.querySelector === "function" ? document.querySelector(".login-note") : null;
+    if (notaLogin) notaLogin.textContent = "No primeiro acesso, você precisará criar sua senha pessoal.";
     const seletor = form.querySelector(".access-picker");
     if (seletor) seletor.hidden = true;
   }
@@ -140,7 +145,7 @@ function sair() {
 
   const sessaoAtual = obterSessao();
   if (sessaoAtual && PERFIS_VALIDOS.has(String(sessaoAtual.perfil || "").toLowerCase())) {
-    window.location.replace(DASHBOARD_URL);
+    window.location.replace(sessaoAtual.deve_trocar_senha ? "pages/trocar-senha.html" : DASHBOARD_URL);
     return;
   }
   if (sessaoAtual) limparSessao();
@@ -175,7 +180,7 @@ function sair() {
     erro.hidden = true;
 
     if (!login.value.trim()) {
-      mostrarMensagem("Informe seu usuário ou matrícula.");
+      mostrarMensagem(AUTH_MODE === "api" ? "Informe seu e-mail." : "Informe seu usuário ou matrícula.");
       login.focus();
       return;
     }
@@ -202,7 +207,7 @@ function sair() {
       salvarSessao(sessao, lembrar.checked);
       if (lembrar.checked) localStorage.setItem("elo.login.salvo", login.value.trim());
       else localStorage.removeItem("elo.login.salvo");
-      window.location.replace(DASHBOARD_URL);
+      window.location.replace(sessao.deve_trocar_senha ? "pages/trocar-senha.html" : DASHBOARD_URL);
     } catch (falha) {
       mostrarMensagem(falha.message || "Não foi possível entrar. Tente novamente.");
       botao.disabled = false;

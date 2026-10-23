@@ -96,3 +96,13 @@ A configuração está em `frontend/assets/js/runtime-config.js`; variáveis inj
 Para desenvolvimento local, configure a origem do frontend em `CORS_ORIGINS` no backend. O modo demo pode ser reativado definindo `ELO_DATA_MODE` como `demo`.
 
 A autenticação real usa e-mail e senha, armazena o token retornado pelo backend na sessão e envia `Authorization: Bearer` nas requisições. Erros JSON do backend são apresentados ao usuário; respostas 401 encerram a sessão. A API não oferece edição de perfil nem redefinição de senha no contrato atual, portanto essas ações não devem simular sucesso.
+
+
+## Fluxo de senha provisória (API)
+
+- O cadastro de aluno envia `nome`, `email` e `solicitante_id` para `POST /auth/cadastro-aluno`; o usuário não escolhe senha no cadastro.
+- O login guarda o token e encaminha contas com `deve_trocar_senha: true` para `frontend/pages/trocar-senha.html`.
+- A tela de primeiro acesso envia `senha_atual` e `nova_senha` para `POST /auth/trocar-senha`, mantendo o token existente após a troca.
+- Respostas `403` com `codigo: TROCA_DE_SENHA_OBRIGATORIA` redirecionam para a tela de criação de senha.
+- A tela de equipe usa `POST /usuarios` sem senha e oferece `PATCH /usuarios/:id/reenviar-senha`. Se o envio de e-mail falhar, a senha provisória retornada é mostrada na tela para repasse manual; ela não é armazenada pelo frontend.
+- Esses endpoints só estarão disponíveis depois que o commit `8a32d99` for implantado no Easypanel. Antes disso, o frontend poderá receber erros por incompatibilidade com a versão antiga da API.

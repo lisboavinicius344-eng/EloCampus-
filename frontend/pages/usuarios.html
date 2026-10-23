@@ -21,6 +21,28 @@
     <div class="content">
       <header class="topbar" id="topbar"></header>
       <main class="main">
+        <section class="stack" id="usuarios-api" hidden aria-labelledby="usuarios-api-titulo">
+          <div class="card stack">
+            <div>
+              <h2 class="h-md" id="usuarios-api-titulo">Equipe do sistema</h2>
+              <p class="muted">Cadastre administradores e operadores. A senha provisória será enviada por e-mail.</p>
+            </div>
+            <div id="usuarios-api-aviso" class="alert alert-info" role="status" aria-live="polite" hidden></div>
+            <form id="usuarios-api-form" class="stack" novalidate>
+              <h3 class="h-sm">Novo usuário da equipe</h3>
+              <div class="form-grid-2">
+                <div class="field"><label for="api-usuario-nome">Nome completo</label><input class="input input-block" id="api-usuario-nome" name="nome" autocomplete="name" required></div>
+                <div class="field"><label for="api-usuario-email">E-mail</label><input class="input input-block" id="api-usuario-email" name="email" type="email" autocomplete="email" required></div>
+              </div>
+              <div class="field"><label for="api-usuario-papel">Perfil</label><select class="input input-block" id="api-usuario-papel" name="papel" required><option value="operador">Operador</option><option value="admin">Administrador</option></select></div>
+              <div><button class="btn" id="api-usuario-criar" type="submit">Criar usuário e enviar senha</button></div>
+            </form>
+          </div>
+          <section class="card stack" aria-label="Usuários da equipe">
+            <div class="row" style="align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap"><div><h2 class="h-md">Usuários cadastrados</h2><p class="muted">Quem ainda não criou a própria senha aparece como aguardando primeiro acesso.</p></div><button class="btn btn-line" id="api-usuarios-atualizar" type="button">Atualizar lista</button></div>
+            <div class="table-wrap"><table><thead><tr><th>Nome</th><th>E-mail</th><th>Perfil</th><th>Primeiro acesso</th><th>Ação</th></tr></thead><tbody id="api-usuarios-tbody"><tr><td colspan="5">Carregando usuários…</td></tr></tbody></table></div>
+          </section>
+        </section>
         <!-- Aviso da etapa 1 do novo empréstimo -->
         <div class="card" id="aviso-fluxo" role="status" hidden>
           <strong>Novo empréstimo · etapa 1 de 3</strong>
@@ -247,7 +269,91 @@
   <script src="../assets/js/api.js"></script>
   <script src="../assets/js/salz-actions.js"></script>
   <script>
+    async function iniciarUsuariosApi() {
+      document.getElementById('usuarios-api').hidden = false;
+      ['#aviso-fluxo', '.page-head', '.filter-row', '.split'].forEach(function (sel) {
+        var el = document.querySelector(sel); if (el) el.hidden = true;
+      });
+      var form = document.getElementById('usuarios-api-form');
+      var aviso = document.getElementById('usuarios-api-aviso');
+      var tbody = document.getElementById('api-usuarios-tbody');
+      var botaoCriar = document.getElementById('api-usuario-criar');
+      function mostrarAviso(texto, tipo, senha) {
+        aviso.className = 'alert ' + (tipo === 'ok' ? 'alert-ok' : tipo === 'error' ? 'alert-error' : 'alert-info');
+        aviso.replaceChildren();
+        var textoEl = document.createElement('p'); textoEl.textContent = texto; aviso.appendChild(textoEl);
+        if (senha) {
+          var destaque = document.createElement('div');
+          destaque.style.cssText = 'margin-top:.75rem;padding:1rem;border:2px solid currentColor;border-radius:12px;font-size:1.05rem;font-weight:700;overflow-wrap:anywhere';
+          destaque.textContent = 'Senha provisória (mostrada uma única vez): ' + senha;
+          aviso.appendChild(destaque);
+          var nota = document.createElement('small'); nota.textContent = 'Copie e repasse ao usuário com segurança. Esta senha não será exibida novamente nesta tela.'; aviso.appendChild(nota);
+        }
+        aviso.hidden = false;
+      }
+      function perfilLegivel(papel) { return ({admin:'Administrador', administrador:'Administrador', operador:'Operador'})[String(papel || '').toLowerCase()] || String(papel || '—'); }
+      async function carregar() {
+        tbody.innerHTML = '<tr><td colspan="5">Carregando usuários…</td></tr>';
+        try {
+          var resultado = await ELO.usuarios();
+          var usuarios = Array.isArray(resultado) ? resultado : (resultado || []).usuarios || [];
+          tbody.replaceChildren();
+          if (!usuarios.length) {
+            var vazio = document.createElement('tr'); vazio.innerHTML = '<td colspan="5">Nenhum usuário da equipe encontrado.</td>'; tbody.appendChild(vazio); return;
+          }
+          usuarios.forEach(function (u) {
+            var tr = document.createElement('tr');
+            var nome = document.createElement('td'); nome.textContent = u.nome || '—';
+            var email = document.createElement('td'); email.textContent = u.email || '—';
+            var papel = document.createElement('td'); papel.textContent = perfilLegivel(u.papel);
+            var primeiro = document.createElement('td');
+            var etiqueta = document.createElement('span');
+            etiqueta.className = 'pill ' + (u.deve_trocar_senha ? 'pill-warn' : 'pill-ok');
+            etiqueta.textContent = u.deve_trocar_senha ? 'Aguardando primeiro acesso' : 'Concluído';
+            primeiro.appendChild(etiqueta);
+            var acao = document.createElement('td'); var reenviar = document.createElement('button');
+            reenviar.type = 'button'; reenviar.className = 'btn btn-sm btn-line'; reenviar.textContent = 'Reenviar senha';
+            reenviar.addEventListener('click', async function () {
+              reenviar.disabled = true; reenviar.textContent = 'Enviando…';
+              try {
+                var r = await ELO.reenviarSenha(u.id);
+                var msg = r?.mensagem || r?.message || (r?.email_enviado === false ? 'O e-mail não foi enviado.' : 'Senha provisória reenviada por e-mail.');
+                mostrarAviso(msg, r?.email_enviado === false ? 'info' : 'ok', r?.email_enviado === false ? r?.senha_provisoria : null);
+                await carregar();
+              } catch (e) { mostrarAviso(e.message || 'Não foi possível reenviar a senha.', 'error'); }
+              finally { reenviar.disabled = false; reenviar.textContent = 'Reenviar senha'; }
+            });
+            acao.appendChild(reenviar); tr.append(nome, email, papel, primeiro, acao); tbody.appendChild(tr);
+          });
+        } catch (e) {
+          tbody.innerHTML = '<tr><td colspan="5">Não foi possível carregar os usuários.</td></tr>';
+          mostrarAviso(e.message || 'Falha ao consultar a API de usuários.', 'error');
+        }
+      }
+      form.addEventListener('submit', async function (e) {
+        e.preventDefault(); aviso.hidden = true;
+        var nome = document.getElementById('api-usuario-nome').value.trim();
+        var email = document.getElementById('api-usuario-email').value.trim().toLowerCase();
+        var papel = document.getElementById('api-usuario-papel').value;
+        if (nome.split(/\s+/).filter(Boolean).length < 2) { mostrarAviso('Informe o nome completo.', 'error'); return; }
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { mostrarAviso('Informe um e-mail válido.', 'error'); return; }
+        botaoCriar.disabled = true; botaoCriar.textContent = 'Criando usuário…';
+        try {
+          var r = await ELO.criarUsuario({ nome: nome, email: email, papel: papel });
+          var msg = r?.mensagem || r?.message || (r?.email_enviado === false ? 'Usuário criado, mas o e-mail não foi enviado.' : 'Usuário criado. A senha provisória foi enviada por e-mail.');
+          mostrarAviso(msg, r?.email_enviado === false ? 'info' : 'ok', r?.email_enviado === false ? r?.senha_provisoria : null);
+          form.reset(); await carregar();
+        } catch (e) { mostrarAviso(e.message || 'Não foi possível criar o usuário.', 'error'); }
+        finally { botaoCriar.disabled = false; botaoCriar.textContent = 'Criar usuário e enviar senha'; }
+      });
+      document.getElementById('api-usuarios-atualizar').addEventListener('click', carregar);
+      await carregar();
+    }
     (function () {
+      if (String(window.ELO_DATA_MODE || 'api').toLowerCase() === 'api') {
+        iniciarUsuariosApi();
+        return;
+      }
       var USER_STORAGE_KEY = 'elo.demo.usuarios';
       var tbody = document.querySelector('#tabela tbody');
       function escHtml(value) { return String(value == null ? '' : value).replace(/[&<>"']/g, function (c) { return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]); }); }
