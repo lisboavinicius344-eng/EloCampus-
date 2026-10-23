@@ -1,7 +1,11 @@
+/* Zoom geral da página: reduza (ex.: .85) ou aumente (ex.: .95) aqui */
+:root { --page-zoom: .9; }
+html { zoom: var(--page-zoom); }
+
 /* ELO Campus — entrada. Mantém a identidade escura roxo/ciano do projeto. */
 .login {
-  min-height: 100vh;
-  min-height: 100svh;
+  min-height: calc(100vh / var(--page-zoom));
+  min-height: calc(100svh / var(--page-zoom));
   display: grid;
   grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
   overflow: hidden;
@@ -171,7 +175,7 @@
 @media (max-width: 899px) {
   .login { grid-template-columns: 1fr; overflow: visible; }
   .brand-side { display: none; }
-  .form-side { align-content: center; gap: 1rem; min-height: 100vh; min-height: 100svh; padding: 1.25rem; }
+  .form-side { align-content: center; gap: 1rem; min-height: calc(100vh / var(--page-zoom)); min-height: calc(100svh / var(--page-zoom)); padding: 1.25rem; }
   .form-side::before { inset: 4% 3%; }
   .mobile-brand { position: relative; z-index: 1; display: flex; align-items: center; gap: .7rem; width: min(100%, 480px); margin-bottom: .25rem; }
   .mobile-brand img { width: 38px; height: 38px; object-fit: contain; }

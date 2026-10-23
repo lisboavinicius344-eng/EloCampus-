@@ -1,12 +1,12 @@
 /* ELO Campus — layout das páginas internas */
 
-.app { min-height: 100vh; display: grid; grid-template-columns: 280px minmax(0, 1fr); }
+.app { min-height: calc(100vh / var(--page-zoom)); display: grid; grid-template-columns: 280px minmax(0, 1fr); }
 
 /* ---------- Menu lateral ---------- */
 .sidebar {
   position: sticky;
   top: 0;
-  height: 100vh;
+  height: calc(100vh / var(--page-zoom));
   display: flex;
   flex-direction: column;
   gap: 2rem;
