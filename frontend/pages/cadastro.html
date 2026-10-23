@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0B1020">
+  <title>Criar conta — ELO Campus</title>
+  <meta name="description" content="Cadastro de usuário do sistema de controle de equipamentos e empréstimos — Instituição - Campus Lapa.">
+  <link rel="icon" type="image/png" href="../assets/img/logo.png">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="stylesheet" href="../assets/css/login.css">
+</head>
+<body>
+  <main class="login">
+
+    <section class="brand-side" aria-label="Apresentação do sistema">
+      <div class="brand">
+        <img src="../assets/img/logo.png" alt="">
+          <span class="brand-name">ELO Campus
+          <span class="brand-sub">Instituição - Campus Lapa</span>
+        </span>
+      </div>
+
+      <div class="hero">
+        <img class="interlace-mark" src="../assets/img/logo-draw.svg" alt="Logo ELO Campus, marca em degradê violeta e rosa">
+
+        <h1>Crie sua conta e comece a solicitar equipamentos.</h1>
+        <p>Cadastre-se como discente, docente ou servidor para solicitar empréstimos, devolver itens e acompanhar seus registros.</p>
+      </div>
+
+      <p class="brand-foot">Projeto de estágio — Desenvolvimento de Sistemas</p>
+    </section>
+
+    <section class="form-side" aria-labelledby="titulo-cadastro">
+      <div class="mobile-brand">
+        <img src="../assets/img/logo-draw.svg" alt="">
+        <strong>ELO Campus</strong>
+      </div>
+
+      <div class="card card-wide">
+        <div class="card-head">
+          <span class="auth-kicker"><span aria-hidden="true"></span> Novo cadastro</span>
+          <h2 id="titulo-cadastro">Criar conta</h2>
+          <p>Preencha os dados abaixo. Contas administrativas são criadas apenas pela administração.</p>
+        </div>
+
+        <div id="cadastro-erro" class="alert alert-error" role="alert" aria-live="polite" hidden></div>
+
+        <form id="cadastro-form" novalidate>
+          <fieldset class="access-picker">
+            <legend>Qual é o seu vínculo?</legend>
+            <div class="access-options access-options-3">
+              <label class="access-option">
+                <input type="radio" name="perfil" value="aluno" checked>
+                <span class="access-option-card">
+                  <span class="access-copy"><strong>Discente</strong><small>Aluno(a)</small></span>
+                  <span class="access-check" aria-hidden="true"></span>
+                </span>
+              </label>
+              <label class="access-option">
+                <input type="radio" name="perfil" value="professor">
+                <span class="access-option-card">
+                  <span class="access-copy"><strong>Docente</strong><small>Professor(a)</small></span>
+                  <span class="access-check" aria-hidden="true"></span>
+                </span>
+              </label>
+              <label class="access-option">
+                <input type="radio" name="perfil" value="servidor">
+                <span class="access-option-card">
+                  <span class="access-copy"><strong>Servidor</strong><small>Técnico-administrativo</small></span>
+                  <span class="access-check" aria-hidden="true"></span>
+                </span>
+              </label>
+            </div>
+          </fieldset>
+
+          <div class="field">
+            <label for="nome">Nome completo</label>
+            <input class="input" id="nome" name="nome" type="text" autocomplete="name" placeholder="Digite seu nome completo" required autofocus>
+            <p class="field-erro" id="nome-erro"></p>
+          </div>
+
+          <div class="form-grid-2">
+            <div class="field">
+              <label for="email">E-mail</label>
+              <input class="input" id="email" name="email" type="email" autocomplete="email" placeholder="voce@lapa.edu.br" required>
+              <p class="field-erro" id="email-erro"></p>
+            </div>
+            <div class="field">
+              <label for="matricula">Matrícula</label>
+              <input class="input" id="matricula" name="matricula" type="text" inputmode="text" placeholder="Sua matrícula" required>
+              <p class="field-erro" id="matricula-erro"></p>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="usuario">Usuário</label>
+            <input class="input" id="usuario" name="usuario" type="text" autocomplete="username" placeholder="Escolha um nome de usuário" required>
+            <p class="field-erro" id="usuario-erro"></p>
+          </div>
+
+          <div class="form-grid-2">
+            <div class="field">
+              <label for="senha">Senha</label>
+              <div class="input-wrap">
+                <input class="input" id="senha" name="senha" type="password" autocomplete="new-password" placeholder="Mín. 6 caracteres" required>
+                <button class="input-toggle" id="senha-toggle" type="button" aria-controls="senha" aria-pressed="false">Mostrar</button>
+              </div>
+              <p class="field-erro" id="senha-erro"></p>
+            </div>
+            <div class="field">
+              <label for="senha2">Confirmar senha</label>
+              <input class="input" id="senha2" name="senha2" type="password" autocomplete="new-password" placeholder="Repita a senha" required>
+              <p class="field-erro" id="senha2-erro"></p>
+            </div>
+          </div>
+
+          <button class="btn btn-primary" id="cadastro-btn" type="submit">Criar conta</button>
+        </form>
+
+        <p class="card-foot">
+          <span class="login-note">Cadastro de demonstração: os dados ficam salvos apenas neste navegador até a integração com o servidor.</span>
+          Já tem uma conta? <a href="../index.html">Voltar para o login</a>
+        </p>
+      </div>
+    </section>
+
+  </main>
+
+  <script src="../assets/js/runtime-config.js"></script>
+  <script src="../assets/js/api.js"></script>
+  <script src="../assets/js/auth.js"></script>
+  <script src="../assets/js/cadastro.js"></script>
+</body>
+</html>

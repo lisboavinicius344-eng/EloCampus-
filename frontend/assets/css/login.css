@@ -202,3 +202,25 @@ html { zoom: var(--page-zoom); }
   .mobile-brand strong, .hero h1, .hero p, .legend, .card { animation: none; }
   .access-option-card, #login-btn::after { transition: none; }
 }
+
+/* Links abaixo do formulário: "Criar conta" à esquerda, "Esqueci minha senha" à direita */
+.auth-links { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .5rem 1rem; }
+a.link-button { display: inline-block; text-decoration: none; font-weight: 500; }
+a.link-button:hover { text-decoration: underline; }
+
+/* Cadastro */
+.card-wide { width: min(100%, 560px); }
+#cadastro-form { display: grid; gap: 1rem; }
+.form-grid-2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
+.access-options-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.access-options-3 .access-option-card { flex-direction: column; align-items: flex-start; }
+.access-options-3 .access-check { position: absolute; top: .7rem; right: .7rem; margin: 0; }
+.field-erro { min-height: 0; margin: 0; color: #FDA4AF; font-size: .78rem; }
+.field-erro:empty { display: none; }
+.input[aria-invalid="true"] { border-color: var(--st-late); }
+#cadastro-btn { width: 100%; min-height: 54px; }
+@media (max-width: 520px) {
+  .form-grid-2 { grid-template-columns: 1fr; }
+  .access-options-3 { grid-template-columns: 1fr; }
+  .access-options-3 .access-option-card { flex-direction: row; align-items: center; }
+}
