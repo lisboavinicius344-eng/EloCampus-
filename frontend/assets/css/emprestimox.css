@@ -2,7 +2,7 @@
    Complementa assets/css/style.css e reutiliza as variáveis do projeto. */
 
 .dashboard-page {
-  min-height: 100vh;
+  min-height: calc(100vh / var(--page-zoom));
   background:
     radial-gradient(ellipse at 72% 12%, rgba(255,255,255,.96), transparent 38%),
     var(--page, #f4f8f4);
@@ -11,7 +11,7 @@
 .dashboard-layout {
   display: grid;
   grid-template-columns: 228px minmax(0, 1fr);
-  min-height: 100vh;
+  min-height: calc(100vh / var(--page-zoom));
 }
 
 /* Navegação lateral */
@@ -20,7 +20,7 @@
   top: 0;
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
+  min-height: calc(100vh / var(--page-zoom));
   padding: 27px 16px 22px;
   color: #fff;
   background: linear-gradient(180deg, var(--green-900, #174b3a), var(--green-950, #10382d));
