@@ -7,6 +7,6 @@ services:
     ports:
       - "${ELO_PORT:-8080}:80"
     environment:
-      ELO_API_BASE_URL: "${ELO_API_BASE_URL:-}"
-      ELO_DATA_MODE: "${ELO_DATA_MODE:-demo}"
+      ELO_API_BASE_URL: "${ELO_API_BASE_URL:-https://elocampus-backend.a6ti6s.easypanel.host/api}"
+      ELO_DATA_MODE: "${ELO_DATA_MODE:-api}"
     restart: unless-stopped

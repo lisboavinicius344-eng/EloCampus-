@@ -87,3 +87,12 @@ O primeiro teste verifica consulta de QR local, empréstimo com vários itens, p
 
 Não há relógio ou temporizador permanente adicionado à interface. As operações registram a data e a hora local no momento em que o empréstimo ou a devolução são confirmados; esse horário aparece nos respectivos registros e no histórico. Sem uma referência confiável de servidor, uma aplicação exclusivamente front-end não consegue garantir a hora real se o relógio do dispositivo estiver incorreto, especialmente sem conexão.
 
+
+
+## Integração com a API
+
+O frontend usa por padrão a API publicada em `https://elocampus-backend.a6ti6s.easypanel.host/api`.
+A configuração está em `frontend/assets/js/runtime-config.js`; variáveis injetadas pelo Docker têm prioridade.
+Para desenvolvimento local, configure a origem do frontend em `CORS_ORIGINS` no backend. O modo demo pode ser reativado definindo `ELO_DATA_MODE` como `demo`.
+
+A autenticação real usa e-mail e senha, armazena o token retornado pelo backend na sessão e envia `Authorization: Bearer` nas requisições. Erros JSON do backend são apresentados ao usuário; respostas 401 encerram a sessão. A API não oferece edição de perfil nem redefinição de senha no contrato atual, portanto essas ações não devem simular sucesso.

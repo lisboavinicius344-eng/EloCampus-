@@ -4,7 +4,7 @@
  */
 "use strict";
 
-const AUTH_MODE = "demo";
+const AUTH_MODE = String(window.ELO_DATA_MODE || "api").toLowerCase() === "api" ? "api" : "demo";
 const SESSION_KEY = "elo.sessao";
 const REMEMBER_KEY = "elo.sessao.lembrar";
 const DASHBOARD_URL = "pages/dashboard.html";
@@ -44,7 +44,21 @@ function cadastrarConta(dados) {
 }
 
 async function autenticar(login, senha) {
-  // Simula apenas latência visual; não representa autenticação institucional.
+  if (AUTH_MODE === "api") {
+    const base = String(window.ELO_API_BASE_URL || "").replace(/\/+$/, "");
+    let resposta;
+    try {
+      resposta = await fetch(`${base}/auth/login`, {
+        method: "POST", headers: { "Accept": "application/json", "Content-Type": "application/json" },
+        body: JSON.stringify({ email: String(login).trim().toLowerCase(), senha })
+      });
+    } catch { throw new Error("Não foi possível conectar ao servidor. Verifique sua conexão e tente novamente."); }
+    const corpo = await resposta.json().catch(() => ({}));
+    if (!resposta.ok) throw new Error(resposta.status === 500 ? "Ocorreu um erro interno. Tente novamente." : (corpo.erro || corpo.mensagem || "Não foi possível entrar."));
+    const u = corpo.usuario || {};
+    const perfil = ({ admin: "administrador", operador: "operador" })[String(u.papel || "").toLowerCase()] || String(u.papel || "").toLowerCase();
+    return { ...u, perfil, login: u.email, token: corpo.token, nome: u.nome, solicitante_id: u.solicitante_id };
+  }
   await new Promise((resolve) => setTimeout(resolve, 250));
   const conta = [...CONTAS_DEMO, ...contasCadastradas()].find((item) => item.login === login && item.senha === senha);
   if (!conta) throw new Error("Usuário ou senha incorretos. Confira os dados e tente novamente.");
@@ -92,6 +106,17 @@ function sair() {
   const lembrar = document.getElementById("lembrar");
   const recuperar = document.getElementById("esqueci-senha");
   const tiposAcesso = [...form.querySelectorAll('input[name="tipo-acesso"]')];
+  if (AUTH_MODE === "api") {
+    login.type = "email";
+    login.autocomplete = "username";
+    login.placeholder = "voce@instituicao.edu.br";
+    const label = form.querySelector('label[for="login"]');
+    if (label) label.textContent = "E-mail institucional";
+    const ajuda = form.querySelector(".field small, .hint");
+    if (ajuda) ajuda.textContent = "Use o e-mail cadastrado pela instituição.";
+    const seletor = form.querySelector(".access-picker");
+    if (seletor) seletor.hidden = true;
+  }
 
   const mostrarMensagem = (texto, tipo = "error") => {
     erro.textContent = texto;
@@ -168,7 +193,7 @@ function sair() {
       if (!PERFIS_VALIDOS.has(perfil)) {
         throw new Error("O perfil vinculado à conta não é reconhecido. Procure a administração.");
       }
-      if (!acessoCombina(perfil, tipoSelecionado())) {
+      if (AUTH_MODE !== "api" && !acessoCombina(perfil, tipoSelecionado())) {
         throw new Error(tipoSelecionado() === "administracao"
           ? "Esta conta não possui perfil administrativo. Selecione “Discente, docente ou servidor” ou procure a administração."
           : "Esta conta pertence à equipe administrativa. Selecione “Administrador / TI” para continuar.");

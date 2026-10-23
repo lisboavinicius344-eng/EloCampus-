@@ -125,15 +125,17 @@
   $("remover-foto").addEventListener("click", () => { imagem = ""; foto.value = ""; fotoPreviewImg.removeAttribute("src"); fotoPreview.hidden = true; });
 
   // Sugestões de tipo e setor a partir do que já existe (se falhar, segue sem elas)
+  let categoriasApi = [];
   try {
     const lista = await ELO.equipamentos();
-    const preencher = (idLista, campo) => {
-      const valores = [...new Set(lista.map((e) => e[campo]).filter(Boolean))]
-        .sort((a, b) => a.localeCompare(b, "pt-BR"));
-      $(idLista).innerHTML = valores.map((v) => `<option value="${esc(v)}"></option>`).join("");
+    const preencher = (idLista, valores) => {
+      $(idLista).innerHTML = [...new Set(valores.filter(Boolean))].sort((a,b)=>a.localeCompare(b,"pt-BR")).map(v=>`<option value="${esc(v)}"></option>`).join("");
     };
-    preencher("lista-categorias", "categoria");
-    preencher("lista-setores", "setor");
+    preencher("lista-setores", lista.map(e=>e.setor));
+    if (ELO.modo() === "api") {
+      categoriasApi = await ELO.categorias();
+      preencher("lista-categorias", categoriasApi.filter(c=>c.ativo !== false).map(c=>c.nome));
+    } else preencher("lista-categorias", lista.map(e=>e.categoria));
   } catch { /* sugestões são opcionais */ }
 
   // Modo edição
