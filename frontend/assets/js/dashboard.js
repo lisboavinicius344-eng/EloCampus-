@@ -133,7 +133,7 @@
 
   try {
     const sessao = typeof obterSessao === "function" ? obterSessao() : null;
-    const perfilFinal = ["aluno", "professor", "servidor"].includes(String(sessao?.perfil || "").toLowerCase());
+    const perfilFinal = ["aluno", "professor"].includes(String(sessao?.perfil || "").toLowerCase());
     if (perfilFinal) {
       const [equipamentos, todosEmprestimos] = await Promise.all([ELO.equipamentos(), ELO.emprestimos()]);
       renderInicioUsuario(equipamentos, todosEmprestimos, sessao);

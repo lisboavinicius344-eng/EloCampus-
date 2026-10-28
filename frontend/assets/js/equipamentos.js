@@ -115,14 +115,13 @@
   // Confirmação vinda do formulário (equipamentos.html?salvo=criado|editado)
   const salvo = new URLSearchParams(window.location.search).get("salvo");
   if (["criado", "editado", "removido", "arquivado"].includes(salvo)) {
-    const viaApi = ELO.modo() === "api";
-    const mensagem = salvo === "criado"
-      ? (viaApi ? "Equipamento cadastrado no servidor com sucesso." : "Equipamento salvo localmente.")
-      : salvo === "editado"
-        ? (viaApi ? "Alterações do equipamento salvas no servidor." : "Alterações salvas localmente.")
-        : salvo === "arquivado"
-          ? "Equipamento inativado com histórico preservado."
-          : "Equipamento inativado com sucesso.";
+    const mensagens = {
+      criado: "Equipamento cadastrado no servidor.",
+      editado: "Alterações do equipamento salvas no servidor.",
+      arquivado: "Equipamento retirado de uso; histórico preservado no servidor.",
+      removido: "Equipamento retirado com segurança.",
+    };
+    const mensagem = mensagens[salvo] || "Alteração concluída.";
     $("filtros").insertAdjacentHTML("beforebegin",
       `<div class="alert alert-ok" role="status" style="margin-bottom:1.25rem">${mensagem}</div>`);
     history.replaceState(null, "", window.location.pathname);

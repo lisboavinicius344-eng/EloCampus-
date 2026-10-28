@@ -11,9 +11,9 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-  <link rel="stylesheet" href="../assets/css/style.css">
-  <link rel="stylesheet" href="../assets/css/layout.css">
-  <link rel="stylesheet" href="../assets/css/equipamentos.css">
+  <link rel="stylesheet" href="../assets/css/style.css?v=2026.10.28.10">
+  <link rel="stylesheet" href="../assets/css/layout.css?v=2026.10.28.10">
+  <link rel="stylesheet" href="../assets/css/equipamentos.css?v=2026.10.28.10">
 </head>
 <body data-pagina="equipamentos">
   <div class="app">
@@ -26,7 +26,7 @@
         <div class="page-head">
           <div>
             <h1 id="titulo">Cadastrar equipamento</h1>
-            <p id="subtitulo">Preencha os dados de identificação. O QR Code é gerado a partir do patrimônio.</p>
+            <p id="subtitulo">Preencha os dados de identificação. O identificador do QR Code usa o patrimônio por padrão, mas pode ser personalizado.</p>
           </div>
           <a class="btn btn-ghost" href="equipamentos.html">Voltar para a lista</a>
         </div>
@@ -45,9 +45,9 @@
               </div>
 
               <div class="field col-2">
-                <label for="f-foto">Foto de referência <span class="muted">(não sincronizada)</span></label>
-                <input class="input file-input" id="f-foto" type="file" accept="image/*" aria-describedby="d-foto e-foto">
-                <span class="hint" id="d-foto">A API atual não armazena fotos; a imagem não será mantida após recarregar.</span>
+                <label for="f-foto">Foto de referência</label>
+                <input class="input file-input" id="f-foto" type="file" accept="image/jpeg,image/png,image/webp,image/gif" aria-describedby="d-foto e-foto">
+                <span class="hint" id="d-foto">JPG, PNG, WebP ou GIF. A foto é reduzida automaticamente antes de enviar.</span>
                 <span class="field-erro" id="e-foto"></span>
                 <div class="foto-preview" id="foto-preview" hidden><img id="foto-preview-img" alt="Pré-visualização da foto do equipamento"><button class="btn btn-ghost btn-sm" type="button" id="remover-foto">Remover foto</button></div>
               </div>
@@ -62,9 +62,9 @@
 
               <div class="field">
                 <label for="f-identificador">Identificador no QR Code</label>
-                <input class="input" id="f-identificador" type="text" readonly tabindex="-1"
-                       aria-describedby="d-identificador" value="">
-                <span class="hint" id="d-identificador">Definido a partir do patrimônio.</span>
+                <input class="input" id="f-identificador" type="text" maxlength="80" autocomplete="off"
+                       placeholder="Automático: patrimônio" aria-describedby="d-identificador">
+                <span class="hint" id="d-identificador">Por padrão, usa o patrimônio. Você pode informar outro código impresso na etiqueta.</span>
               </div>
             </div>
 
@@ -72,7 +72,11 @@
             <div class="form-grid">
               <div class="field">
                 <label for="f-categoria">Tipo ou categoria</label>
-                <input class="input" id="f-categoria" type="text" maxlength="80" list="lista-categorias" autocomplete="off" placeholder="Escolha uma sugestão ou digite uma categoria" aria-describedby="e-categoria d-categoria" required><datalist id="lista-categorias"></datalist><span class="hint" id="d-categoria">Se a categoria ainda não existir, ela será criada ao salvar.</span>
+                <input class="input" id="f-categoria" type="text" maxlength="80" list="lista-categorias"
+                       autocomplete="off" placeholder="Selecione uma sugestão ou digite uma categoria"
+                       aria-describedby="d-categoria e-categoria" required>
+                <datalist id="lista-categorias"></datalist>
+                <span class="hint" id="d-categoria">Categorias existentes aparecem como sugestões; você também pode cadastrar uma nova pelo nome.</span>
                 <span class="field-erro" id="e-categoria"></span>
               </div>
 
@@ -121,11 +125,11 @@
     </div>
   </div>
 
-  <script src="../assets/js/auth.js"></script>
-  <script src="../assets/js/layout.js"></script>
-  <script src="../assets/js/visuais.js"></script>
-  <script src="../assets/js/runtime-config.js"></script>
-  <script src="../assets/js/api.js"></script>
-  <script src="../assets/js/equipamento-form.js"></script>
+  <script src="../assets/js/auth.js?v=2026.10.28.10"></script>
+  <script src="../assets/js/layout.js?v=2026.10.28.10"></script>
+  <script src="../assets/js/visuais.js?v=2026.10.28.10"></script>
+  <script src="../assets/js/runtime-config.js?v=2026.10.28.10"></script>
+  <script src="../assets/js/api.js?v=2026.10.28.10"></script>
+  <script src="../assets/js/equipamento-form.js?v=2026.10.28.10"></script>
 </body>
 </html>

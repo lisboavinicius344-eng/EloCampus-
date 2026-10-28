@@ -33,11 +33,46 @@
         <div><dt>Setor responsável</dt><dd>${esc(e.setor)}</dd></div>
         <div><dt>Condição física</dt><dd>${esc(e.condicao)}</dd></div>
         <div><dt>Situação</dt><dd>${esc(e.situacao || "Não informada")}</dd></div>
+        <div class="col-2"><dt>Quem pode usar</dt><dd>${e.elegibilidade === "somente_funcionarios" ? "Somente professores e funcionários" : "Todos os perfis elegíveis"}</dd></div>
         ${e.observacoes ? `<div class="col-2"><dt>Observações</dt><dd>${esc(e.observacoes)}</dd></div>` : ""}
       </dl>
-      <button class="btn btn-danger" id="retirar">Retirar equipamento</button>
+      <section class="qr-label" id="etiqueta-qr" aria-labelledby="qr-label-title">
+        <div class="qr-label-copy"><h3 id="qr-label-title">Etiqueta QR do equipamento</h3><p>O código impresso corresponde ao identificador usado na consulta do acervo.</p><strong>${esc(e.qr_code || e.patrimonio || "")}</strong></div>
+        <div class="qr-label-code" id="qr-code-image" aria-label="QR Code do equipamento"></div>
+        <button class="btn btn-ghost" id="imprimir-qr" type="button">Imprimir etiqueta</button>
+      </section>
+      <button class="btn btn-danger" id="retirar" type="button">Retirar equipamento</button>
     </div></div>`;
 
+    const codigoQr = String(e.qr_code || e.patrimonio || "").trim();
+    const qrTarget = $("qr-code-image");
+    if (codigoQr && window.ELOQRCode && window.ELOQRCodeLevel) {
+      try {
+        const qr = new ELOQRCode(-1, ELOQRCodeLevel.M);
+        qr.addData(codigoQr);
+        qr.make();
+        const matrix = qr.modules;
+        const quiet = 4;
+        const size = matrix.length + quiet * 2;
+        const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+        svg.setAttribute("viewBox", `0 0 ${size} ${size}`);
+        svg.setAttribute("role", "img");
+        svg.setAttribute("aria-label", `QR Code com identificador ${codigoQr}`);
+        svg.setAttribute("shape-rendering", "crispEdges");
+        const bg = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+        bg.setAttribute("width", String(size)); bg.setAttribute("height", String(size)); bg.setAttribute("fill", "#fff"); svg.append(bg);
+        let pathData = "";
+        matrix.forEach((row, y) => row.forEach((dark, x) => { if (dark) pathData += `M${x + quiet} ${y + quiet}h1v1h-1z`; }));
+        const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+        path.setAttribute("d", pathData); path.setAttribute("fill", "#000"); svg.append(path);
+        qrTarget.replaceChildren(svg);
+      } catch {
+        qrTarget.textContent = "Não foi possível gerar o QR Code deste identificador.";
+      }
+    } else {
+      qrTarget.textContent = "Identificador indisponível para gerar o QR Code.";
+    }
+    $("imprimir-qr").addEventListener("click", () => window.print());
     $("retirar").addEventListener("click", () => { $("modal-exclusao").hidden = false; $("confirmar-exclusao").focus(); });
     $("cancelar-exclusao").addEventListener("click", () => { $("modal-exclusao").hidden = true; });
     $("confirmar-exclusao").addEventListener("click", async () => {

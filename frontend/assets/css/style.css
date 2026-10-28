@@ -1,7 +1,3 @@
-/* Zoom geral da página: reduza (ex.: .85) ou aumente (ex.: .95) aqui */
-:root { --page-zoom: .9; }
-html { zoom: var(--page-zoom); }
-
 /* ELO Campus — estilos globais
    Tokens e componentes compartilhados por todas as páginas. */
 
@@ -40,7 +36,7 @@ html { color-scheme: dark; }
 
 body {
   margin: 0;
-  min-height: calc(100vh / var(--page-zoom));
+  min-height: 100vh;
   background: var(--bg);
   color: var(--text);
   font-family: var(--font);

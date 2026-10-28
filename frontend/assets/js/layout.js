@@ -35,12 +35,12 @@ const EloUtil = {
 (function () {
   let sessao = obterSessao();
   const publico = document.body.dataset.publico === "true";
-  const perfisValidos = new Set(["administrador", "operador", "aluno", "professor", "servidor"]);
+  const perfisValidos = new Set(["administrador", "operador", "aluno", "professor"]);
   if (!sessao && !publico) { window.location.replace("../index.html"); return; }
   if (!sessao) sessao = { nome: "Consulta pública", perfil: "visitante" };
   const perfilAtual = String(sessao.perfil || "").toLowerCase();
   const equipe = ["administrador", "operador"].includes(perfilAtual);
-  const usuarioFinal = ["aluno", "professor", "servidor"].includes(perfilAtual);
+  const usuarioFinal = ["aluno", "professor"].includes(perfilAtual);
   const paginaAtual = document.body.dataset.pagina;
   const arquivoAtual = window.location.pathname.split("/").pop();
   const paginasRestritas = ["movimentacoes.html", "usuarios.html", "solicitantes.html", "equipamento-form.html", "manutencoes.html", "categorias.html"];
@@ -115,7 +115,7 @@ const EloUtil = {
     { id: "perfil", rotulo: "Configuração do perfil", icone: "gear", href: "perfil.html" },
   ];
 
-  // Para discentes, docentes e servidores, o menu é uma área de autoatendimento:
+  // Para discentes e docentes, o menu é uma área de autoatendimento:
   // sem termos administrativos, cadastro interno ou informações de operação.
   const NAV_USUARIO = [
     { id: "painel", rotulo: "Início", icone: "home", href: "dashboard.html" },
@@ -145,7 +145,7 @@ const EloUtil = {
 
   const nome = EloUtil.esc(sessao.nome || "Usuário");
   const iniciais = (sessao.nome || "U").split(" ").slice(0, 2).map((p) => p[0]).join("").toUpperCase();
-  const ROTULOS_PERFIL = { administrador: "Administrador · TI", operador: "Equipe operacional", aluno: "Discente", professor: "Docente", servidor: "Servidor" };
+  const ROTULOS_PERFIL = { administrador: "Administrador · TI", operador: "Equipe operacional", aluno: "Discente", professor: "Docente" };
   const perfil = usuarioFinal ? "Minha conta" : (ROTULOS_PERFIL[perfilAtual] || (sessao.perfil ? sessao.perfil[0].toUpperCase() + sessao.perfil.slice(1) : ""));
   const subtituloMarca = usuarioFinal ? "" : "<small>Instituição - Campus Lapa</small>";
 

@@ -15,6 +15,9 @@ const normalizarEquipamento = (equipamento = {}) => ({
   situacao: equipamento.situacao || ({ disponivel: "disponivel", emprestado: "emprestado", manutencao: "manutencao", baixado: "inativo" }[equipamento.status] || "disponivel"),
   base: equipamento.status === "baixado" ? "inativo" : equipamento.status,
   localizacao: equipamento.localizacao || "",
+  imagem: equipamento.imagem_url
+    ? (/^https?:\/\//i.test(equipamento.imagem_url) ? equipamento.imagem_url : `${API_BASE_URL}${equipamento.imagem_url}`)
+    : (equipamento.imagem || ""),
 });
 
 const normalizarEmprestimo = (emprestimo = {}) => {
@@ -175,21 +178,23 @@ const ELO = {
     return { itens: feitos };
   },
   removerEquipamento: (id) => requisitar(`/equipamentos/${encodeURIComponent(id)}/inativar`, { metodo: "PATCH" }),
-  salvarEquipamento: async (dados, id) => {
+  salvarEquipamento: async (d, id) => {
     const corpo = {
-      nome: dados.nome,
-      numero_patrimonio: dados.patrimonio || dados.numero_patrimonio,
-      setor: dados.setor,
-      localizacao: dados.localizacao || "",
-      estado_conservacao: estadoApi(dados.condicao || dados.estado_conservacao),
-      qr_code: dados.qr_code || dados.patrimonio || dados.numero_patrimonio,
-      observacoes: dados.observacoes || null,
-      elegibilidade: dados.elegibilidade || "todos",
+      nome: d.nome,
+      numero_patrimonio: d.patrimonio || d.numero_patrimonio,
+      setor: d.setor,
+      localizacao: d.localizacao || "",
+      estado_conservacao: estadoApi(d.condicao || d.estado_conservacao),
+      qr_code: d.qr_code || d.patrimonio || d.numero_patrimonio,
+      observacoes: d.observacoes || null,
+      elegibilidade: d.elegibilidade || "todos",
     };
-    if (dados.categoria_id) corpo.categoria_id = Number(dados.categoria_id);
-    else corpo.categoria = String(dados.categoria || "").trim();
+    if (d.categoria_id) corpo.categoria_id = Number(d.categoria_id);
+    else corpo.categoria = String(d.categoria || "").trim();
+    if (d.imagemAlterada) corpo.imagem = d.imagem || null; // null remove a foto existente
     return (await requisitar(id ? `/equipamentos/${encodeURIComponent(id)}` : "/equipamentos", {
-      metodo: id ? "PUT" : "POST", corpo,
+      metodo: id ? "PUT" : "POST",
+      corpo,
     })).equipamento;
   },
   categorias: async () => (await requisitar("/categorias")).categorias,
