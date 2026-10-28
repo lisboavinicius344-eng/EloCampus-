@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0B1020">
+  <title>Minhas reservas — ELO Campus</title>
+  <link rel="icon" type="image/png" href="../assets/img/logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/emprestimos.css">
+  <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="../assets/css/layout.css">
+  <link rel="stylesheet" href="../assets/css/salz-bridge.css">
+</head>
+<body data-pagina="minhas-reservas" data-view="minhas">
+  <div class="app">
+    <aside class="sidebar" id="sidebar"></aside>
+    <div class="content">
+      <header class="topbar" id="topbar"></header>
+      <main class="main"><header class="page-head">
+      <div>
+        <h1>Minhas reservas</h1>
+        <p>Acompanhe o status e cancele reservas pendentes ou aprovadas.</p>
+      </div>
+      <div class="toolbar">
+        <a class="btn" href="novo-emprestimo.html">+ Reservar equipamento</a>
+      </div>
+    </header>
+
+    <div id="reserva-mensagem" class="alert" role="alert" hidden style="margin-bottom:1rem"></div>
+
+    <section class="card" aria-label="Lista das minhas reservas">
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Equipamentos</th><th>Período</th><th>Status</th><th><span class="sr-only">Ação</span></th></tr>
+          </thead>
+          <tbody id="lista-reservas"><tr><td colspan="4" class="muted">Carregando reservas…</td></tr></tbody>
+        </table>
+      </div>
+    </section>
+    </main>
+    </div>
+  </div>
+  <script src="../assets/js/auth.js"></script>
+  <script src="../assets/js/layout.js"></script>
+  <script src="../assets/js/dados-demo.js"></script>
+  <script src="../assets/js/visuais.js"></script>
+  <script src="../assets/js/runtime-config.js"></script>
+  <script src="../assets/js/api.js"></script>
+  <script src="../assets/js/salz-actions.js"></script>
+  <script src="../assets/js/reservas.js"></script>
+</body>
+</html>

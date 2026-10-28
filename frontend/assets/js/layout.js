@@ -43,8 +43,8 @@ const EloUtil = {
   const usuarioFinal = ["aluno", "professor", "servidor"].includes(perfilAtual);
   const paginaAtual = document.body.dataset.pagina;
   const arquivoAtual = window.location.pathname.split("/").pop();
-  const paginasRestritas = ["movimentacoes.html", "usuarios.html", "relatorio.html", "servidor.html", "equipamento-form.html"];
-  const paginasUsuario = ["dashboard.html", "disponiveis.html", "consulta-qr-interno.html", "emprestimos.html", "novo-emprestimo.html", "devolucoes.html", "perfil.html"];
+  const paginasRestritas = ["movimentacoes.html", "usuarios.html", "relatorio.html", "servidor.html", "equipamento-form.html", "reservas.html"];
+  const paginasUsuario = ["dashboard.html", "disponiveis.html", "consulta-qr-interno.html", "emprestimos.html", "novo-emprestimo.html", "devolucoes.html", "perfil.html", "minhas-reservas.html"];
 
   // O controle de navegação evita acessos acidentais pela URL; segurança real
   // precisa ser aplicada no backend quando a autenticação institucional existir.
@@ -95,6 +95,7 @@ const EloUtil = {
       { id: "consulta-qr", rotulo: "Consulta por QR Code", icone: "qr", href: "consulta-qr-interno.html" },
     ]},
     { grupo: "Empréstimos e devoluções", itens: [
+      { id: "reservas", rotulo: "Reservas", icone: "box", href: "reservas.html" },
       { id: "emprestimos", rotulo: "Empréstimos", icone: "swap", href: "emprestimos.html" },
       { id: "devolucoes", rotulo: "Devoluções", icone: "undo", href: "devolucoes.html" },
     ]},
@@ -113,9 +114,10 @@ const EloUtil = {
     { id: "painel", rotulo: "Início", icone: "home", href: "dashboard.html" },
     { id: "disponiveis", rotulo: "Ver os equipamentos", icone: "box", href: "disponiveis.html" },
     { id: "consulta-qr", rotulo: "Consultar QR Code", icone: "qr", href: "consulta-qr-interno.html" },
-    { id: "pedir", rotulo: "Pedir empréstimo", icone: "swap", href: "novo-emprestimo.html" },
+    { id: "pedir", rotulo: "Reservar equipamento", icone: "swap", href: "novo-emprestimo.html" },
+    { id: "minhas-reservas", rotulo: "Minhas reservas", icone: "box", href: "minhas-reservas.html" },
     { id: "devolucoes", rotulo: "Devolver equipamentos", icone: "undo", href: "devolucoes.html" },
-    { id: "emprestimos", rotulo: "Meus empréstimos", icone: "box", href: "emprestimos.html" },
+    { id: "emprestimos", rotulo: "Meus empréstimos", icone: "swap", href: "emprestimos.html" },
   ];
   const NAV = usuarioFinal ? NAV_USUARIO : NAV_EQUIPE;
 

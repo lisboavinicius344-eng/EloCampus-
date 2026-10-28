@@ -24,5 +24,5 @@ assert.match(availableHtml, /<h1>Ver os equipamentos<\/h1>/);
 assert.match(layoutJs, /href: "devolucoes\.html"\s*\}/);
 assert.match(layoutJs, /"novo-emprestimo\.html", "devolucoes\.html"/);
 assert.match(returnHtml, /id="form-devolucao"/);
-assert.match(loanHtml, /id="confirmar-emprestimo"/);
+assert.match(loanHtml, /id="form-reserva"/);
 console.log('PASS: login inclui os perfis esperados, logo com animação desenhada, catálogo renomeado e atalhos de autoatendimento/QR Code.');

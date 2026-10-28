@@ -39,6 +39,7 @@ const ELO={
  criarReserva:d=>requisitar("/reservas",{metodo:"POST",corpo:d}),
  aprovarReserva:id=>requisitar(`/reservas/${encodeURIComponent(id)}/aprovar`,{metodo:"PATCH"}),
  rejeitarReserva:id=>requisitar(`/reservas/${encodeURIComponent(id)}/rejeitar`,{metodo:"PATCH"}),
+ retirarReserva:(id,d={})=>requisitar(`/reservas/${encodeURIComponent(id)}/retirar`,{metodo:"POST",corpo:d}),
  cancelarReserva:id=>requisitar(`/reservas/${encodeURIComponent(id)}/cancelar`,{metodo:"PATCH"}),
  manutencoes:async()=>MODO_DADOS==="demo"?[]:(await requisitar("/manutencoes")).manutencoes,
  abrirManutencao:d=>requisitar("/manutencoes",{metodo:"POST",corpo:d}),

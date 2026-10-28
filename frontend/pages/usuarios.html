@@ -135,7 +135,6 @@
                   <li><span class="dot dot-pink"></span><div><strong>Retirou Cabo HDMI 3 m</strong><div class="muted">07/10 · 16:20 · CAB-0045</div></div></li>
                 </ol>
                 <div class="stack-sm">
-                  <a class="btn btn-block" href="novo-emprestimo.html" data-novo-emprestimo>Novo empréstimo para ela</a>
                   <button class="btn btn-line btn-block" id="editar-selecionado" type="button">Editar cadastro</button>
                 </div>
               </div>
@@ -460,8 +459,10 @@
         } else {
           atualizarHistoricoSolicitante(tr);
           var link = painel.querySelector('[data-novo-emprestimo]');
-          link.textContent = 'Novo empréstimo para ' + tr.dataset.nome;
-          link.dataset.nome = tr.dataset.nome; link.dataset.matricula = tr.dataset.matricula || ''; link.dataset.vinculo = tr.dataset.vinculo || '';
+          if (link) {
+            link.textContent = 'Novo empréstimo para ' + tr.dataset.nome;
+            link.dataset.nome = tr.dataset.nome; link.dataset.matricula = tr.dataset.matricula || ''; link.dataset.vinculo = tr.dataset.vinculo || '';
+          }
         }
       }
 

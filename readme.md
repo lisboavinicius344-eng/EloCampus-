@@ -12,7 +12,7 @@ Este repositório mantém a estrutura original da interface web em `frontend/`. 
 - Relatórios baseados nos registros carregados, filtros e exportação CSV.
 - Consulta local por patrimônio, identificador ou URL codificada no QR Code.
 - Tela de login com seleção explícita de acesso para Discente/Docente/Servidor ou Administração/TI, validada contra o perfil da conta de demonstração.
-- Área de autoatendimento separada para discente, docente e servidor, com acesso direto a Ver os equipamentos, Pedir empréstimo, Devolver equipamentos e Consultar QR Code.
+- Área de autoatendimento separada para discente, docente e servidor, com acesso direto a Ver os equipamentos, Reservar equipamento (a equipe aprova e registra a retirada, que cria o empréstimo), Devolver equipamentos e Consultar QR Code.
 - A página Ver os equipamentos apresenta os itens disponíveis para empréstimo e pode abrir a solicitação com um item previamente selecionado. A consulta por QR Code também fica disponível para os perfis de autoatendimento.
 - Empréstimos e devoluções dos usuários comuns mostram apenas registros vinculados à própria conta, com menos campos administrativos; páginas de gestão permanecem separadas.
 - Contas de demonstração para administrador, operador, aluno, professor e servidor (perfil comum).

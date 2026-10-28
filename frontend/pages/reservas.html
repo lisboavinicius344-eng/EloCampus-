@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0B1020">
+  <title>Reservas — ELO Campus</title>
+  <link rel="icon" type="image/png" href="../assets/img/logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/emprestimos.css">
+  <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="../assets/css/layout.css">
+  <link rel="stylesheet" href="../assets/css/salz-bridge.css">
+</head>
+<body data-pagina="reservas" data-view="equipe">
+  <div class="app">
+    <aside class="sidebar" id="sidebar"></aside>
+    <div class="content">
+      <header class="topbar" id="topbar"></header>
+      <main class="main"><header class="page-head">
+      <div>
+        <h1>Reservas</h1>
+        <p>Aprove ou rejeite pedidos e registre a retirada quando a pessoa vier buscar.</p>
+      </div>
+      <div class="toolbar">
+        <label for="busca" class="sr-only">Buscar</label>
+        <input class="input" id="busca" type="search" placeholder="Buscar pessoa ou equipamento" style="width:280px">
+        <a class="btn btn-line" href="emprestimos.html">Ver empréstimos</a>
+      </div>
+    </header>
+
+    <div class="tabs" role="tablist" aria-label="Filtro por status">
+      <button class="tab" role="tab" aria-selected="true"  type="button" data-filtro="">Todas</button>
+      <button class="tab" role="tab" aria-selected="false" type="button" data-filtro="pendente">Pendentes</button>
+      <button class="tab" role="tab" aria-selected="false" type="button" data-filtro="aprovada">Aprovadas</button>
+      <button class="tab" role="tab" aria-selected="false" type="button" data-filtro="retirada">Retiradas</button>
+      <button class="tab" role="tab" aria-selected="false" type="button" data-filtro="encerradas">Rejeitadas / canceladas</button>
+    </div>
+
+    <div id="reserva-mensagem" class="alert" role="alert" hidden style="margin-bottom:1rem"></div>
+
+    <section class="card" aria-label="Lista de reservas">
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Solicitante</th><th>Equipamentos</th><th>Período</th><th>Status</th><th><span class="sr-only">Ações</span></th></tr>
+          </thead>
+          <tbody id="lista-reservas"><tr><td colspan="5" class="muted">Carregando reservas…</td></tr></tbody>
+        </table>
+      </div>
+    </section>
+
+    <dialog id="dlg-retirada" aria-labelledby="dlg-retirada-titulo" style="max-width:480px;width:calc(100% - 2rem);border-radius:20px;padding:1.5rem;background:var(--surface,#11182B);color:var(--text,#fff);border:1px solid var(--line,#29344D)">
+      <form method="dialog" id="form-retirada" class="stack">
+        <h2 id="dlg-retirada-titulo" style="font-size:20px">Registrar retirada</h2>
+        <p class="muted" id="dlg-retirada-sub"></p>
+        <div class="field">
+          <label for="ret-devolucao">Devolução prevista (opcional)</label>
+          <input class="input input-block" id="ret-devolucao" type="datetime-local">
+          <span class="hint">Se ficar em branco, vale o fim da reserva.</span>
+        </div>
+        <div class="field">
+          <label for="ret-obs">Observações (opcional)</label>
+          <textarea class="input input-block" id="ret-obs" placeholder="Condição do item na retirada…"></textarea>
+        </div>
+        <div id="dlg-retirada-erro" class="alert" role="alert" hidden></div>
+        <div class="stack-sm">
+          <button class="btn btn-block" type="submit" id="ret-confirmar">Confirmar retirada</button>
+          <button class="btn btn-line btn-block" type="button" id="ret-cancelar">Voltar</button>
+        </div>
+      </form>
+    </dialog>
+    </main>
+    </div>
+  </div>
+  <script src="../assets/js/auth.js"></script>
+  <script src="../assets/js/layout.js"></script>
+  <script src="../assets/js/dados-demo.js"></script>
+  <script src="../assets/js/visuais.js"></script>
+  <script src="../assets/js/runtime-config.js"></script>
+  <script src="../assets/js/api.js"></script>
+  <script src="../assets/js/salz-actions.js"></script>
+  <script src="../assets/js/reservas.js"></script>
+</body>
+</html>
