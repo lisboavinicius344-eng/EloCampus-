@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Saúde da API — ELO Campus</title>
+  <link rel="icon" href="../assets/img/logo.png">
+  <link rel="stylesheet" href="../assets/css/style.css"><link rel="stylesheet" href="../assets/css/layout.css"><link rel="stylesheet" href="../assets/css/dashboard.css">
+</head>
+<body data-pagina="servidor">
+  <div class="app"><aside class="sidebar" id="sidebar"></aside><div class="content"><header class="topbar" id="topbar"></header>
+    <main class="main">
+      <header class="page-head"><div><h1>Saúde da API</h1><p>Estado da conexão com o serviço utilizado pelo ELO Campus.</p></div></header>
+      <div id="api-health-message" class="alert alert-info" role="status" aria-live="polite">Verificando conexão…</div>
+      <div class="dash-grid">
+        <section class="panel"><h2 class="panel-title">Status da conexão</h2><p><span class="badge" id="api-health-badge">Consultando</span></p><dl class="stack-sm"><div class="kv"><dt class="muted">Serviço</dt><dd id="api-health-name">—</dd></div><div class="kv"><dt class="muted">Última verificação</dt><dd id="api-health-time">—</dd></div></dl><button class="btn btn-line" id="api-health-refresh" type="button">Verificar novamente</button></section>
+        <section class="panel"><h2 class="panel-title">Ações</h2><div class="acoes"><a class="acao" href="usuarios.html">Gerenciar contas da equipe</a><a class="acao" href="perfil.html">Configurar meu perfil</a><a class="acao" href="dashboard.html">Voltar ao painel</a></div><p class="muted small">Este painel não exibe credenciais, tokens, senhas ou detalhes internos do servidor.</p></section>
+      </div>
+    </main>
+  </div></div>
+  <script src="../assets/js/runtime-config.js"></script><script src="../assets/js/api.js"></script><script src="../assets/js/auth.js"></script><script src="../assets/js/layout.js"></script><script src="../assets/js/servidor-status.js"></script>
+</body></html>

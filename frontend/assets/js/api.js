@@ -15,9 +15,6 @@ const normalizarEquipamento = (equipamento = {}) => ({
   situacao: equipamento.situacao || ({ disponivel: "disponivel", emprestado: "emprestado", manutencao: "manutencao", baixado: "inativo" }[equipamento.status] || "disponivel"),
   base: equipamento.status === "baixado" ? "inativo" : equipamento.status,
   localizacao: equipamento.localizacao || "",
-  imagem: equipamento.imagem_url
-    ? (/^https?:\/\//i.test(equipamento.imagem_url) ? equipamento.imagem_url : `${API_BASE_URL}${equipamento.imagem_url}`)
-    : (equipamento.imagem || ""),
 });
 
 const normalizarEmprestimo = (emprestimo = {}) => {
@@ -178,24 +175,19 @@ const ELO = {
     return { itens: feitos };
   },
   removerEquipamento: (id) => requisitar(`/equipamentos/${encodeURIComponent(id)}/inativar`, { metodo: "PATCH" }),
-  salvarEquipamento: async (d, id) => {
+  salvarEquipamento: async (dados, id) => {
+    const categorias = (await requisitar("/categorias")).categorias || [];
+    const categoria = categorias.find((item) => String(item.id) === String(dados.categoria_id) || String(item.nome).toLowerCase() === String(dados.categoria || "").toLowerCase());
+    if (!categoria) throw new Error("Selecione uma categoria cadastrada e ativa. A API exige categoria_id.");
     const corpo = {
-      nome: d.nome,
-      numero_patrimonio: d.patrimonio || d.numero_patrimonio,
-      setor: d.setor,
-      localizacao: d.localizacao || "",
-      estado_conservacao: estadoApi(d.condicao || d.estado_conservacao),
-      qr_code: d.qr_code || d.patrimonio || d.numero_patrimonio,
-      observacoes: d.observacoes || null,
-      elegibilidade: d.elegibilidade || "todos",
+      nome: dados.nome, categoria_id: Number(categoria.id),
+      numero_patrimonio: dados.patrimonio || dados.numero_patrimonio,
+      setor: dados.setor, localizacao: dados.localizacao || "",
+      estado_conservacao: estadoApi(dados.condicao || dados.estado_conservacao),
+      qr_code: dados.qr_code || dados.patrimonio || dados.numero_patrimonio,
+      observacoes: dados.observacoes || null, elegibilidade: dados.elegibilidade || "todos",
     };
-    if (d.categoria_id) corpo.categoria_id = Number(d.categoria_id);
-    else corpo.categoria = String(d.categoria || "").trim();
-    if (d.imagemAlterada) corpo.imagem = d.imagem || null; // null remove a foto existente
-    return (await requisitar(id ? `/equipamentos/${encodeURIComponent(id)}` : "/equipamentos", {
-      metodo: id ? "PUT" : "POST",
-      corpo,
-    })).equipamento;
+    return (await requisitar(id ? `/equipamentos/${encodeURIComponent(id)}` : "/equipamentos", { metodo: id ? "PUT" : "POST", corpo })).equipamento;
   },
   categorias: async () => (await requisitar("/categorias")).categorias,
   categoria: async (id) => (await requisitar(`/categorias/${encodeURIComponent(id)}`)).categoria,

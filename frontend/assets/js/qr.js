@@ -4,7 +4,14 @@
   const $ = (id) => document.getElementById(id);
   const video = $("qr-video"), reader = $("qr-reader"), hint = $("qr-reader-hint"), abrirCamera = $("abrir-camera"), arquivo = $("qr-arquivo");
   const form = $("consulta-form"), campo = $("codigo"), botao = $("consultar-btn"), status = $("consulta-status"), resultado = $("resultado"), permissao = $("qr-permission");
-  if (![video, reader, abrirCamera, arquivo, form, campo, botao, status, resultado, permissao].every(Boolean)) return;
+  const elementosObrigatorios = { video, reader, hint, abrirCamera, arquivo, form, campo, botao, status, resultado, permissao };
+  const elementosAusentes = Object.entries(elementosObrigatorios)
+    .filter(([, elemento]) => !elemento)
+    .map(([nome]) => nome);
+  if (elementosAusentes.length) {
+    console.error("consulta-qr: elemento ausente", elementosAusentes);
+    return;
+  }
 
   let stream = null, timer = null, detector = null, lendo = false;
   const esc = (v) => String(v ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));

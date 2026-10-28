@@ -10,8 +10,13 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../assets/css/style.css?v=2026.10.28.10">
-  <link rel="stylesheet" href="../assets/css/login.css?v=2026.10.28.10">
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="stylesheet" href="../assets/css/login.css">
+  <style>
+    .password-note{margin:.75rem 0;padding:.85rem 1rem;border:1px solid rgba(139,92,246,.28);border-radius:12px;background:rgba(139,92,246,.08);color:var(--text-secondary,#cbd5e1);font-size:.9rem;line-height:1.5}
+    #trocar-senha-form{display:grid;gap:1rem}
+    #trocar-senha-btn{width:100%;min-height:52px}
+  </style>
 </head>
 <body class="auth-page auth-page-password">
   <main class="login">
@@ -39,102 +44,51 @@
           <div class="field"><label for="senha-atual">Senha provisória atual</label><input class="input" id="senha-atual" name="senha_atual" type="password" autocomplete="current-password" required></div>
           <div class="field"><label for="nova-senha">Nova senha</label><input class="input" id="nova-senha" name="nova_senha" type="password" autocomplete="new-password" minlength="8" required><small class="muted">Mínimo de 8 caracteres.</small></div>
           <div class="field"><label for="confirmar-senha">Confirmar nova senha</label><input class="input" id="confirmar-senha" name="confirmar_senha" type="password" autocomplete="new-password" minlength="8" required></div>
-          <button class="btn btn-primary" id="revisar-senha-btn" type="submit">Revisar alteração</button>
+          <button class="btn btn-primary" id="trocar-senha-btn" type="submit">Salvar nova senha</button>
         </form>
-
-        <section id="senha-revisao" class="password-review" aria-labelledby="titulo-revisao-senha" hidden>
-          <h3 id="titulo-revisao-senha">Confirme a alteração</h3>
-          <p>Confira antes de continuar. A senha só será alterada quando você clicar em “Confirmar troca de senha”.</p>
-          <div class="review-row"><span>Senha atual</span><strong>Informada</strong></div>
-          <div class="review-row"><span>Nova senha</span><strong>•••••••• (oculta)</strong></div>
-          <div class="password-review-actions">
-            <button class="btn btn-ghost" id="voltar-edicao-senha" type="button">Voltar e corrigir</button>
-            <button class="btn btn-primary" id="confirmar-troca-senha" type="button">Confirmar troca de senha</button>
-          </div>
-        </section>
-
-        <section id="senha-sucesso" aria-live="polite" hidden>
-          <div class="password-note">Sua senha foi alterada com sucesso. Escolha para onde deseja ir.</div>
-          <div class="password-review-actions">
-            <a class="btn btn-primary" href="dashboard.html">Ir ao painel</a>
-            <a class="btn btn-ghost" href="../index.html">Voltar ao login</a>
-          </div>
-        </section>
         <p class="card-foot"><a href="../index.html" id="voltar-login">Voltar para o login</a></p>
       </div>
     </section>
   </main>
-  <script src="../assets/js/runtime-config.js?v=2026.10.28.10"></script>
-  <script src="../assets/js/api.js?v=2026.10.28.10"></script>
-  <script src="../assets/js/auth.js?v=2026.10.28.10"></script>
+  <script src="../assets/js/runtime-config.js"></script>
+  <script src="../assets/js/api.js"></script>
+  <script src="../assets/js/auth.js"></script>
   <script>
     (() => {
-      const form = document.getElementById("trocar-senha-form");
-      const msg = document.getElementById("trocar-senha-mensagem");
-      const atual = document.getElementById("senha-atual");
-      const nova = document.getElementById("nova-senha");
-      const confirmar = document.getElementById("confirmar-senha");
-      const etapaRevisao = document.getElementById("senha-revisao");
-      const botaoVoltar = document.getElementById("voltar-edicao-senha");
-      const botaoConfirmar = document.getElementById("confirmar-troca-senha");
-      const etapaSucesso = document.getElementById("senha-sucesso");
-      const linkVoltarLogin = document.getElementById("voltar-login");
+      const form = document.getElementById('trocar-senha-form');
+      const msg = document.getElementById('trocar-senha-mensagem');
+      const atual = document.getElementById('senha-atual');
+      const nova = document.getElementById('nova-senha');
+      const confirmar = document.getElementById('confirmar-senha');
+      const botao = document.getElementById('trocar-senha-btn');
       const sessao = obterSessao();
-
       function avisar(texto, ok = false) {
         msg.textContent = texto;
-        msg.className = `alert ${ok ? "alert-ok" : "alert-error"}`;
+        msg.className = `alert ${ok ? 'alert-ok' : 'alert-error'}`;
         msg.hidden = false;
       }
-      function limparAviso() { msg.hidden = true; msg.textContent = ""; }
-
       if (!sessao?.token) {
-        avisar("Sua sessão não está disponível. Entre novamente e use a senha provisória recebida por e-mail.");
+        avisar('Sua sessão não está disponível. Entre novamente e use a senha provisória recebida por e-mail.');
         form.hidden = true;
-      } else if (ELO.modo() !== "api") {
-        avisar("A troca de senha exige conexão com a API.");
-        form.hidden = true;
+      } else if (ELO.modo() !== 'api') {
+        avisar('A troca de senha exige conexão com a API.');
       }
-
-      form.addEventListener("submit", (e) => {
-        e.preventDefault();
-        limparAviso();
-        if (!atual.value) { avisar("Informe sua senha provisória."); atual.focus(); return; }
-        if (nova.value.length < 8) { avisar("A nova senha deve ter pelo menos 8 caracteres."); nova.focus(); return; }
-        if (nova.value !== confirmar.value) { avisar("A confirmação não corresponde à nova senha."); confirmar.focus(); return; }
-        if (nova.value === atual.value) { avisar("A nova senha deve ser diferente da senha provisória."); nova.focus(); return; }
-
-        form.hidden = true;
-        etapaSucesso.hidden = true;
-        etapaRevisao.hidden = false;
-        botaoConfirmar.focus();
-      });
-
-      botaoVoltar.addEventListener("click", () => {
-        etapaRevisao.hidden = true;
-        form.hidden = false;
-        limparAviso();
-        nova.focus();
-      });
-
-      botaoConfirmar.addEventListener("click", async () => {
-        limparAviso();
-        botaoConfirmar.disabled = true;
-        botaoVoltar.disabled = true;
-        botaoConfirmar.textContent = "Alterando senha…";
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault(); msg.hidden = true;
+        if (!atual.value) { avisar('Informe sua senha provisória.'); atual.focus(); return; }
+        if (nova.value.length < 8) { avisar('A nova senha deve ter pelo menos 8 caracteres.'); nova.focus(); return; }
+        if (nova.value !== confirmar.value) { avisar('A confirmação não corresponde à nova senha.'); confirmar.focus(); return; }
+        if (nova.value === atual.value) { avisar('A nova senha deve ser diferente da senha provisória.'); nova.focus(); return; }
+        botao.disabled = true; botao.textContent = 'Salvando…';
         try {
           await ELO.trocarSenha({ senha_atual: atual.value, nova_senha: nova.value });
-          salvarSessao({ ...obterSessao(), deve_trocar_senha: false });
-          etapaRevisao.hidden = true;
-          form.hidden = true;
-          etapaSucesso.hidden = false;
-          linkVoltarLogin.hidden = true;
-          etapaSucesso.querySelector("a").focus();
+          const atualizada = { ...obterSessao(), deve_trocar_senha: false };
+          salvarSessao(atualizada);
+          avisar('Senha criada com sucesso. Redirecionando para o painel…', true);
+          window.setTimeout(() => window.location.replace('dashboard.html'), 500);
         } catch (falha) {
-          avisar(falha.message || "Não foi possível trocar a senha. Confira os dados e tente novamente.");
-          botaoConfirmar.disabled = false;
-          botaoVoltar.disabled = false;
-          botaoConfirmar.textContent = "Confirmar troca de senha";
+          avisar(falha.message || 'Não foi possível trocar a senha. Confira os dados e tente novamente.');
+          botao.disabled = false; botao.textContent = 'Salvar nova senha';
         }
       });
     })();

@@ -1,3 +1,7 @@
+/* Zoom geral da página: reduza (ex.: .85) ou aumente (ex.: .95) aqui */
+:root { --page-zoom: .9; }
+html { zoom: var(--page-zoom); }
+
 /* ==========================================================
    ELO Campus — CSS geral (tema escuro)
    Fontes: Fredoka (títulos) + Outfit (texto)
@@ -66,7 +70,7 @@ a:hover { text-decoration: underline; }
 .muted { color: var(--text-2); }
 
 /* ---------- layout do app ---------- */
-.app { display: flex; flex-wrap: wrap; min-height: 100vh; }
+.app { display: flex; flex-wrap: wrap; min-height: calc(100vh / var(--page-zoom)); }
 .sidebar {
   flex: 0 0 280px;
   background: var(--surface);

@@ -6,7 +6,7 @@
   const esc = (value) => EloUtil.esc(value ?? "");
   const sessaoAtual = typeof obterSessao === "function" ? obterSessao() : null;
   const perfilAtual = String(sessaoAtual?.perfil || "").toLowerCase();
-  const usuarioFinal = ["aluno", "professor"].includes(perfilAtual);
+  const usuarioFinal = ["aluno", "professor", "servidor"].includes(perfilAtual);
   const parametrosIniciais = new URLSearchParams(location.search);
   if (!sessaoAtual) return; // layout.js já redireciona para o login se não houver sessão.
   if (!parametrosIniciais.get("nome") && ["administrador", "operador"].includes(perfilAtual)) {
@@ -39,13 +39,13 @@
   };
   const formatarCampoData = (valor) => valor ? EloUtil.dataHora(new Date(valor)) : "—";
   const nomeData = (e) => `${e.nome} — ${e.patrimonio}`;
-  const vinculosPerfil = { aluno: "Aluno", professor: "Professor" };
+  const vinculosPerfil = { aluno: "Aluno", professor: "Professor", servidor: "Servidor" };
 
   if (usuarioFinal) {
     const nomeSessao = String(sessaoAtual?.nome || "").trim();
     campoSolicitante.value = nomeSessao;
     campoSolicitante.readOnly = true;
-    campoVinculo.value = vinculosPerfil[perfilAtual] || "Aluno";
+    campoVinculo.value = vinculosPerfil[perfilAtual] || "Servidor";
     campoVinculo.disabled = true;
 
     // Modo de autoatendimento: o usuário informa apenas o que precisa, não dados

@@ -1,0 +1,54 @@
+/* ==========================================================
+   ELO Campus — Relatório
+   Complementa o emprestimos.css (carregue DEPOIS dele).
+   ========================================================== */
+
+/* ---------- filtros ---------- */
+.filters { display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end; }
+.filters .field { display: flex; flex-direction: column; gap: 6px; }
+.filters label { font-size: 13px; font-weight: 600; color: var(--text-2); }
+.filters .spacer { flex: 1 1 20px; }
+.filters .input { min-width: 180px; }
+
+/* ---------- cards de resumo ---------- */
+.rel-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 20px; }
+.rel-stat { padding: 22px 24px; }
+.rel-stat-label { color: var(--text-2); font-size: 15px; }
+.rel-stat-value { font-family: var(--font-title); font-size: 38px; font-weight: 600; line-height: 1.1; margin-top: 6px; }
+.rel-stat-note { font-size: 13px; margin-top: 6px; font-weight: 600; }
+.rel-stat-note.up { color: var(--ok-fg); }
+.rel-stat-note.down { color: var(--late-fg); }
+
+/* ---------- título de card ---------- */
+.card-title { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; }
+
+/* ---------- gráfico de barras verticais ---------- */
+.bars { display: flex; align-items: stretch; gap: 16px; height: 240px; border-bottom: 2px solid var(--line); }
+.bar-col { flex: 1 1 0; min-width: 0; height: 100%; padding-top: 30px; /* reserva o espaço do valor acima da barra */ display: flex; flex-direction: column; justify-content: flex-end; align-items: center; gap: 8px; }
+.bar-val { flex: none; line-height: 1.2; font-size: 13px; font-weight: 600; color: var(--text-2); }
+.bar { flex: none; width: 100%; max-width: 56px; border-radius: 14px 14px 4px 4px; background: var(--grad-main); }
+.bar.cool { background: var(--grad-cool); }
+.bar-labels { display: flex; gap: 16px; min-width: 0; padding-top: 10px; }
+.bar-labels span { flex: 1 1 0; text-align: center; font-size: 13px; color: var(--text-2); }
+
+.legend { display: flex; gap: 18px; flex-wrap: wrap; font-size: 14px; color: var(--text-2); }
+.legend i { display: inline-block; width: 12px; height: 12px; border-radius: 4px; margin-right: 6px; background: var(--grad-main); vertical-align: -1px; }
+.legend i.cool { background: var(--grad-cool); }
+
+/* ---------- barras horizontais ---------- */
+.hbars { display: flex; flex-direction: column; gap: 18px; }
+.hbar-head { display: flex; gap: 12px; justify-content: space-between; font-size: 14px; font-weight: 500; margin-bottom: 6px; }
+.hbar-head span:last-child { color: var(--text-2); }
+.hbar-track { height: 12px; border-radius: 999px; background: var(--surface-3); }
+.hbar-fill { max-width: 100%; height: 12px; border-radius: 999px; background: linear-gradient(90deg, #4b0ff0, #00d1ff); }
+
+/* ---------- exportar ---------- */
+.export { display: flex; flex-wrap: wrap; gap: 10px; }
+
+/* ---------- responsivo ---------- */
+@media (max-width: 720px) {
+  .bars, .bar-labels { gap: 8px; }
+  .filters .field, .filters .btn { flex: 1 1 100%; }
+  .filters .spacer { display: none; }
+  .export .btn { flex: 1 1 auto; }
+}

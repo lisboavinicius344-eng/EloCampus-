@@ -1,0 +1,134 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0B1020">
+  <title>Relatório — ELO Campus</title>
+  <link rel="icon" type="image/png" href="../assets/img/logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/emprestimos.css">
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="stylesheet" href="../assets/css/relatorio.css">
+  <link rel="stylesheet" href="../assets/css/layout.css">
+  <link rel="stylesheet" href="../assets/css/salz-bridge.css">
+</head>
+<body data-pagina="relatorios">
+  <div class="app">
+    <aside class="sidebar" id="sidebar"></aside>
+    <div class="content">
+      <header class="topbar" id="topbar"></header>
+      <main class="main"><header class="page-head">
+      <div>
+        <h1>Relatório</h1>
+        <p>Uso dos equipamentos no Campus Lapa.</p>
+      </div>
+      <div class="export">
+        <button class="btn btn-line" type="button">Exportar CSV</button>
+        <button class="btn" type="button">Exportar PDF</button>
+      </div>
+    </header>
+
+    <!-- Filtros -->
+    <form class="filters" aria-label="Filtros do relatório">
+      <div class="field">
+        <label for="periodo">Período</label>
+        <select class="input" id="periodo">
+          <option value="30">Últimos 30 dias</option>
+          <option value="6m">Últimos 6 meses</option>
+          <option value="ano">Ano atual</option>
+          <option value="personalizado">Personalizado</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="categoria">Categoria</label>
+        <select class="input" id="categoria"><option value="">Todas as categorias</option></select>
+      </div>
+      <div class="field">
+        <label for="vinculo">Vínculo</label>
+        <select class="input" id="vinculo"><option value="">Todos os vínculos</option><option value="aluno">Alunos</option><option value="professor">Professores</option><option value="servidor">Servidores</option><option value="grupo">Grupos e setores</option></select>
+      </div>
+      <span class="spacer"></span>
+      <div class="field" id="campo-data-inicial" hidden><label for="data-inicial">De</label><input class="input" type="date" id="data-inicial"></div>
+      <div class="field" id="campo-data-final" hidden><label for="data-final">Até</label><input class="input" type="date" id="data-final"></div>
+      <button class="btn" type="submit">Aplicar filtros</button>
+      <button class="btn btn-ghost" id="limpar-relatorio" type="button">Limpar</button>
+    </form>
+
+    <!-- Resumo -->
+    <section class="rel-stats" aria-label="Resumo do período">
+      <div class="card rel-stat">
+        <div class="rel-stat-label">Empréstimos</div>
+        <div class="rel-stat-value" id="stat-emprestimos">0</div>
+        <div class="rel-stat-note muted" id="nota-emprestimos">Registros no período selecionado</div>
+      </div>
+      <div class="card rel-stat">
+        <div class="rel-stat-label">Devolvidos no prazo</div>
+        <div class="rel-stat-value" id="stat-prazo">—</div>
+        <div class="rel-stat-note muted">Percentual dos registros devolvidos</div>
+      </div>
+      <div class="card rel-stat">
+        <div class="rel-stat-label">Atrasos</div>
+        <div class="rel-stat-value" id="stat-atrasos">0</div>
+        <div class="rel-stat-note muted">Empréstimos ainda atrasados</div>
+      </div>
+      <div class="card rel-stat">
+        <div class="rel-stat-label">Itens com avaria</div>
+        <div class="rel-stat-value" id="stat-avarias">0</div>
+        <div class="rel-stat-note muted">Devoluções com avaria registrada</div>
+      </div>
+    </section>
+
+    <div class="split">
+      <div class="grow-2 stack">
+        <!-- Gráfico mensal -->
+        <section class="card" aria-label="Empréstimos por mês">
+          <div class="card-title">
+            <h2>Empréstimos por mês</h2>
+            <div class="legend"><span><i></i>Empréstimos</span><span><i class="cool"></i>Devoluções</span></div>
+          </div>
+          <div class="bars" id="grafico-mensal" role="img" aria-label="Empréstimos e devoluções por mês"><p class="muted">Carregando dados…</p></div>
+          <div class="bar-labels" id="rotulos-mensais"></div>
+        </section>
+
+        <!-- Ranking -->
+        <section class="card" aria-label="Equipamentos mais emprestados">
+          <div class="card-title"><h2>Equipamentos mais emprestados</h2></div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Equipamento</th><th>Categoria</th><th>Empréstimos</th><th>Atrasos</th></tr>
+              </thead>
+              <tbody id="ranking-equipamentos"><tr><td colspan="4" class="muted">Carregando registros…</td></tr></tbody>
+            </table>
+          </div>
+        </section>
+      </div>
+
+      <div class="grow-1 stack">
+        <!-- Por categoria -->
+        <section class="card" aria-label="Empréstimos por categoria">
+          <div class="card-title"><h2>Por categoria</h2></div>
+          <div class="hbars" id="relatorio-categorias"><p class="muted">Carregando dados…</p></div>
+        </section>
+
+        <!-- Por vínculo -->
+        <section class="card" aria-label="Empréstimos por vínculo">
+          <div class="card-title"><h2>Por vínculo</h2></div>
+          <div class="hbars" id="relatorio-vinculos"><p class="muted">Carregando dados…</p></div>
+        </section>
+      </div>
+    </div></main>
+    </div>
+  </div>
+  <script src="../assets/js/auth.js"></script>
+  <script src="../assets/js/layout.js"></script>
+  <script src="../assets/js/runtime-config.js"></script>
+  <script src="../assets/js/api.js"></script>
+  <script src="../assets/js/salz-actions.js"></script>
+  <script src="../assets/js/relatorio.js"></script>
+</body>
+</html>

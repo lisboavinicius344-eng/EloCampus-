@@ -35,15 +35,15 @@ const EloUtil = {
 (function () {
   let sessao = obterSessao();
   const publico = document.body.dataset.publico === "true";
-  const perfisValidos = new Set(["administrador", "operador", "aluno", "professor"]);
+  const perfisValidos = new Set(["administrador", "operador", "aluno", "professor", "servidor"]);
   if (!sessao && !publico) { window.location.replace("../index.html"); return; }
   if (!sessao) sessao = { nome: "Consulta pública", perfil: "visitante" };
   const perfilAtual = String(sessao.perfil || "").toLowerCase();
   const equipe = ["administrador", "operador"].includes(perfilAtual);
-  const usuarioFinal = ["aluno", "professor"].includes(perfilAtual);
+  const usuarioFinal = ["aluno", "professor", "servidor"].includes(perfilAtual);
   const paginaAtual = document.body.dataset.pagina;
   const arquivoAtual = window.location.pathname.split("/").pop();
-  const paginasRestritas = ["movimentacoes.html", "usuarios.html", "solicitantes.html", "equipamento-form.html", "manutencoes.html", "categorias.html"];
+  const paginasRestritas = ["movimentacoes.html", "usuarios.html", "solicitantes.html", "relatorio.html", "servidor.html", "equipamento-form.html", "manutencoes.html", "categorias.html"];
   const paginasUsuario = ["dashboard.html", "disponiveis.html", "consulta-qr-interno.html", "emprestimos.html", "novo-emprestimo.html", "reservas.html", "perfil.html", "trocar-senha.html"];
 
   // O controle de navegação evita acessos acidentais pela URL; segurança real
@@ -115,7 +115,7 @@ const EloUtil = {
     { id: "perfil", rotulo: "Configuração do perfil", icone: "gear", href: "perfil.html" },
   ];
 
-  // Para discentes e docentes, o menu é uma área de autoatendimento:
+  // Para discentes, docentes e servidores, o menu é uma área de autoatendimento:
   // sem termos administrativos, cadastro interno ou informações de operação.
   const NAV_USUARIO = [
     { id: "painel", rotulo: "Início", icone: "home", href: "dashboard.html" },
@@ -145,7 +145,7 @@ const EloUtil = {
 
   const nome = EloUtil.esc(sessao.nome || "Usuário");
   const iniciais = (sessao.nome || "U").split(" ").slice(0, 2).map((p) => p[0]).join("").toUpperCase();
-  const ROTULOS_PERFIL = { administrador: "Administrador · TI", operador: "Equipe operacional", aluno: "Discente", professor: "Docente" };
+  const ROTULOS_PERFIL = { administrador: "Administrador · TI", operador: "Equipe operacional", aluno: "Discente", professor: "Docente", servidor: "Servidor" };
   const perfil = usuarioFinal ? "Minha conta" : (ROTULOS_PERFIL[perfilAtual] || (sessao.perfil ? sessao.perfil[0].toUpperCase() + sessao.perfil.slice(1) : ""));
   const subtituloMarca = usuarioFinal ? "" : "<small>Instituição - Campus Lapa</small>";
 
@@ -166,7 +166,7 @@ const EloUtil = {
     <span class="topbar-brand"><img src="../assets/img/logo.png" alt="">ELO Campus</span>`;
 
   if (usuarioFinal) {
-    document.querySelectorAll('a[href="equipamento-form.html"], a[href="movimentacoes.html"], a[href="usuarios.html"], a[href="solicitantes.html"]').forEach((el) => { el.hidden = true; el.style.display = "none"; });
+    document.querySelectorAll('a[href="equipamento-form.html"], a[href="movimentacoes.html"], a[href="relatorio.html"], a[href="usuarios.html"], a[href="solicitantes.html"], a[href="servidor.html"]').forEach((el) => { el.hidden = true; el.style.display = "none"; });
     document.querySelectorAll('#editar, #retirar, #confirmar-exclusao, [data-editar], #btn-novo-usuario').forEach((el) => { el.hidden = true; el.disabled = true; el.style.display = "none"; });
   }
 

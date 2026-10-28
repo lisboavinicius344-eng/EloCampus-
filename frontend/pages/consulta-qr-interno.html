@@ -6,10 +6,10 @@
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>Consulta por QR Code — ELO Campus</title>
     <link rel="icon" href="../assets/img/logo.png">
-    <link rel="stylesheet" href="../assets/css/style.css?v=2026.10.28.10">
-    <link rel="stylesheet" href="../assets/css/layout.css?v=2026.10.28.10">
-    <link rel="stylesheet" href="../assets/css/qr.css?v=2026.10.28.10">
-    <link rel="stylesheet" href="../assets/css/salz-bridge.css?v=2026.10.28.10">
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="../assets/css/layout.css">
+    <link rel="stylesheet" href="../assets/css/qr.css">
+    <link rel="stylesheet" href="../assets/css/salz-bridge.css">
 </head>
 
 <body data-pagina="consulta-qr">
@@ -54,7 +54,7 @@
                             <label for="codigo">Identificador do QR Code</label>
                             <input class="input" id="codigo" type="text" placeholder="Ex.: PRJ-0017" required>
                         </div>
-                        <button class="btn btn-primary" type="submit">Consultar</button>
+                        <button class="btn btn-primary" id="consultar-btn" type="submit">Consultar</button>
                     </form>
 
                     <div id="consulta-status" class="qr-status" role="status"></div>
@@ -65,12 +65,12 @@
         </div>
     </div>
 
-    <script src="../assets/js/auth.js?v=2026.10.28.10"></script>
-    <script src="../assets/js/layout.js?v=2026.10.28.10"></script>
-      <script src="../assets/js/runtime-config.js?v=2026.10.28.10"></script>
-  <script src="../assets/js/api.js?v=2026.10.28.10"></script>
+    <script src="../assets/js/auth.js"></script>
+    <script src="../assets/js/layout.js"></script>
+      <script src="../assets/js/runtime-config.js"></script>
+  <script src="../assets/js/api.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
-    <script src="../assets/js/qr.js?v=2026.10.28.10"></script>
+    <script src="../assets/js/qr.js"></script>
 </body>
 
 </html>

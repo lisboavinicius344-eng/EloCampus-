@@ -28,7 +28,7 @@
     const busca = $("busca");
     const abas = [...document.querySelectorAll("[data-filtro]")];
     const sessao = typeof obterSessao === "function" ? obterSessao() : null;
-    const usuarioFinal = ["aluno", "professor"].includes(String(sessao?.perfil || "").toLowerCase());
+    const usuarioFinal = ["aluno", "professor", "servidor"].includes(String(sessao?.perfil || "").toLowerCase());
     const chaveNome = (valor) => norm(valor).replace(/\s+/g, " ").trim();
     const pertenceAoUsuario = (l) => {
       if (!usuarioFinal) return true;
@@ -182,7 +182,7 @@
     const mensagem = $("mensagem-devolucao");
     const sessao = typeof obterSessao === "function" ? obterSessao() : null;
     const perfil = String(sessao?.perfil || "").toLowerCase();
-    const usuarioFinal = ["aluno", "professor"].includes(perfil);
+    const usuarioFinal = ["aluno", "professor", "servidor"].includes(perfil);
     const chaveNome = (valor) => norm(valor).replace(/\s+/g, " ").trim();
     const pertenceAoUsuario = (l) => {
       if (!usuarioFinal) return true;
