@@ -31,7 +31,7 @@
         <h2>${esc(item.nome)}</h2>
         <p class="available-kind">${esc(item.categoria || "Outros")}</p>
         <p class="available-code">Código do item: ${esc(item.patrimonio)}</p>
-        <a class="btn btn-primary" href="novo-emprestimo.html?equipamentoId=${encodeURIComponent(item.id)}">Reservar este item <span aria-hidden="true">→</span></a>
+        <a class="btn btn-primary" href="novo-emprestimo.html?equipamentoId=${encodeURIComponent(item.id)}">Solicitar este item <span aria-hidden="true">→</span></a>
       </article>`;
     }).join("");
   }

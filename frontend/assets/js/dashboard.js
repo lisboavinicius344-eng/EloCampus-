@@ -127,7 +127,7 @@
     $("itens-comigo").innerHTML = `<div class="self-loan-list">${ativos.slice(0, 5).map((l) => {
       const prazoItem = prazo(l.prevista);
       const situacao = prazoItem.classe === "late" ? `<span class="badge badge-late">${esc(prazoItem.texto)}</span>` : `<span class="badge badge-ok">Devolver até ${esc(new Date(l.prevista).toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" }))}</span>`;
-      return `<article class="self-loan"><div class="self-loan-main"><strong>${esc(l.equipamento?.nome || "Equipamento")}</strong><small>${esc(l.equipamento?.patrimonio || "")}</small></div><div class="self-loan-meta">${situacao}<a href="devolucoes.html?itemId=${encodeURIComponent(l.id)}&emprestimoId=${encodeURIComponent(l.emprestimoId)}">Devolver</a></div></article>`;
+      return `<article class="self-loan"><div class="self-loan-main"><strong>${esc(l.equipamento?.nome || "Equipamento")}</strong><small>${esc(l.equipamento?.patrimonio || "")}</small></div><div class="self-loan-meta">${situacao}</div></article>`;
     }).join("")}${ativos.length > 5 ? `<a href="emprestimos.html">Ver os ${ativos.length} itens</a>` : ""}</div>`;
   }
 

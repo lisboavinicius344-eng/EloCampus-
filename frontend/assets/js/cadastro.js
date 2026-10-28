@@ -25,7 +25,7 @@
     const dados = {
       nome: nome.value.trim(),
       email: email.value.trim().toLowerCase(),
-      solicitante_id: Number(solicitanteId.value)
+      solicitante_id: /^\d+$/.test(solicitanteId.value.trim()) ? Number(solicitanteId.value.trim()) : NaN
     };
     if (dados.nome.split(/\s+/).filter(Boolean).length < 2) {
       mostrar(erro, "Informe seu nome completo."); nome.focus(); return;

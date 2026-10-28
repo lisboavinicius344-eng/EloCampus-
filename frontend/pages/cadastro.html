@@ -15,7 +15,7 @@
   <link rel="stylesheet" href="../assets/css/style.css">
   <link rel="stylesheet" href="../assets/css/login.css">
 </head>
-<body>
+<body class="auth-page auth-page-cadastro">
   <main class="login">
 
     <section class="brand-side" aria-label="Apresentação do sistema">
@@ -44,9 +44,10 @@
 
       <div class="card card-wide">
         <div class="card-head">
+          <div class="auth-feature-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0M18 8v6M15 11h6"/></svg><span>Etapa 1 · Identificação</span></div>
           <span class="auth-kicker"><span aria-hidden="true"></span> Novo cadastro</span>
           <h2 id="titulo-cadastro">Criar conta</h2>
-          <p>Informe seus dados e o código do cadastro de solicitante fornecido pela administração.</p>
+          <p>O autocadastro está disponível para discentes e docentes com um cadastro de solicitante ativo. Informe o código fornecido pela equipe.</p>
         </div>
 
         <div id="cadastro-erro" class="alert alert-error" role="alert" aria-live="polite" hidden></div>
@@ -63,15 +64,19 @@
           </div>
           <div class="field">
             <label for="solicitante_id">Código do solicitante</label>
-            <input class="input" id="solicitante_id" name="solicitante_id" type="number" min="1" step="1" inputmode="numeric" placeholder="ID do seu cadastro institucional" required>
-            <small class="muted">Use o ID do cadastro de solicitante fornecido pela administração. Ele não é necessariamente sua matrícula.</small>
+            <input class="input" id="solicitante_id" name="solicitante_id" type="text" inputmode="numeric" pattern="[0-9]+" autocomplete="off" placeholder="Ex.: 30" aria-describedby="solicitante-ajuda" required>
+            <small class="muted" id="solicitante-ajuda">Este código é o ID do cadastro no ELO Campus, não necessariamente sua matrícula. A equipe precisa cadastrar você primeiro na área “Solicitantes”.</small>
           </div>
           <button class="btn btn-primary" id="cadastro-btn" type="submit">Solicitar acesso</button>
         </form>
+        <div class="alert alert-info cadastro-prerequisito" role="note">
+          <strong>Ainda não tem o código?</strong> Não use sua matrícula como substituto. Solicite à equipe de atendimento que crie seu cadastro de solicitante e informe o código retornado pelo sistema.
+        </div>
 
         <p class="card-foot">
           Após o cadastro, você receberá uma senha provisória por e-mail. Ela é válida por 24 horas e deverá ser trocada no primeiro acesso.
           Já tem uma conta? <a href="../index.html">Voltar para o login</a>
+          <span class="muted"> · </span><a href="privacidade.html">Aviso de privacidade</a>
         </p>
       </div>
     </section>

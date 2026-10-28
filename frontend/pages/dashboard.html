@@ -31,7 +31,7 @@
           </div>
           <a class="btn btn-primary" href="equipamento-form.html">+ Cadastrar equipamento</a>
         </div>
-        <div class="alert alert-error aviso-demo" id="erro" role="alert" hidden></div>
+        <div class="alert alert-error dashboard-api-alert" id="erro" role="alert" hidden></div>
 
         <section id="inicio-usuario" class="self-home" hidden aria-label="Seu espaço">
           <div class="self-actions" aria-label="O que você quer fazer?">
@@ -42,12 +42,12 @@
             </a>
             <a class="self-action self-action-request" href="novo-emprestimo.html">
               <span class="self-action-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg></span>
-              <span class="self-action-copy"><strong>Reservar equipamento</strong><small>Escolha os itens e o período; a equipe aprova a reserva.</small></span>
+              <span class="self-action-copy"><strong>Reservar equipamento</strong><small>Envie uma solicitação para a equipe confirmar.</small></span>
               <span class="self-action-arrow" aria-hidden="true">→</span>
             </a>
-            <a class="self-action self-action-return" href="devolucoes.html">
+            <a class="self-action self-action-return" href="reservas.html">
               <span class="self-action-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14 4 9l5-5"/><path d="M4 9h10a6 6 0 0 1 0 12h-3"/></svg></span>
-              <span class="self-action-copy"><strong>Devolver equipamentos</strong><small>Marque os itens que está entregando.</small></span>
+              <span class="self-action-copy"><strong>Minhas reservas</strong><small>Acompanhe ou cancele suas solicitações.</small></span>
               <span class="self-action-arrow" aria-hidden="true">→</span>
             </a>
             <a class="self-action self-action-qr" href="consulta-qr-interno.html">
@@ -69,7 +69,6 @@
               <a class="btn btn-primary" href="disponiveis.html">Ver equipamentos</a>
             </section>
           </div>
-          <p class="self-demo-note">Esta é uma versão de demonstração. As operações ainda não são registros oficiais do servidor.</p>
         </section>
 
         <section aria-label="Indicadores">
@@ -93,8 +92,8 @@
             <section class="panel" aria-labelledby="t-acoes">
               <h2 class="panel-title" id="t-acoes">Ações rápidas</h2><p class="muted acao-hint">Escolha uma operação para continuar.</p>
               <ul class="acoes">
-                <li><a class="acao" href="reservas.html">Aprovar reservas e registrar retiradas</a></li>
-                <li><a class="acao" href="devolucoes.html">Cadastrar devolução</a></li>
+                <li><a class="acao" href="novo-emprestimo.html">+ Nova solicitação</a></li>
+                <li><a class="acao" href="reservas.html">Minhas reservas</a></li>
                 <li><a class="acao" href="consulta-qr-interno.html">Consultar QR Code</a></li>
                 <li><a class="acao" href="equipamentos.html">Consultar equipamentos</a></li>
                 <li><a class="acao" href="emprestimos.html">Acompanhar empréstimos</a></li>
@@ -114,7 +113,6 @@
 
   <script src="../assets/js/auth.js"></script>
   <script src="../assets/js/layout.js"></script>
-  <script src="../assets/js/dados-demo.js"></script>
   <script src="../assets/js/runtime-config.js"></script>
   <script src="../assets/js/api.js"></script>
   <script src="../assets/js/dashboard.js"></script>

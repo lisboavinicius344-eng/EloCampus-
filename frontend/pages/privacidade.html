@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0B1020">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Aviso de privacidade — ELO Campus</title>
+  <link rel="icon" type="image/png" href="../assets/img/logo.png">
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <style>
+    .privacy-shell{width:min(100% - 2rem,900px);margin:0 auto;padding:clamp(1.25rem,4vw,3rem) 0 3rem}
+    .privacy-card{background:linear-gradient(145deg,rgba(17,24,43,.98),rgba(14,21,39,.98));border:1px solid var(--border);border-radius:var(--radius-l);padding:clamp(1.25rem,4vw,2.5rem);box-shadow:0 24px 80px rgba(0,0,0,.24)}
+    .privacy-eyebrow{color:var(--cyan);font-size:.78rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase}
+    .privacy-card h1{font-size:clamp(1.8rem,4vw,2.5rem);line-height:1.15;margin:.6rem 0 1rem}
+    .privacy-card h2{font-size:1.12rem;margin:1.6rem 0 .45rem}
+    .privacy-card p,.privacy-card li{color:var(--muted);line-height:1.7}
+    .privacy-card ul{padding-left:1.25rem}
+    .privacy-draft{margin:1rem 0;padding:1rem;border:1px solid rgba(251,191,36,.35);border-radius:14px;background:rgba(251,191,36,.08);color:#fde68a}
+    .privacy-actions{display:flex;flex-wrap:wrap;gap:1rem;margin-top:2rem}
+  </style>
+</head>
+<body>
+  <main class="privacy-shell">
+    <article class="privacy-card">
+      <div class="privacy-eyebrow">ELO Campus · Transparência</div>
+      <h1>Aviso de privacidade</h1>
+      <p>Este aviso explica, em linguagem simples, quais dados podem ser tratados para autenticar usuários e administrar o empréstimo de equipamentos no ELO Campus.</p>
+      <div class="privacy-draft"><strong>Versão preliminar para validação institucional.</strong> Antes do uso oficial, a instituição responsável deve completar os campos de identificação e contato abaixo, confirmar as finalidades e os prazos de retenção e aprovar este aviso com seu responsável por privacidade/jurídico.</div>
+
+      <h2>1. Quem é responsável pelos dados?</h2>
+      <p><strong>Controlador:</strong> [informar nome oficial da instituição responsável].</p>
+      <p><strong>Contato de privacidade / encarregado:</strong> [informar canal institucional de atendimento].</p>
+
+      <h2>2. Quais dados podem ser tratados?</h2>
+      <ul>
+        <li>Dados de identificação e contato, como nome, e-mail, vínculo institucional e setor, quando aplicáveis.</li>
+        <li>Dados operacionais necessários para controlar equipamentos, reservas, empréstimos, devoluções, manutenção e histórico de movimentações.</li>
+        <li>Dados técnicos de sessão e segurança necessários para autenticação, controle de acesso e investigação de incidentes.</li>
+      </ul>
+      <p>Não digite senhas em observações, descrições de empréstimos ou campos livres. O sistema não precisa dessas informações para administrar equipamentos.</p>
+
+      <h2>3. Para que os dados são utilizados?</h2>
+      <p>Os dados são utilizados para autenticar usuários, verificar o perfil de acesso, administrar o acervo, registrar solicitações e movimentações, comunicar instruções de acesso e proteger a operação do sistema. A instituição deve documentar e aprovar as finalidades e bases legais aplicáveis antes da implantação oficial.</p>
+
+      <h2>4. Senhas e segurança</h2>
+      <p>O front-end não oferece uma função para administradores consultar senhas. Senhas devem ser tratadas exclusivamente pelo serviço de autenticação do back-end, armazenadas apenas em formato de hash seguro no servidor e nunca registradas em logs. Senhas provisórias e links de recuperação devem ter validade limitada e ser trocados ou consumidos de forma segura.</p>
+      <p>A sessão do navegador é mantida em armazenamento de sessão, e não como token persistente no armazenamento local. Se a opção “Lembrar meu e-mail” for marcada, somente o endereço de e-mail será guardado neste dispositivo, até que seja removido pelo usuário ou pelo navegador.</p>
+
+      <h2>5. Compartilhamento e serviços externos</h2>
+      <p>O navegador envia as operações para a API do ELO Campus configurada pelo serviço. Mensagens de cadastro ou recuperação podem depender de um serviço de e-mail operado pela instituição ou por um fornecedor contratado. As páginas atualmente carregam fontes do Google Fonts; portanto, o navegador pode fazer solicitações a esse terceiro. A instituição deve avaliar se mantém esse recurso ou passa a hospedar as fontes localmente e documentar fornecedores, transferências e contratos aplicáveis.</p>
+
+      <h2>6. Retenção e descarte</h2>
+      <p>Os prazos para manter cadastros, empréstimos, devoluções e históricos devem ser definidos pela instituição conforme sua finalidade e suas obrigações. <strong>Prazo de retenção aprovado:</strong> [preencher antes da publicação oficial].</p>
+
+      <h2>7. Direitos e solicitações</h2>
+      <p>Para solicitar informações sobre tratamento de dados, correção de dados cadastrais ou esclarecimentos sobre compartilhamento e retenção, utilize o canal institucional de privacidade indicado acima. A instituição deverá avaliar cada solicitação e responder conforme as regras aplicáveis.</p>
+
+      <h2>8. Atualizações deste aviso</h2>
+      <p>Este texto deve ser revisto quando houver mudanças nos serviços, nos dados tratados, nos fornecedores ou nas finalidades. <strong>Última revisão:</strong> 24/10/2026.</p>
+
+      <nav class="privacy-actions" aria-label="Navegação">
+        <a class="btn btn-primary" href="../index.html">Voltar ao login</a>
+        <a href="recuperar-senha.html">Recuperar acesso</a>
+      </nav>
+    </article>
+  </main>
+</body>
+</html>

@@ -2,11 +2,7 @@
 set -eu
 
 API_URL=${ELO_API_BASE_URL:-https://elocampus-backend.a6ti6s.easypanel.host/api}
-DATA_MODE=${ELO_DATA_MODE:-api}
-case "$DATA_MODE" in
-  api|demo) ;;
-  *) DATA_MODE=demo ;;
-esac
+DATA_MODE=api
 
 escape_js() {
   printf '%s' "$1" | sed -e 's/\\/\\\\/g' -e 's/"/\\"/g' -e 's/</\\u003c/g' -e 's/>/\\u003e/g'

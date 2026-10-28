@@ -43,9 +43,8 @@
       if (titulo) titulo.textContent = "Meus empréstimos";
       if (descricao) descricao.textContent = "Veja o prazo dos itens que estão com você e acompanhe as devoluções.";
       if (busca) busca.placeholder = "Buscar meus equipamentos";
-      const acao = document.querySelector("#acao-reservas");
-      if (acao) { acao.href = "novo-emprestimo.html"; acao.textContent = "Reservar equipamento"; }
-      if (descricao) descricao.textContent = "Veja o prazo dos itens que estão com você e acompanhe as devoluções. Para pegar um equipamento, faça uma reserva.";
+      const acao = document.querySelector('.page-head a[href="novo-emprestimo.html"]');
+      if (acao) acao.textContent = "Pedir empréstimo";
       const cabecalhos = document.querySelectorAll(".table-wrap thead th");
       if (cabecalhos[1]) cabecalhos[1].hidden = true;
       if (cabecalhos[2]) cabecalhos[2].textContent = "Prazo / devolução";
@@ -313,7 +312,7 @@
         });
         registros = (await ELO.emprestimos()).filter(pertenceAoUsuario);
         desenharRecentes(); desenharFila();
-        aviso(mensagem, `${result.itens} ${result.itens === 1 ? "equipamento devolvido" : "equipamentos devolvidos"} às ${new Date(result.devolvidoEm).toLocaleTimeString("pt-BR", {hour:"2-digit",minute:"2-digit"})}. Alteração salva nesta demonstração local; não é um registro oficial do servidor.`, "ok");
+        aviso(mensagem, `${result.itens} ${result.itens === 1 ? "equipamento devolvido" : "equipamentos devolvidos"}. A devolução foi registrada no servidor.`, "ok");
         history.replaceState(null, "", location.pathname);
         revisar = false;
         form.reset();

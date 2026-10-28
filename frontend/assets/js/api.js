@@ -1,53 +1,259 @@
-/* ELO Campus — camada de dados para API real e modo demonstração. */
+/* ELO Campus — integração exclusiva com a API oficial. Sem dados de demonstração no navegador. */
 "use strict";
-const API_BASE_URL=String(window.ELO_API_BASE_URL||"").replace(/\/+$/,"");
-const MODO_DADOS=String(window.ELO_DATA_MODE||"api").toLowerCase()==="api"?"api":"demo";
-const estadoFrontend=v=>({novo:"Novo",bom:"Bom",regular:"Regular",danificado:"Danificado"}[String(v||"").toLowerCase()]||v||"");
-const estadoApi=v=>String(v||"bom").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"");
-const normalizarEquipamento=e=>({...e,patrimonio:e.numero_patrimonio??e.patrimonio??"",categoria:e.categoria??"",condicao:estadoFrontend(e.estado_conservacao??e.condicao),situacao:e.situacao||({disponivel:"disponivel",emprestado:"emprestado",manutencao:"manutencao",baixado:"inativo"}[e.status]||"disponivel"),base:e.status==="baixado"?"inativo":e.status,localizacao:e.localizacao||""});
-const normalizarEmprestimo=l=>{const item=(l.itens||[])[0]||{};return {...l,emprestimoId:l.id,equipamento:{id:item.equipamento_id??l.equipamento_id,nome:item.equipamento||l.equipamento||"Equipamento",patrimonio:item.numero_patrimonio||l.numero_patrimonio||"",categoria:item.categoria||"",setor:item.setor||"",condicao:estadoFrontend(item.estado_na_retirada)},solicitante:{id:l.solicitante_id,nome:l.solicitante||"—",vinculo:"",matricula:""},retirada:l.data_emprestimo,prevista:l.data_prevista_devolucao,devolvida:item.data_devolucao||(l.status==="concluido"?l.data_devolucao:null),registradoPor:l.usuario_responsavel||"—",observacoes:l.observacoes||"",situacao:(l.status==="concluido"||item.data_devolucao)?"devolvido":(l.status==="cancelado"?"cancelado":(new Date(l.data_prevista_devolucao)<new Date()?"atrasado":"emprestado")),itens:l.itens||[]};};
-async function requisitar(caminho,opcoes={}){
- const sessao=typeof obterSessao==="function"?obterSessao():null,headers={Accept:"application/json"};
- if(opcoes.corpo!==undefined&&opcoes.corpo!==null)headers["Content-Type"]="application/json";
- if(sessao?.token)headers.Authorization=`Bearer ${sessao.token}`;
- let resposta;try{resposta=await fetch(`${API_BASE_URL}${caminho}`,{method:opcoes.metodo||"GET",headers,body:opcoes.corpo==null?undefined:JSON.stringify(opcoes.corpo)});}catch{throw new Error("Não foi possível conectar ao servidor. Verifique a conexão e tente novamente.");}
- const corpo=await resposta.json().catch(()=>null);
- if(!resposta.ok){if(resposta.status===403&&corpo?.codigo==="TROCA_DE_SENHA_OBRIGATORIA"&&!location.pathname.endsWith("trocar-senha.html")){location.href=location.pathname.includes("/pages/")?"trocar-senha.html":"pages/trocar-senha.html";}const msg=resposta.status===500?"Ocorreu um erro interno. Tente novamente em instantes.":(corpo?.erro||corpo?.mensagem||(resposta.status===401?"Sua sessão expirou. Entre novamente.":"Não foi possível concluir a solicitação."));if(resposta.status===401&&!opcoes.naoRedirecionar401){try{sessionStorage.removeItem("elo.sessao");localStorage.removeItem("elo.sessao");}catch{}if(!/\/(index\.html)?$/.test(location.pathname))location.href="../index.html?sessao=expirada";}const e=new Error(msg);e.status=resposta.status;e.campo=corpo?.campo;throw e;}
- return corpo;
+
+const API_BASE_URL = String(window.ELO_API_BASE_URL || "").replace(/\/+$/, "");
+const MODO_DADOS = "api";
+
+const estadoFrontend = (valor) => ({ novo: "Novo", bom: "Bom", regular: "Regular", danificado: "Danificado" }[String(valor || "").toLowerCase()] || valor || "");
+const estadoApi = (valor) => String(valor || "bom").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+
+const normalizarEquipamento = (equipamento = {}) => ({
+  ...equipamento,
+  patrimonio: equipamento.numero_patrimonio ?? equipamento.patrimonio ?? "",
+  categoria: equipamento.categoria ?? "",
+  condicao: estadoFrontend(equipamento.estado_conservacao ?? equipamento.condicao),
+  situacao: equipamento.situacao || ({ disponivel: "disponivel", emprestado: "emprestado", manutencao: "manutencao", baixado: "inativo" }[equipamento.status] || "disponivel"),
+  base: equipamento.status === "baixado" ? "inativo" : equipamento.status,
+  localizacao: equipamento.localizacao || "",
+});
+
+const normalizarEmprestimo = (emprestimo = {}) => {
+  const item = (emprestimo.itens || [])[0] || {};
+  const previsto = emprestimo.data_prevista_devolucao ? new Date(emprestimo.data_prevista_devolucao) : null;
+  const atrasado = emprestimo.status === "em_andamento" && previsto instanceof Date && !Number.isNaN(previsto.valueOf()) && previsto.valueOf() < Date.now();
+  return {
+    ...emprestimo,
+    emprestimoId: emprestimo.id,
+    equipamento: {
+      id: item.equipamento_id ?? emprestimo.equipamento_id,
+      nome: item.equipamento || emprestimo.equipamento || "Equipamento",
+      patrimonio: item.numero_patrimonio || emprestimo.numero_patrimonio || "",
+      categoria: item.categoria || "",
+      setor: item.setor || "",
+      condicao: estadoFrontend(item.estado_na_retirada),
+    },
+    solicitante: { id: emprestimo.solicitante_id, nome: emprestimo.solicitante || "—", vinculo: "", matricula: "" },
+    retirada: emprestimo.data_emprestimo,
+    prevista: emprestimo.data_prevista_devolucao,
+    devolvida: item.data_devolucao || (emprestimo.status === "concluido" ? emprestimo.data_devolucao : null),
+    registradoPor: emprestimo.usuario_responsavel || "—",
+    observacoes: emprestimo.observacoes || "",
+    situacao: emprestimo.status === "concluido" || item.data_devolucao ? "devolvido" : emprestimo.status === "cancelado" ? "cancelado" : atrasado ? "atrasado" : "emprestado",
+    itens: emprestimo.itens || [],
+  };
+};
+
+// Remove secrets from parsed API responses before exposing objects to page code.
+// The backend must also avoid returning secrets at all; DevTools can still show raw HTTP responses.
+function sanitizarResposta(valor) {
+  if (Array.isArray(valor)) return valor.map(sanitizarResposta);
+  if (!valor || typeof valor !== "object") return valor;
+  const sensiveis = new Set([
+    "senha", "senhaprovisoria", "senhaatual", "novasenha", "password", "temporarypassword",
+    "passwordhash", "senhahash", "token", "accesstoken", "refreshtoken", "resettoken", "tokenrecuperacao",
+  ]);
+  return Object.fromEntries(Object.entries(valor)
+    .filter(([chave]) => !sensiveisTem(chave, sensiveis))
+    .map(([chave, conteudo]) => [chave, sanitizarResposta(conteudo)]));
 }
-async function origem(demo,caminho,opcoes){if(MODO_DADOS==="demo"){await new Promise(r=>setTimeout(r,25));return demo();}return requisitar(caminho,opcoes);}
-const ELO={
- modo:()=>MODO_DADOS,
- resumoDashboard:()=>origem(demoResumo,"/dashboard/resumo"),
- equipamentos:async()=>MODO_DADOS==="demo"?demoEquipamentos():(await requisitar("/equipamentos")).equipamentos.map(normalizarEquipamento),
- equipamento:async id=>MODO_DADOS==="demo"?demoEquipamento(id):normalizarEquipamento((await requisitar(`/equipamentos/${encodeURIComponent(id)}`)).equipamento),
- consultaQr:async codigo=>MODO_DADOS==="demo"?demoConsultaQr(codigo):requisitar(`/consulta-qr/${encodeURIComponent(codigo)}`),
- perfil:async()=>MODO_DADOS==="demo"?(obterSessao()||{}):(obterSessao()?.usuario||obterSessao()||{}),
- salvarPerfil:async dados=>{if(MODO_DADOS==="demo")return dados;throw new Error("A API ainda não disponibiliza edição de perfil.");},
- emprestimos:async()=>MODO_DADOS==="demo"?demoEmprestimos():(await requisitar("/emprestimos")).emprestimos.map(normalizarEmprestimo),
- movimentacoes:async()=>MODO_DADOS==="demo"?demoMovimentacoes():(await requisitar("/historico")).map(m=>({id:m.id,quando:m.data_movimentacao,tipo:m.tipo_movimentacao,classe:m.tipo_movimentacao,equipamento:{id:m.equipamento_id,nome:m.equipamento_nome,patrimonio:"",categoria:""},detalhe:m.descricao,por:m.usuario_nome,emprestimoId:m.emprestimo_id})),
- registrarEmprestimo:async d=>{if(MODO_DADOS==="demo")return demoRegistrarEmprestimo(d);const s=obterSessao()||{};let sid=d.solicitante_id??s.solicitante_id;
- if(!sid && d.solicitante){const lista=(await requisitar("/solicitantes")).solicitantes||[];const alvo=lista.find(x=>String(x.nome||"").trim().toLocaleLowerCase("pt-BR")===String(d.solicitante).trim().toLocaleLowerCase("pt-BR"));sid=alvo?.id;}
- if(!sid)throw new Error("Não foi possível identificar o cadastro do solicitante. Confira se ele está cadastrado e ativo.");
- return requisitar("/emprestimos",{metodo:"POST",corpo:{solicitante_id:Number(sid),equipamentos:(d.equipamentos||[]).map(Number),data_prevista_devolucao:new Date(d.prevista).toISOString(),observacoes:[d.finalidade,d.observacoes].filter(Boolean).join(" — ")||null}});},
- registrarDevolucao:async d=>{if(MODO_DADOS==="demo")return demoRegistrarDevolucao(d);const lista=(await requisitar("/emprestimos")).emprestimos||[],ids=new Set((d.itens||[]).map(String)),alvos=lista.filter(l=>ids.has(String(l.id))||ids.has(String(l.equipamento_id)));if(!alvos.length)throw new Error("Não foi possível relacionar os itens selecionados aos empréstimos. Atualize a página.");let feitos=0;for(const l of alvos){const det=(await requisitar(`/emprestimos/${encodeURIComponent(l.id)}`)).emprestimo;for(const it of det.itens||[]){if((ids.has(String(it.equipamento_id))||ids.has(String(l.id)))&&!it.data_devolucao){await requisitar(`/emprestimos/${encodeURIComponent(l.id)}/itens/${encodeURIComponent(it.equipamento_id)}/devolver`,{metodo:"PATCH",corpo:{estado_na_devolucao:estadoApi(d.condicao||"bom"),observacoes:[d.observacoes,d.acessoriosConferidos?"Acessórios conferidos":"",d.equipamentoConferido?"Equipamento conferido":"",d.assinaturaRecebida?"Assinatura recebida":""].filter(Boolean).join("; ")||null}});feitos++;}}}if(!feitos)throw new Error("Nenhum item pendente de devolução foi encontrado.");return {itens:feitos};},
- removerEquipamento:async id=>MODO_DADOS==="demo"?demoRemoverEquipamento(id):requisitar(`/equipamentos/${encodeURIComponent(id)}/inativar`,{metodo:"PATCH"}),
- salvarEquipamento:async(d,id)=>{if(MODO_DADOS==="demo")return demoSalvarEquipamento(d,id);const cats=(await requisitar("/categorias")).categorias||[],cat=cats.find(c=>String(c.id)===String(d.categoria_id)||String(c.nome).toLowerCase()===String(d.categoria||"").toLowerCase());if(!cat)throw new Error("Selecione uma categoria cadastrada e ativa. A API exige categoria_id.");const corpo={nome:d.nome,categoria_id:Number(cat.id),numero_patrimonio:d.patrimonio||d.numero_patrimonio,setor:d.setor,localizacao:d.localizacao||"",estado_conservacao:estadoApi(d.condicao||d.estado_conservacao),qr_code:d.qr_code||d.patrimonio||d.numero_patrimonio,observacoes:d.observacoes||null,elegibilidade:d.elegibilidade||"todos"};return (await requisitar(id?`/equipamentos/${encodeURIComponent(id)}`:"/equipamentos",{metodo:id?"PUT":"POST",corpo})).equipamento;},
- categorias:async()=>MODO_DADOS==="demo"?[]:(await requisitar("/categorias")).categorias,
- solicitantes:async()=>MODO_DADOS==="demo"?[]:(await requisitar("/solicitantes")).solicitantes,
- reservas:async()=>MODO_DADOS==="demo"?[]:(await requisitar("/reservas")).reservas,
- criarReserva:d=>requisitar("/reservas",{metodo:"POST",corpo:d}),
- aprovarReserva:id=>requisitar(`/reservas/${encodeURIComponent(id)}/aprovar`,{metodo:"PATCH"}),
- rejeitarReserva:id=>requisitar(`/reservas/${encodeURIComponent(id)}/rejeitar`,{metodo:"PATCH"}),
- retirarReserva:(id,d={})=>requisitar(`/reservas/${encodeURIComponent(id)}/retirar`,{metodo:"POST",corpo:d}),
- cancelarReserva:id=>requisitar(`/reservas/${encodeURIComponent(id)}/cancelar`,{metodo:"PATCH"}),
- manutencoes:async()=>MODO_DADOS==="demo"?[]:(await requisitar("/manutencoes")).manutencoes,
- abrirManutencao:d=>requisitar("/manutencoes",{metodo:"POST",corpo:d}),
- finalizarManutencao:(id,d)=>requisitar(`/manutencoes/${encodeURIComponent(id)}/finalizar`,{metodo:"PATCH",corpo:d}),
- cadastroAluno:d=>requisitar("/auth/cadastro-aluno",{metodo:"POST",corpo:{nome:String(d.nome||"").trim(),email:String(d.email||"").trim().toLowerCase(),solicitante_id:Number(d.solicitante_id)}}),
- trocarSenha:d=>requisitar("/auth/trocar-senha",{metodo:"POST",corpo:{senha_atual:d.senha_atual,nova_senha:d.nova_senha}}),
- usuarios:async()=>MODO_DADOS==="demo"?[]:(await requisitar("/usuarios")).usuarios,
- criarUsuario:d=>requisitar("/usuarios",{metodo:"POST",corpo:{nome:String(d.nome||"").trim(),email:String(d.email||"").trim().toLowerCase(),papel:d.papel}}),
- reenviarSenha:id=>requisitar(`/usuarios/${encodeURIComponent(id)}/reenviar-senha`,{metodo:"PATCH"}),
- desativarUsuario:id=>requisitar(`/usuarios/${encodeURIComponent(id)}/desativar`,{metodo:"PATCH"})
+function sensiveisTem(chave, sensiveis) {
+  const normalizada = String(chave).toLowerCase().replace(/[_\s-]/g, "");
+  return sensiveis.has(normalizada);
+}
+
+async function requisitar(caminho, opcoes = {}) {
+  if (!API_BASE_URL) throw new Error("A API do ELO Campus não está configurada. Defina ELO_API_BASE_URL.");
+  const sessao = typeof obterSessao === "function" ? obterSessao() : null;
+  const headers = { Accept: "application/json" };
+  if (opcoes.corpo !== undefined && opcoes.corpo !== null) headers["Content-Type"] = "application/json";
+  if (!opcoes.semAutenticacao && sessao?.token) headers.Authorization = `Bearer ${sessao.token}`;
+
+  let resposta;
+  try {
+    resposta = await fetch(`${API_BASE_URL}${caminho}`, {
+      method: opcoes.metodo || "GET",
+      headers,
+      body: opcoes.corpo == null ? undefined : JSON.stringify(opcoes.corpo),
+      cache: "no-store",
+      credentials: "omit",
+    });
+  } catch {
+    throw new Error("Não foi possível conectar ao servidor. Verifique a conexão e tente novamente.");
+  }
+
+  const corpoBruto = await resposta.json().catch(() => null);
+  if (!resposta.ok) {
+    if (resposta.status === 403 && corpoBruto?.codigo === "TROCA_DE_SENHA_OBRIGATORIA" && !location.pathname.endsWith("trocar-senha.html")) {
+      location.href = location.pathname.includes("/pages/") ? "trocar-senha.html" : "pages/trocar-senha.html";
+    }
+    let mensagem = corpoBruto?.erro || corpoBruto?.mensagem || "Não foi possível concluir a solicitação.";
+    if (resposta.status === 500) mensagem = "Ocorreu um erro interno. Tente novamente em instantes.";
+    if (resposta.status === 401 && !opcoes.naoRedirecionar401) {
+      try {
+        sessionStorage.removeItem("elo.sessao");
+        localStorage.removeItem("elo.sessao");
+      } catch { /* o navegador pode bloquear o armazenamento */ }
+      if (!/\/(index\.html)?$/.test(location.pathname)) location.href = "../index.html?sessao=expirada";
+    }
+    const erro = new Error(mensagem);
+    erro.status = resposta.status;
+    erro.codigo = corpoBruto?.codigo;
+    erro.campo = corpoBruto?.campo;
+    throw erro;
+  }
+  return sanitizarResposta(corpoBruto);
+}
+
+const ELO = {
+  modo: () => MODO_DADOS,
+  verificarSaude: () => requisitar("/health", { semAutenticacao: true, naoRedirecionar401: true }),
+  resumoDashboard: () => requisitar("/dashboard/resumo"),
+  equipamentos: async () => (await requisitar("/equipamentos")).equipamentos.map(normalizarEquipamento),
+  equipamento: async (id) => normalizarEquipamento((await requisitar(`/equipamentos/${encodeURIComponent(id)}`)).equipamento),
+  consultaQr: async (codigo) => {
+    const caminho = `/consulta-qr/${encodeURIComponent(String(codigo || "").trim())}`;
+    const sessao = typeof obterSessao === "function" ? obterSessao() : null;
+    // A consulta é pública, mas uma sessão válida de equipe recebe os detalhes do empréstimo atual.
+    if (!sessao?.token) return requisitar(caminho, { semAutenticacao: true, naoRedirecionar401: true });
+    try {
+      return await requisitar(caminho, { naoRedirecionar401: true });
+    } catch (erro) {
+      // Consulta pública continua disponível quando o token expirou; descarte a sessão antiga.
+      if (erro.status === 401) {
+        if (typeof limparSessao === "function") limparSessao();
+        return requisitar(caminho, { semAutenticacao: true, naoRedirecionar401: true });
+      }
+      throw erro;
+    }
+  },
+  perfil: async () => obterSessao()?.usuario || obterSessao() || {},
+  salvarPerfil: async () => { throw new Error("A API ainda não disponibiliza edição de perfil. Nenhuma alteração foi salva."); },
+  emprestimos: async () => (await requisitar("/emprestimos")).emprestimos.map(normalizarEmprestimo),
+  movimentacoes: async () => (await requisitar("/historico")).map((movimento) => ({
+    id: movimento.id, quando: movimento.data_movimentacao, tipo: movimento.tipo_movimentacao,
+    classe: movimento.tipo_movimentacao,
+    equipamento: { id: movimento.equipamento_id, nome: movimento.equipamento_nome, patrimonio: "", categoria: "" },
+    detalhe: movimento.descricao, por: movimento.usuario_nome, emprestimoId: movimento.emprestimo_id,
+  })),
+  registrarEmprestimo: async (dados) => {
+    const sessao = obterSessao() || {};
+    let solicitanteId = dados.solicitante_id ?? sessao.solicitante_id;
+    if (!solicitanteId && dados.solicitante) {
+      const solicitantes = (await requisitar("/solicitantes")).solicitantes || [];
+      solicitanteId = solicitantes.find((pessoa) => String(pessoa.nome || "").trim().toLocaleLowerCase("pt-BR") === String(dados.solicitante).trim().toLocaleLowerCase("pt-BR"))?.id;
+    }
+    if (!solicitanteId) throw new Error("Não foi possível identificar o cadastro do solicitante. Confira se ele está cadastrado e ativo.");
+    return requisitar("/emprestimos", { metodo: "POST", corpo: {
+      solicitante_id: Number(solicitanteId),
+      equipamentos: (dados.equipamentos || []).map(Number),
+      data_prevista_devolucao: new Date(dados.prevista).toISOString(),
+      observacoes: [dados.finalidade, dados.observacoes].filter(Boolean).join(" — ") || null,
+    } });
+  },
+  registrarDevolucao: async (dados) => {
+    const lista = (await requisitar("/emprestimos")).emprestimos || [];
+    const ids = new Set((dados.itens || []).map(String));
+    const alvos = lista.filter((emprestimo) => ids.has(String(emprestimo.id)) || ids.has(String(emprestimo.equipamento_id)));
+    if (!alvos.length) throw new Error("Não foi possível relacionar os itens selecionados aos empréstimos. Atualize a página.");
+    let feitos = 0;
+    for (const emprestimo of alvos) {
+      const detalhe = (await requisitar(`/emprestimos/${encodeURIComponent(emprestimo.id)}`)).emprestimo;
+      for (const item of detalhe.itens || []) {
+        if ((ids.has(String(item.equipamento_id)) || ids.has(String(emprestimo.id))) && !item.data_devolucao) {
+          await requisitar(`/emprestimos/${encodeURIComponent(emprestimo.id)}/itens/${encodeURIComponent(item.equipamento_id)}/devolver`, {
+            metodo: "PATCH",
+            corpo: {
+              estado_na_devolucao: estadoApi(dados.condicao || "bom"),
+              observacoes: [dados.observacoes, dados.acessoriosConferidos ? "Acessórios conferidos" : "", dados.equipamentoConferido ? "Equipamento conferido" : "", dados.assinaturaRecebida ? "Assinatura recebida" : ""].filter(Boolean).join("; ") || null,
+            },
+          });
+          feitos += 1;
+        }
+      }
+    }
+    if (!feitos) throw new Error("Nenhum item pendente de devolução foi encontrado.");
+    return { itens: feitos };
+  },
+  removerEquipamento: (id) => requisitar(`/equipamentos/${encodeURIComponent(id)}/inativar`, { metodo: "PATCH" }),
+  salvarEquipamento: async (dados, id) => {
+    const corpo = {
+      nome: dados.nome,
+      numero_patrimonio: dados.patrimonio || dados.numero_patrimonio,
+      setor: dados.setor,
+      localizacao: dados.localizacao || "",
+      estado_conservacao: estadoApi(dados.condicao || dados.estado_conservacao),
+      qr_code: dados.qr_code || dados.patrimonio || dados.numero_patrimonio,
+      observacoes: dados.observacoes || null,
+      elegibilidade: dados.elegibilidade || "todos",
+    };
+    if (dados.categoria_id) corpo.categoria_id = Number(dados.categoria_id);
+    else corpo.categoria = String(dados.categoria || "").trim();
+    return (await requisitar(id ? `/equipamentos/${encodeURIComponent(id)}` : "/equipamentos", {
+      metodo: id ? "PUT" : "POST", corpo,
+    })).equipamento;
+  },
+  categorias: async () => (await requisitar("/categorias")).categorias,
+  categoria: async (id) => (await requisitar(`/categorias/${encodeURIComponent(id)}`)).categoria,
+  criarCategoria: (dados) => requisitar("/categorias", { metodo: "POST", corpo: { nome: String(dados.nome || "").trim(), descricao: String(dados.descricao || "").trim() || null } }),
+  editarCategoria: (id, dados) => requisitar(`/categorias/${encodeURIComponent(id)}`, { metodo: "PUT", corpo: { nome: String(dados.nome || "").trim(), descricao: String(dados.descricao || "").trim() || null } }),
+  desativarCategoria: (id) => requisitar(`/categorias/${encodeURIComponent(id)}/desativar`, { metodo: "PATCH" }),
+  solicitantes: async () => {
+    const resposta = await requisitar("/solicitantes");
+    if (!Array.isArray(resposta?.solicitantes)) {
+      throw new Error("A resposta da API de solicitantes está fora do contrato esperado. Confirme se GET /solicitantes retorna { solicitantes: [...] }.");
+    }
+    return resposta.solicitantes;
+  },
+  solicitante: async (id) => (await requisitar(`/solicitantes/${encodeURIComponent(id)}`)).solicitante,
+  criarSolicitante: (dados) => requisitar("/solicitantes", {
+    metodo: "POST",
+    corpo: {
+      nome: String(dados.nome || "").trim(),
+      tipo: String(dados.tipo || "").trim().toLowerCase(),
+      setor: String(dados.setor || "").trim() || null,
+      email: String(dados.email || "").trim().toLowerCase() || null,
+      telefone: String(dados.telefone || "").trim() || null,
+    },
+  }),
+  editarSolicitante: (id, dados) => requisitar(`/solicitantes/${encodeURIComponent(id)}`, {
+    metodo: "PUT",
+    corpo: {
+      nome: String(dados.nome || "").trim(),
+      tipo: String(dados.tipo || "").trim().toLowerCase(),
+      setor: String(dados.setor || "").trim() || null,
+      email: String(dados.email || "").trim().toLowerCase() || null,
+      telefone: String(dados.telefone || "").trim() || null,
+    },
+  }),
+  desativarSolicitante: (id) => requisitar(`/solicitantes/${encodeURIComponent(id)}/desativar`, { metodo: "PATCH" }),
+  salvarSolicitante: (id, dados) => ELO.editarSolicitante(id, dados),
+  reservas: async () => (await requisitar("/reservas")).reservas,
+  criarReserva: (dados) => requisitar("/reservas", { metodo: "POST", corpo: dados }),
+  aprovarReserva: (id) => requisitar(`/reservas/${encodeURIComponent(id)}/aprovar`, { metodo: "PATCH" }),
+  rejeitarReserva: (id) => requisitar(`/reservas/${encodeURIComponent(id)}/rejeitar`, { metodo: "PATCH" }),
+  cancelarReserva: (id) => requisitar(`/reservas/${encodeURIComponent(id)}/cancelar`, { metodo: "PATCH" }),
+  retirarReserva: (id, dados = {}) => requisitar(`/reservas/${encodeURIComponent(id)}/retirar`, { metodo: "POST", corpo: dados }),
+  manutencoes: async () => (await requisitar("/manutencoes")).manutencoes,
+  abrirManutencao: (dados) => requisitar("/manutencoes", { metodo: "POST", corpo: dados }),
+  finalizarManutencao: (id, dados) => requisitar(`/manutencoes/${encodeURIComponent(id)}/finalizar`, { metodo: "PATCH", corpo: dados }),
+  cadastroAluno: (dados) => requisitar("/auth/cadastro-aluno", { metodo: "POST", semAutenticacao: true, naoRedirecionar401: true, corpo: {
+    nome: String(dados.nome || "").trim(), email: String(dados.email || "").trim().toLowerCase(), solicitante_id: Number(dados.solicitante_id),
+  } }),
+  solicitarRecuperacaoSenha: async (email) => {
+    try {
+      return await requisitar("/auth/esqueci-senha", { metodo: "POST", semAutenticacao: true, naoRedirecionar401: true, corpo: { email: String(email || "").trim().toLowerCase() } });
+    } catch (erro) {
+      if (erro.status === 404 || erro.status === 405) {
+        const indisponivel = new Error("A recuperação automática ainda não está habilitada no servidor. Entre em contato com a administração para solicitar o reenvio da senha provisória.");
+        indisponivel.status = erro.status;
+        throw indisponivel;
+      }
+      throw erro;
+    }
+  },
+  trocarSenha: (dados) => requisitar("/auth/trocar-senha", { metodo: "POST", corpo: { senha_atual: dados.senha_atual, nova_senha: dados.nova_senha } }),
+  usuarios: async () => (await requisitar("/usuarios")).usuarios,
+  criarUsuario: (dados) => requisitar("/usuarios", { metodo: "POST", corpo: { nome: String(dados.nome || "").trim(), email: String(dados.email || "").trim().toLowerCase(), papel: dados.papel } }),
+  reenviarSenha: (id) => requisitar(`/usuarios/${encodeURIComponent(id)}/reenviar-senha`, { metodo: "PATCH" }),
+  desativarUsuario: (id) => requisitar(`/usuarios/${encodeURIComponent(id)}/desativar`, { metodo: "PATCH" }),
 };

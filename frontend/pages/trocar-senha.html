@@ -18,7 +18,7 @@
     #trocar-senha-btn{width:100%;min-height:52px}
   </style>
 </head>
-<body>
+<body class="auth-page auth-page-password">
   <main class="login">
     <section class="brand-side" aria-label="Apresentação do sistema">
       <div class="brand"><img src="../assets/img/logo.png" alt=""><span class="brand-name">ELO Campus<span class="brand-sub">Instituição - Campus Lapa</span></span></div>
@@ -33,6 +33,7 @@
       <div class="mobile-brand"><img src="../assets/img/logo-draw.svg" alt=""><strong>ELO Campus</strong></div>
       <div class="card">
         <div class="card-head">
+          <div class="auth-feature-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 4.5 6v5.5c0 4.4 3 7.5 7.5 9.5 4.5-2 7.5-5.1 7.5-9.5V6z"/><path d="m9 12 2 2 4-4"/></svg><span>Etapa final · Proteção da conta</span></div>
           <span class="auth-kicker"><span aria-hidden="true"></span> Primeiro acesso</span>
           <h2 id="titulo-senha">Criar sua senha</h2>
           <p>Use a senha provisória recebida por e-mail e escolha uma nova senha pessoal.</p>
@@ -82,7 +83,7 @@
         try {
           await ELO.trocarSenha({ senha_atual: atual.value, nova_senha: nova.value });
           const atualizada = { ...obterSessao(), deve_trocar_senha: false };
-          salvarSessao(atualizada, Boolean(localStorage.getItem('elo.sessao')));
+          salvarSessao(atualizada);
           avisar('Senha criada com sucesso. Redirecionando para o painel…', true);
           window.setTimeout(() => window.location.replace('dashboard.html'), 500);
         } catch (falha) {

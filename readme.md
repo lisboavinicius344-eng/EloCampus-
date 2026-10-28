@@ -1,108 +1,92 @@
-# ELO Campus — Front-end
+# ELO Campus — Front-end integrado à API
 
-Este repositório mantém a estrutura original da interface web em `frontend/`. As alterações desta etapa corrigem interações e apresentação dos dados no front-end sem implementar servidor de aplicação, API, banco de dados ou autenticação real.
+Este repositório contém o front-end estático do ELO Campus. O navegador usa a API oficial por padrão; não há contas de demonstração, empréstimos fictícios ou base de dados de demonstração dentro da pasta servida pelo Nginx.
 
-## O que está disponível nesta etapa
+## O que está disponível
 
-- Telas originais, estilos e assets preservados.
-- Cadastros e operações de demonstração usando o armazenamento local do navegador.
-- Empréstimos com seleção de vários equipamentos, etapa de revisão e confirmação.
-- Devoluções parciais por equipamento, com revisão e confirmação.
-- Histórico de retiradas/devoluções e filtros por texto, tipo e período.
-- Relatórios baseados nos registros carregados, filtros e exportação CSV.
-- Consulta local por patrimônio, identificador ou URL codificada no QR Code.
-- Tela de login com seleção explícita de acesso para Discente/Docente/Servidor ou Administração/TI, validada contra o perfil da conta de demonstração.
-- Área de autoatendimento separada para discente, docente e servidor, com acesso direto a Ver os equipamentos, Reservar equipamento (a equipe aprova e registra a retirada, que cria o empréstimo), Devolver equipamentos e Consultar QR Code.
-- A página Ver os equipamentos apresenta os itens disponíveis para empréstimo e pode abrir a solicitação com um item previamente selecionado. A consulta por QR Code também fica disponível para os perfis de autoatendimento.
-- Empréstimos e devoluções dos usuários comuns mostram apenas registros vinculados à própria conta, com menos campos administrativos; páginas de gestão permanecem separadas.
-- Contas de demonstração para administrador, operador, aluno, professor e servidor (perfil comum).
-- Docker/Nginx para servir apenas arquivos estáticos do front-end.
+- Login real por e-mail, via `POST /auth/login`.
+- Fluxo de senha provisória e troca obrigatória no primeiro acesso, conforme o contrato da API.
+- Cadastro de alunos/docentes sem campo de senha.
+- Telas públicas de acesso com visual próprio por etapa: entrar, criar conta, recuperar acesso e criar senha.
+- Tela de recuperação de acesso com mensagem genérica para reduzir enumeração de contas.
+- Aviso de privacidade público em `frontend/pages/privacidade.html`, marcado como versão preliminar até a instituição completar os dados de controlador/contato e aprovar os prazos/finalidades.
+- Gestão de contas da equipe sem campos de senha e sem exibição de senhas provisórias.
+- Token guardado em `sessionStorage`; a opção de lembrar guarda somente o e-mail, quando marcada.
+- Chamadas da API com `cache: no-store`, tratamento de erros no campo `erro`, tratamento de sessão expirada e bloqueio obrigatório de troca de senha.
+- “Lembrar meu e-mail” grava somente um endereço válido no `localStorage`, atualiza quando o campo é alterado e remove o valor quando a opção é desmarcada. Senha e token nunca são incluídos nessa preferência.
+- Consulta QR Code mostra os campos do equipamento retornados pela API; quando a equipe está autenticada, solicita detalhes do empréstimo atual e histórico. Para visitantes e usuários comuns, respeita a resposta pública e não revela o nome do solicitante nem o histórico restrito.
+- Telas de equipamentos, categorias, empréstimos, devoluções, reservas, manutenções, QR Code, histórico, solicitantes, usuários e painel.
+- Docker/Nginx para servir somente os arquivos do front-end.
 
-**Importante:** os registros feitos nesta versão são locais a este navegador e não são dados oficiais nem são sincronizados entre dispositivos. A camada `api.js` preserva um ponto de integração futuro; o modo inicial continua sendo `demo`.
+## Cadastro de solicitantes e criação de conta
+
+O cadastro de **solicitante** é diferente da conta de login. A equipe deve primeiro abrir **Administração → Solicitantes**, criar o registro e entregar à pessoa o **código/ID que a API devolver**. Só então aluno ou professor usa a página pública `frontend/pages/cadastro.html`, informando nome, e-mail e esse `solicitante_id`; o backend valida se o registro existe, está ativo, tem tipo permitido e ainda não está vinculado a outra conta. O front-end não consulta a lista de solicitantes anonimamente, pois `GET /solicitantes` exige autenticação de equipe e expor a lista publicamente revelaria dados pessoais.
+
+A gestão de solicitantes usa `GET/POST/PUT /solicitantes`, `GET /solicitantes/<id>` e `PATCH /solicitantes/<id>/desativar`. Admin e operador podem abrir a página; a gestão de contas (`/usuarios`) permanece exclusiva do admin. A desativação preserva o histórico e não equivale a apagar o registro.
+
+## Recuperação de senha — dependência do back-end
+
+A tela `frontend/pages/recuperar-senha.html` envia o e-mail para `POST /api/auth/esqueci-senha`. **Essa rota ainda não constava no API.md que foi fornecido para integração.** Se o servidor responder `404`/`405`, a tela explica que a recuperação automática ainda não está habilitada e orienta a solicitar o reenvio à administração.
+
+O contrato de implementação e as exigências de segurança estão em [`docs/RECUPERACAO-SENHA-E-PRIVACIDADE.md`](docs/RECUPERACAO-SENHA-E-PRIVACIDADE.md). O back-end precisa implementar essa rota para que o envio de senha provisória ou instruções de redefinição funcione de ponta a ponta. A resposta pública deve ser genérica, independentemente de o e-mail existir.
+
+## Privacidade e senhas
+
+- O front-end não contém senhas de contas nem salva senhas digitadas.
+- Tokens ficam em `sessionStorage` durante a sessão atual. Tokens legados encontrados em `localStorage` são removidos, não restaurados; usuários antigos precisarão entrar novamente. A opção “Lembrar meu e-mail” guarda apenas o e-mail quando marcada.
+- “Lembrar meu e-mail” armazena apenas o endereço de e-mail, e somente se a pessoa marcar a opção.
+- A tela da equipe não exibe `senha_provisoria`. A camada API remove campos de senha de objetos antes de entregá-los às telas.
+- **Limitação importante:** o navegador não consegue ocultar um segredo que o próprio servidor envia no corpo HTTP: esse corpo pode ser inspecionado no DevTools. Para cumprir o requisito de não revelar senhas à administração, o back-end deve parar de devolver `senha_provisoria` nas respostas de criação/reenvio, inclusive quando falha o e-mail. O documento de privacidade detalha o ajuste.
+- Essas medidas são melhorias técnicas, não uma declaração de conformidade jurídica completa com a LGPD. A instituição deve definir base legal/finalidade, aviso de privacidade, retenção, permissões, auditoria e resposta a incidentes.
 
 ## Executar no Windows sem Docker
 
-1. Instale o Node.js ou Python, se ainda não estiverem instalados.
-2. Abra o PowerShell na pasta do projeto.
-3. Execute um servidor estático apontando para `frontend`:
+1. Instale Python 3 se ainda não estiver instalado.
+2. Abra o PowerShell na raiz do projeto.
+3. Execute:
 
    ```powershell
    py -m http.server 8080 --directory frontend
    ```
 
-4. Abra `http://localhost:8080` no navegador. Para encerrar, use `Ctrl+C` no PowerShell.
+4. Acesse `http://localhost:8080`. Para encerrar, pressione `Ctrl+C`.
 
-## Contas de demonstração
-
-| Perfil | Usuário | Senha |
-|---|---|---|
-| Administrador (TI) | `admin` | `admin123` |
-| Operador | `operador` | `operador123` |
-| Aluno | `aluno` | `aluno123` |
-| Professor | `professor` | `professor123` |
-| Servidor (usuário comum) | `servidor` | `servidor123` |
-
-Essas credenciais existem apenas para demonstrar a navegação por perfil. Não devem ser usadas em produção. A separação de telas e rotas é um controle de interface, não uma barreira de segurança: autenticação e autorização reais precisam ser aplicadas no back-end antes da publicação oficial.
+A origem local (`http://localhost:8080`) precisa estar liberada em `CORS_ORIGINS` no back-end para chamadas à API. Se o CORS não estiver configurado, o navegador bloqueará as requisições mesmo que a API esteja funcionando.
 
 ## Docker
 
-Pré-requisitos: Docker Engine/Desktop com o comando `docker compose` habilitado.
+Pré-requisitos: Docker Engine/Desktop com `docker compose` disponível.
 
 1. Copie `.env.example` para `.env`.
-2. Na pasta que contém o `Dockerfile`, execute:
+2. Na pasta que contém `Dockerfile` e `docker-compose.yml`, execute:
 
    ```powershell
+   docker compose config
    docker compose up --build -d
+   docker compose ps
    ```
 
-3. Abra `http://localhost:8080` (ou a porta definida por `ELO_PORT` no `.env`).
-4. Verifique a disponibilidade do servidor em `http://localhost:8080/healthz` — a resposta deve ser `ok`.
-5. Para consultar os registros de execução: `docker compose logs -f elo-campus-frontend`.
-6. Para encerrar: `docker compose down`.
+3. Acesse `http://localhost:8080` (ou a porta definida por `ELO_PORT`).
+4. Verifique o servidor estático em `http://localhost:8080/healthz`; a resposta esperada é `ok`.
+5. Logs: `docker compose logs -f elo-campus-frontend`.
+6. Encerramento: `docker compose down`.
 
-O Compose contém apenas o serviço web estático. Não cria API, servidor de aplicação, banco de dados ou serviços fictícios.
+O Compose inclui apenas o serviço estático do front-end. Não cria API nem banco de dados.
 
-### Configuração para a futura API
+## Configuração da API
 
-O modo padrão é `ELO_DATA_MODE=demo`. Quando a API existir, configure `ELO_DATA_MODE=api` e `ELO_API_BASE_URL` no `.env`, usando, por exemplo, `/api` se o Nginx/API estiverem expostos na mesma origem. A aplicação não envia credenciais de servidor nem define endereços de produção no código. Alterar o modo para `api` antes da implementação da API fará as chamadas falharem explicitamente, como esperado.
+O endereço padrão é `https://elocampus-backend.a6ti6s.easypanel.host/api`. No Docker, ele pode ser sobrescrito por `ELO_API_BASE_URL` em `.env`. O modo de produção é fixado em `api`; a pasta servida não contém dados de demonstração nem credenciais fictícias.
 
-Ao executar por um servidor estático fora do Docker, `frontend/assets/js/runtime-config.js` contém valores padrão de demonstração; ajuste esse arquivo somente quando estiver preparando a integração.
+## Atualizações de integração (28/10/2026)
 
-## Testes automatizados disponíveis
+- A navegação de autoatendimento usa **Reservar equipamento** e **Minhas reservas**; a devolução é operação da equipe no balcão.
+- Incluídas as telas de **Reservas**, **Categorias** e **Manutenções**, conectadas às rotas de API documentadas.
+- O cadastro/edição de equipamentos aceita uma categoria sugerida ou digitada. Se a categoria existir, envia `categoria_id`; se for nova, envia o nome para a API. Também envia `elegibilidade`. A API atual não armazena fotos; o formulário informa essa limitação.
+- No fluxo de retirada da equipe, o solicitante é selecionado por ID, evitando correspondência frágil por nome.
+- Páginas legadas de Relatórios e Saúde do Servidor, não usadas na navegação operacional, foram removidas do pacote.
+- `runtime-config.js` tem versão identificada e o Nginx aplica `Cache-Control: no-store` para evitar manter a configuração de API em cache.
+- As telas de autenticação mantêm diferenças discretas usando a paleta original (fundo escuro e acento ciano), sem cores chamativas fora da identidade visual.
 
-Com Node.js instalado, execute na raiz do repositório:
+### Limites e pré-requisitos
 
-```powershell
-node tests/test-local-data.cjs
-node tests/test-login-auth.cjs
-node tests/test-profile-routes.cjs
-node tests/test-self-service.cjs
-node tests/test-self-service-ui.cjs
-node tests/test-ui-access.cjs
-```
-
-O primeiro teste verifica consulta de QR local, empréstimo com vários itens, prevenção de empréstimo duplicado/indisponível, devolução parcial/final, atualização do histórico, persistência após recriar a camada de dados e rollback em caso de falha de armazenamento. O segundo testa o login de demonstração, a correspondência entre área escolhida e perfil, e a rejeição de senhas incorretas. O terceiro testa a separação entre páginas administrativas e páginas de autoatendimento. O quarto testa empréstimos e devoluções no próprio cadastro e rejeita operações locais em nome de terceiros. O quinto verifica a estrutura própria do autoatendimento, o catálogo de disponíveis, os atalhos de solicitação, a consulta por QR Code e a simplificação de empréstimos. O sexto verifica os acessos de autoatendimento e a animação de desenho progressivo da logo vetorial no login.
-
-## Relógio e horário das operações
-
-Não há relógio ou temporizador permanente adicionado à interface. As operações registram a data e a hora local no momento em que o empréstimo ou a devolução são confirmados; esse horário aparece nos respectivos registros e no histórico. Sem uma referência confiável de servidor, uma aplicação exclusivamente front-end não consegue garantir a hora real se o relógio do dispositivo estiver incorreto, especialmente sem conexão.
-
-
-
-## Integração com a API
-
-O frontend usa por padrão a API publicada em `https://elocampus-backend.a6ti6s.easypanel.host/api`.
-A configuração está em `frontend/assets/js/runtime-config.js`; variáveis injetadas pelo Docker têm prioridade.
-Para desenvolvimento local, configure a origem do frontend em `CORS_ORIGINS` no backend. O modo demo pode ser reativado definindo `ELO_DATA_MODE` como `demo`.
-
-A autenticação real usa e-mail e senha, armazena o token retornado pelo backend na sessão e envia `Authorization: Bearer` nas requisições. Erros JSON do backend são apresentados ao usuário; respostas 401 encerram a sessão. A API não oferece edição de perfil nem redefinição de senha no contrato atual, portanto essas ações não devem simular sucesso.
-
-
-## Fluxo de senha provisória (API)
-
-- O cadastro de aluno envia `nome`, `email` e `solicitante_id` para `POST /auth/cadastro-aluno`; o usuário não escolhe senha no cadastro.
-- O login guarda o token e encaminha contas com `deve_trocar_senha: true` para `frontend/pages/trocar-senha.html`.
-- A tela de primeiro acesso envia `senha_atual` e `nova_senha` para `POST /auth/trocar-senha`, mantendo o token existente após a troca.
-- Respostas `403` com `codigo: TROCA_DE_SENHA_OBRIGATORIA` redirecionam para a tela de criação de senha.
-- A tela de equipe usa `POST /usuarios` sem senha e oferece `PATCH /usuarios/:id/reenviar-senha`. Se o envio de e-mail falhar, a senha provisória retornada é mostrada na tela para repasse manual; ela não é armazenada pelo frontend.
-- Esses endpoints só estarão disponíveis depois que o commit `8a32d99` for implantado no Easypanel. Antes disso, o frontend poderá receber erros por incompatibilidade com a versão antiga da API.
+Estas telas chamam a API configurada em `assets/js/runtime-config.js`; operações só funcionarão se a API implantada expuser as rotas descritas e o usuário tiver o papel necessário. O front-end não substitui autorização no backend. A validação sintática dos arquivos JavaScript e a integridade do pacote são verificadas antes da entrega; a validação de ponta a ponta no Easypanel depende de registros e contas reais do ambiente.

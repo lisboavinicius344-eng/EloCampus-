@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#0B1020">
-  <title>Reservar equipamento — ELO Campus</title>
+  <title>Novo empréstimo — ELO Campus</title>
   <link rel="icon" type="image/png" href="../assets/img/logo.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -15,97 +15,156 @@
   <link rel="stylesheet" href="../assets/css/layout.css">
   <link rel="stylesheet" href="../assets/css/salz-bridge.css">
 </head>
-<body data-pagina="reservar" data-view="reservar">
+<body data-pagina="emprestimos">
   <div class="app">
     <aside class="sidebar" id="sidebar"></aside>
     <div class="content">
       <header class="topbar" id="topbar"></header>
       <main class="main"><header class="page-head">
       <div>
-        <h1>Reservar equipamento</h1>
-        <p>Escolha os equipamentos e o período. A equipe aprova a reserva e registra a retirada quando você for buscar.</p>
-      </div>
-      <div class="toolbar">
-        <a class="btn btn-line" href="minhas-reservas.html">Minhas reservas</a>
+        <h1>Novo empréstimo</h1>
+        <p>Escolha os equipamentos que precisa e informe quando pretende devolvê-los.</p>
       </div>
     </header>
 
-    <ol class="steps" aria-label="Como funciona">
-      <li class="step current" aria-current="step"><span class="step-num">1</span><span class="step-label">Reservar</span></li>
-      <li class="step"><span class="step-num">2</span><span class="step-label">Aprovação da equipe</span></li>
-      <li class="step"><span class="step-num">3</span><span class="step-label">Retirada</span></li>
+    <ol class="steps" aria-label="Etapas">
+      <li class="step done"><span class="step-num">✓</span><span class="step-label">Solicitante</span></li>
+      <li class="step current" aria-current="step"><span class="step-num">2</span><span class="step-label">Equipamentos</span></li>
+      <li class="step"><span class="step-num">3</span><span class="step-label">Confirmação</span></li>
     </ol>
 
-    <form class="split" id="form-reserva" action="#" method="post" novalidate>
+    <form class="split" action="#" method="post">
+      <!-- Formulário -->
       <div class="card grow-2 form-card">
+
+        <section class="form-section" aria-labelledby="t-solicitante">
+          <h2 id="t-solicitante">Solicitante</h2>
+          <div class="form-row">
+            <div class="field">
+              <label for="solicitante">Nome ou matrícula</label>
+              <input class="input input-block" id="solicitante" name="solicitante" type="search" list="lista-solicitantes" placeholder="Escolha o solicitante na etapa anterior" readonly required>
+              <datalist id="lista-solicitantes">
+                <option value="Mariana Costa · 2024118">
+                <option value="Juliana Rocha · 2023076">
+                <option value="Lucas Ferreira · 2024203">
+              </datalist>
+              <span class="hint">Definido na etapa anterior. <a href="usuarios.html?origem=novo-emprestimo">Alterar solicitante</a></span>
+            </div>
+            <div class="field">
+              <label for="vinculo">Vínculo</label>
+              <select class="input input-block" id="vinculo" name="vinculo">
+                <option>Aluno</option>
+                <option>Professor</option>
+                <option>Servidor</option>
+                <option>Perfil</option>
+                <option>Grupo ou setor</option>
+              </select>
+            </div>
+          </div>
+        </section>
 
         <section class="form-section" aria-labelledby="t-equip">
           <h2 id="t-equip">Equipamentos</h2>
           <div class="add-row">
             <div class="field">
-              <label for="equip">Adicionar por nome ou patrimônio</label>
+              <label for="equip">Adicionar por nome, patrimônio ou QR Code</label>
               <input class="input input-block" id="equip" type="search" list="lista-equipamentos" placeholder="Ex.: LAP-0142" autocomplete="off"><datalist id="lista-equipamentos"></datalist>
             </div>
             <button class="btn btn-line" id="adicionar-equip" type="button">+ Adicionar</button>
           </div>
+
           <div class="picked-list" id="lista-equipamentos-selecionados" aria-live="polite">
             <p class="muted" id="nenhum-equipamento">Nenhum equipamento selecionado.</p>
           </div>
         </section>
 
-        <section class="form-section" aria-labelledby="t-periodo">
-          <h2 id="t-periodo">Período</h2>
+        <section class="form-section" aria-labelledby="t-prazo">
+          <h2 id="t-prazo">Prazo e finalidade</h2>
           <div class="form-row">
             <div class="field">
-              <label for="data-inicio">Início</label>
-              <input class="input input-block" id="data-inicio" name="data_inicio" type="datetime-local" required>
+              <label for="retirada">Retirada</label>
+              <input class="input input-block" id="retirada" name="retirada" type="datetime-local" required>
             </div>
             <div class="field">
-              <label for="data-fim">Fim</label>
-              <input class="input input-block" id="data-fim" name="data_fim" type="datetime-local" required>
+              <label for="devolucao">Devolução prevista</label>
+              <input class="input input-block" id="devolucao" name="devolucao" type="datetime-local" required>
             </div>
           </div>
           <div class="form-row">
             <div class="field">
               <label for="finalidade">Finalidade</label>
               <select class="input input-block" id="finalidade" name="finalidade">
-                <option>Aula</option><option>Evento</option><option>Projeto ou pesquisa</option><option>Uso administrativo</option><option>Outro</option>
+                <option>Aula</option>
+                <option>Evento</option>
+                <option>Projeto ou pesquisa</option>
+                <option>Uso administrativo</option>
+                <option>Outro</option>
               </select>
             </div>
           </div>
           <div class="field">
             <label for="obs">Observações</label>
-            <textarea class="input input-block" id="obs" name="observacoes" placeholder="Finalidade, local de uso…"></textarea>
+            <textarea class="input input-block" id="obs" name="obs" placeholder="Local de uso, condição do item na retirada…"></textarea>
           </div>
         </section>
       </div>
 
-      <aside class="grow-1 summary" aria-label="Resumo da reserva">
+      <!-- Resumo -->
+      <aside class="grow-1 summary" aria-label="Resumo do empréstimo">
         <h2>Resumo</h2>
         <div class="stack-sm">
+          <div class="summary-row" data-resumo-interno><span>Solicitante</span><strong id="resumo-solicitante">—</strong></div>
           <div class="summary-row"><span>Itens</span><strong id="resumo-itens">0 equipamentos</strong></div>
-          <div class="summary-row"><span>Início</span><strong id="resumo-inicio">—</strong></div>
-          <div class="summary-row"><span>Fim</span><strong id="resumo-fim">—</strong></div>
+          <div class="summary-row" data-resumo-interno><span>Retirada</span><strong id="resumo-retirada">—</strong></div>
+          <div class="summary-row" data-resumo-prazo><span>Devolução</span><strong id="resumo-devolucao">—</strong></div>
         </div>
         <label class="terms">
-          <input type="checkbox" id="aceite" required>
+          <input type="checkbox" required>
           Confirmo que vou cuidar dos equipamentos e respeitar o prazo de devolução.
         </label>
-        <button class="btn btn-white btn-block" id="enviar-reserva" type="submit">Reservar</button>
-        <a class="cancel" href="minhas-reservas.html">Cancelar</a>
+        <button class="btn btn-white btn-block" type="submit">Revisar empréstimo</button>
+        <a class="cancel" href="emprestimos.html">Cancelar</a>
       </aside>
     </form>
-    <div id="reserva-mensagem" class="alert" role="alert" hidden style="margin-top:1rem"></div>
+    <div id="emprestimo-mensagem" class="alert" role="status" hidden style="margin-top:1rem"></div>
+    <section class="card stack" id="revisao-emprestimo" hidden aria-labelledby="titulo-revisao" style="margin-top:1rem">
+      <h2 id="titulo-revisao">Confirmar empréstimo</h2>
+      <p class="muted" id="texto-revisao-pedido">Confira os dados antes de confirmar.</p>
+      <div id="resumo-revisao"></div>
+      <div class="stack-sm">
+        <button class="btn btn-block" type="button" id="confirmar-emprestimo">Confirmar empréstimo</button>
+        <button class="btn btn-line btn-block" type="button" id="voltar-edicao">Voltar e corrigir</button>
+      </div>
+    </section>
     </main>
     </div>
   </div>
+  <script>
+    // Preenche o solicitante recebido da etapa 1 (antes dos demais scripts da página).
+    (function () {
+      var p = new URLSearchParams(location.search);
+      var nome = p.get('nome'); if (!nome) return;
+      var mat = p.get('matricula');
+      var campo = document.getElementById('solicitante');
+      campo.value = nome + (mat ? ' · ' + mat : '');
+      campo.dispatchEvent(new Event('input', { bubbles: true }));
+      campo.dispatchEvent(new Event('change', { bubbles: true }));
+      document.getElementById('resumo-solicitante').textContent = nome;
+
+      var v = (p.get('vinculo') || '').toLowerCase();
+      var alvo = v.indexOf('alun') === 0 ? 'Aluno' : v.indexOf('prof') === 0 ? 'Professor'
+               : v.indexOf('serv') === 0 ? 'Servidor' : v.indexOf('grupo') === 0 ? 'Grupo ou setor' : v.indexOf('perfil') === 0 ? 'Perfil' : '';
+      var sel = document.getElementById('vinculo');
+      for (var i = 0; alvo && i < sel.options.length; i++) {
+        if (sel.options[i].text === alvo) { sel.selectedIndex = i; break; }
+      }
+    })();
+  </script>
   <script src="../assets/js/auth.js"></script>
   <script src="../assets/js/layout.js"></script>
-  <script src="../assets/js/dados-demo.js"></script>
   <script src="../assets/js/visuais.js"></script>
   <script src="../assets/js/runtime-config.js"></script>
   <script src="../assets/js/api.js"></script>
-  <script src="../assets/js/salz-actions.js"></script>
-  <script src="../assets/js/reservas.js"></script>
+  <script src="../assets/js/salz-actions.js"></script><script src="../assets/js/fluxo-emprestimos.js"></script>
 </body>
 </html>

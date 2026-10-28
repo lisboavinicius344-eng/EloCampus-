@@ -45,9 +45,9 @@
               </div>
 
               <div class="field col-2">
-                <label for="f-foto">Foto do equipamento <span class="muted">(opcional)</span></label>
+                <label for="f-foto">Foto de referência <span class="muted">(não sincronizada)</span></label>
                 <input class="input file-input" id="f-foto" type="file" accept="image/*" aria-describedby="d-foto e-foto">
-                <span class="hint" id="d-foto">Envie uma foto para identificar o item no cadastro e nos detalhes.</span>
+                <span class="hint" id="d-foto">A API atual não armazena fotos; a imagem não será mantida após recarregar.</span>
                 <span class="field-erro" id="e-foto"></span>
                 <div class="foto-preview" id="foto-preview" hidden><img id="foto-preview-img" alt="Pré-visualização da foto do equipamento"><button class="btn btn-ghost btn-sm" type="button" id="remover-foto">Remover foto</button></div>
               </div>
@@ -72,9 +72,7 @@
             <div class="form-grid">
               <div class="field">
                 <label for="f-categoria">Tipo ou categoria</label>
-                <input class="input" id="f-categoria" type="text" maxlength="60" list="lista-categorias"
-                       autocomplete="off" placeholder="Escolha ou digite um tipo" aria-describedby="e-categoria" required>
-                <datalist id="lista-categorias"></datalist>
+                <input class="input" id="f-categoria" type="text" maxlength="80" list="lista-categorias" autocomplete="off" placeholder="Escolha uma sugestão ou digite uma categoria" aria-describedby="e-categoria d-categoria" required><datalist id="lista-categorias"></datalist><span class="hint" id="d-categoria">Se a categoria ainda não existir, ela será criada ao salvar.</span>
                 <span class="field-erro" id="e-categoria"></span>
               </div>
 
@@ -86,6 +84,7 @@
                 <span class="field-erro" id="e-setor"></span>
               </div>
 
+              <div class="field"><label for="f-elegibilidade">Quem pode usar</label><select class="input" id="f-elegibilidade"><option value="todos">Todos os perfis</option><option value="somente_funcionarios">Somente professores e funcionários</option></select><span class="hint">Alunos não poderão reservar equipamentos restritos a funcionários.</span></div>
               <div class="field">
                 <label for="f-condicao">Condição física</label>
                 <select class="input" id="f-condicao" aria-describedby="e-condicao" required>
@@ -124,7 +123,7 @@
 
   <script src="../assets/js/auth.js"></script>
   <script src="../assets/js/layout.js"></script>
-  <script src="../assets/js/dados-demo.js"></script><script src="../assets/js/visuais.js"></script>
+  <script src="../assets/js/visuais.js"></script>
   <script src="../assets/js/runtime-config.js"></script>
   <script src="../assets/js/api.js"></script>
   <script src="../assets/js/equipamento-form.js"></script>
