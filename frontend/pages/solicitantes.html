@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0B1020">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Solicitantes — ELO Campus</title>
+  <link rel="icon" type="image/png" href="../assets/img/logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="stylesheet" href="../assets/css/layout.css">
+  <link rel="stylesheet" href="../assets/css/solicitantes.css">
+</head>
+<body data-pagina="solicitantes">
+  <div class="app">
+    <aside class="sidebar" id="sidebar"></aside>
+    <div class="content">
+      <header class="topbar" id="topbar"></header>
+      <main class="main">
+        <header class="page-head">
+          <div>
+            <h1>Solicitantes</h1>
+            <p>Cadastre as pessoas que podem receber equipamentos e vincule o acesso ao cadastro correto.</p>
+          </div>
+          <button class="btn btn-ghost" id="solicitantes-atualizar" type="button">Atualizar lista</button>
+        </header>
+
+        <div id="solicitantes-aviso" class="alert" role="status" aria-live="polite" hidden></div>
+
+        <section class="solicitantes-grid">
+          <section class="card solicitante-form-card" aria-labelledby="solicitante-form-titulo">
+            <div class="solicitante-card-heading">
+              <span class="solicitante-icon" aria-hidden="true">＋</span>
+              <div>
+                <h2 id="solicitante-form-titulo">Novo solicitante</h2>
+                <p class="muted">O cadastro é separado da conta de acesso ao site.</p>
+              </div>
+            </div>
+            <div class="solicitante-help">
+              <strong>Por que isso é necessário?</strong>
+              <p>O cadastro de solicitante é separado do login. Apenas discentes/alunos e docentes/professores usam o código para criar uma conta. Servidores, técnicos e externos ficam cadastrados para a equipe identificar no empréstimo e não têm autocadastro previsto nesta API.</p>
+            </div>
+            <form id="solicitante-form" class="stack" novalidate>
+              <input id="solicitante-form-id" type="hidden">
+              <div class="field">
+                <label for="solicitante-nome">Nome completo *</label>
+                <input class="input input-block" id="solicitante-nome" name="nome" maxlength="120" autocomplete="name" required>
+              </div>
+              <div class="field">
+                <label for="solicitante-tipo">Vínculo *</label>
+                <select class="input input-block" id="solicitante-tipo" name="tipo" required>
+                  <option value="aluno">Discente / Aluno</option>
+                  <option value="professor">Docente / Professor</option>
+                  <option value="servidor">Servidor</option>
+                  <option value="tecnico">Técnico</option>
+                  <option value="externo">Externo</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="solicitante-setor">Setor, curso ou unidade</label>
+                <input class="input input-block" id="solicitante-setor" name="setor" maxlength="100" autocomplete="organization">
+              </div>
+              <div class="field">
+                <label for="solicitante-email">E-mail</label>
+                <input class="input input-block" id="solicitante-email" name="email" type="email" maxlength="254" autocomplete="email">
+              </div>
+              <div class="field">
+                <label for="solicitante-telefone">Telefone</label>
+                <input class="input input-block" id="solicitante-telefone" name="telefone" type="tel" maxlength="30" autocomplete="tel">
+              </div>
+              <div class="solicitante-form-actions">
+                <button class="btn btn-primary" id="solicitante-salvar" type="submit">Cadastrar solicitante</button>
+                <button class="btn btn-ghost" id="solicitante-cancelar" type="button" hidden>Cancelar edição</button>
+              </div>
+            </form>
+          </section>
+
+          <section class="card solicitante-list-card" aria-labelledby="solicitante-lista-titulo">
+            <div class="solicitante-list-heading">
+              <div>
+                <h2 id="solicitante-lista-titulo">Cadastros existentes</h2>
+                <p class="muted">O código é o ID devolvido pela API — não é necessariamente a matrícula institucional.</p>
+              </div>
+              <span class="solicitante-count" id="solicitante-contagem" aria-live="polite">—</span>
+            </div>
+            <div class="solicitante-filters">
+              <div class="field">
+                <label for="solicitante-busca">Pesquisar</label>
+                <input class="input input-block" id="solicitante-busca" type="search" placeholder="Nome, código ou e-mail" autocomplete="off">
+              </div>
+              <div class="field">
+                <label for="solicitante-status">Situação</label>
+                <select class="input input-block" id="solicitante-status">
+                  <option value="ativos">Ativos</option>
+                  <option value="todos">Todos</option>
+                  <option value="inativos">Inativos</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="solicitante-filtro-tipo">Vínculo</label>
+                <select class="input input-block" id="solicitante-filtro-tipo">
+                  <option value="">Todos</option>
+                  <option value="aluno">Discente / Aluno</option>
+                  <option value="professor">Docente / Professor</option>
+                  <option value="servidor">Servidor</option>
+                  <option value="tecnico">Técnico</option>
+                  <option value="externo">Externo</option>
+                </select>
+              </div>
+            </div>
+            <div class="table-wrap">
+              <table class="table solicitantes-table">
+                <thead><tr><th>Código</th><th>Solicitante</th><th>Vínculo</th><th>Contato</th><th>Situação</th><th>Ações</th></tr></thead>
+                <tbody id="solicitantes-tbody"><tr><td colspan="6" class="estado-vazio">Carregando cadastros da API…</td></tr></tbody>
+              </table>
+            </div>
+            <p class="muted small solicitante-table-note">Contas de acesso são gerenciadas separadamente. Nunca informe ou solicite senhas nesta tela.</p>
+          </section>
+        </section>
+      </main>
+    </div>
+  </div>
+  <script src="../assets/js/runtime-config.js"></script>
+  <script src="../assets/js/api.js"></script>
+  <script src="../assets/js/auth.js"></script>
+  <script src="../assets/js/layout.js"></script>
+  <script src="../assets/js/solicitantes-manager.js"></script>
+</body>
+</html>

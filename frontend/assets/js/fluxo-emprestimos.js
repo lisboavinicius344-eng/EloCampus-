@@ -16,6 +16,7 @@
   if (!parametrosIniciais.get("nome") && !usuarioFinal) return;
   const mensagem = $("emprestimo-mensagem");
   const campoSolicitante = $("solicitante");
+  let solicitantesDisponiveis = [];
   const campoVinculo = $("vinculo");
   const campoEquipamento = $("equip");
   const listaEquipamentos = $("lista-equipamentos-selecionados");
@@ -42,7 +43,7 @@
 
   if (usuarioFinal) {
     const nomeSessao = String(sessaoAtual?.nome || "").trim();
-    campoSolicitante.value = nomeSessao + (sessaoAtual?.matricula ? ` · ${sessaoAtual.matricula}` : "");
+    campoSolicitante.value = nomeSessao;
     campoSolicitante.readOnly = true;
     campoVinculo.value = vinculosPerfil[perfilAtual] || "Servidor";
     campoVinculo.disabled = true;
@@ -56,8 +57,8 @@
     document.querySelectorAll("[data-resumo-interno]").forEach((linha) => { linha.hidden = true; });
     const h1 = document.querySelector(".page-head h1");
     const intro = document.querySelector(".page-head p");
-    if (h1) h1.textContent = "Pedir empréstimo";
-    if (intro) intro.textContent = "Escolha os equipamentos e diga até quando precisa deles.";
+    if (h1) h1.textContent = "Reservar equipamento";
+    if (intro) intro.textContent = "Escolha os equipamentos e envie sua solicitação para a equipe.";
     const tituloEquipamentos = $("t-equip"); if (tituloEquipamentos) tituloEquipamentos.textContent = "O que você precisa?";
     const labelEquipamento = document.querySelector('label[for="equip"]');
     if (labelEquipamento) labelEquipamento.textContent = "Buscar pelo nome ou código do item";
@@ -122,6 +123,17 @@
   (async () => {
     try {
       equipamentos = await ELO.equipamentos();
+      if (!usuarioFinal) {
+        try {
+          solicitantesDisponiveis = (await ELO.solicitantes()).filter(x => x.ativo !== false);
+          campoSolicitante.removeAttribute("readonly"); campoSolicitante.type = "text";
+          const select = document.createElement("select"); select.id = "solicitante-id-select"; select.className = campoSolicitante.className; select.required = true;
+          select.add(new Option("Selecione um solicitante", ""));
+          solicitantesDisponiveis.forEach(x => select.add(new Option(`${x.nome} · código ${x.id}`, String(x.id))));
+          campoSolicitante.hidden = true; campoSolicitante.required = false; campoSolicitante.parentElement.insertBefore(select, campoSolicitante);
+          select.addEventListener("change", () => { const x=solicitantesDisponiveis.find(y=>String(y.id)===select.value); campoSolicitante.value=x?.nome||""; $("resumo-solicitante").textContent=x?`${x.nome} · #${x.id}`:"—"; });
+        } catch (e) { mostrarMensagem(`Não foi possível carregar solicitantes: ${e.message}`); }
+      }
       const disponiveis = equipamentos.filter((e) => e.situacao === "disponivel");
       $("lista-equipamentos").innerHTML = disponiveis.map((e) => `<option value="${esc(e.patrimonio)}" label="${esc(e.nome)}"></option><option value="${esc(nomeData(e))}"></option>`).join("");
       const itemInicial = parametrosIniciais.get("equipamentoId");
@@ -159,13 +171,14 @@
     event.preventDefault();
     esconderMensagem();
     if (!form.reportValidity()) return;
-    if (!campoSolicitante.value.trim()) return mostrarMensagem("Selecione um solicitante na página Usuários.");
+    if (!usuarioFinal && !$("solicitante-id-select")?.value) return mostrarMensagem("Selecione um solicitante cadastrado.");
     if (!selecionados.length) return mostrarMensagem("Adicione pelo menos um equipamento antes de continuar.");
     const retirada = new Date($("retirada").value);
     const devolucao = new Date($("devolucao").value);
     if (!Number.isFinite(retirada.getTime()) || !Number.isFinite(devolucao.getTime()) || devolucao <= retirada) return mostrarMensagem("A devolução prevista deve ocorrer depois da retirada.");
     dadosParaConfirmar = {
-      solicitante: usuarioFinal ? String(sessaoAtual?.nome || "").trim() : campoSolicitante.value.split(" · ")[0].trim(),
+      solicitante: usuarioFinal ? String(sessaoAtual?.nome || "").trim() : campoSolicitante.value.trim(),
+      solicitante_id: usuarioFinal ? undefined : Number($("solicitante-id-select")?.value),
       matricula: usuarioFinal ? String(sessaoAtual?.matricula || "") : (parametrosIniciais.get("matricula") || ""),
       vinculo: usuarioFinal ? vinculosPerfil[perfilAtual] : campoVinculo.value,
       equipamentos: selecionados.map((e) => e.id),
@@ -174,7 +187,7 @@
       finalidade: $("finalidade").value,
       observacoes: $("obs").value.trim(),
     };
-    resumoReview.innerHTML = `<div class="stack-sm">${usuarioFinal ? "" : `<div class="summary-row"><span>Solicitante</span><strong>${esc(dadosParaConfirmar.solicitante)}</strong></div><div class="summary-row"><span>Vínculo</span><strong>${esc(dadosParaConfirmar.vinculo)}</strong></div><div class="summary-row"><span>Retirada</span><strong>${esc(formatarCampoData($("retirada").value))}</strong></div>`}<div class="summary-row"><span>Devolução prevista</span><strong>${esc(formatarCampoData($("devolucao").value))}</strong></div><div><strong>Equipamentos</strong><ul>${selecionados.map((e) => `<li>${esc(e.nome)} · ${esc(e.patrimonio)}</li>`).join("")}</ul></div>${dadosParaConfirmar.observacoes ? `<p><strong>Observações:</strong> ${esc(dadosParaConfirmar.observacoes)}</p>` : ""}</div><p class="muted">${usuarioFinal ? "Esta demonstração salva o pedido apenas neste navegador; ele ainda não é um registro oficial." : "A confirmação registrará a operação apenas na fonte local deste navegador até a integração com o servidor."}</p>`;
+    resumoReview.innerHTML = `<div class="stack-sm">${usuarioFinal ? "" : `<div class="summary-row"><span>Solicitante</span><strong>${esc(dadosParaConfirmar.solicitante)}</strong></div><div class="summary-row"><span>Vínculo</span><strong>${esc(dadosParaConfirmar.vinculo)}</strong></div><div class="summary-row"><span>Retirada</span><strong>${esc(formatarCampoData($("retirada").value))}</strong></div>`}<div class="summary-row"><span>Devolução prevista</span><strong>${esc(formatarCampoData($("devolucao").value))}</strong></div><div><strong>Equipamentos</strong><ul>${selecionados.map((e) => `<li>${esc(e.nome)} · ${esc(e.patrimonio)}</li>`).join("")}</ul></div>${dadosParaConfirmar.observacoes ? `<p><strong>Observações:</strong> ${esc(dadosParaConfirmar.observacoes)}</p>` : ""}</div><p class="muted">${usuarioFinal ? "Seu pedido será enviado ao servidor para análise da equipe. O equipamento só estará liberado após aprovação e registro da retirada." : "A confirmação enviará a retirada para registro no sistema oficial."}</p>`;
     form.hidden = true;
     formReview.hidden = false;
     $("confirmar-emprestimo").focus();
@@ -185,8 +198,13 @@
     if (!dadosParaConfirmar) return mostrarMensagem("Revise os dados antes de confirmar.");
     const botao = $("confirmar-emprestimo"); botao.disabled = true;
     try {
-      await ELO.registrarEmprestimo(dadosParaConfirmar);
-      location.href = usuarioFinal ? "emprestimos.html?salvo=registrado" : "emprestimos.html?salvo=registrado";
+      if (usuarioFinal) {
+        await ELO.criarReserva({ equipamentos: dadosParaConfirmar.equipamentos.map(Number), data_inicio: dadosParaConfirmar.retirada, data_fim: dadosParaConfirmar.prevista, observacoes: [dadosParaConfirmar.finalidade, dadosParaConfirmar.observacoes].filter(Boolean).join(" — ") || null });
+        location.href = "reservas.html?salvo=registrado";
+      } else {
+        await ELO.registrarEmprestimo(dadosParaConfirmar);
+        location.href = "emprestimos.html?salvo=registrado";
+      }
     } catch (error) {
       formReview.hidden = true; form.hidden = false;
       mostrarMensagem(error.message || "Não foi possível registrar o empréstimo.");

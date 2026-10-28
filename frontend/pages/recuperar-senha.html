@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0B1020">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Recuperar acesso — ELO Campus</title>
+  <meta name="description" content="Solicite instruções para recuperar o acesso ao ELO Campus.">
+  <link rel="icon" type="image/png" href="../assets/img/logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="stylesheet" href="../assets/css/login.css">
+  <style>
+    .recovery-note{margin:.75rem 0;padding:.85rem 1rem;border:1px solid rgba(139,92,246,.28);border-radius:12px;background:rgba(139,92,246,.08);color:var(--text-secondary,#cbd5e1);font-size:.9rem;line-height:1.55}
+    #recuperar-form{display:grid;gap:1rem}
+    #recuperar-btn{width:100%;min-height:50px}
+    .recovery-actions{display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap;margin-top:1rem}
+    .recovery-actions a{color:var(--accent,#a78bfa);font-weight:600}
+  </style>
+</head>
+<body class="auth-page auth-page-recovery">
+  <main class="login">
+    <section class="brand-side" aria-label="Apresentação do sistema">
+      <div class="brand"><img src="../assets/img/logo.png" alt=""><span class="brand-name">ELO Campus<span class="brand-sub">Instituição - Campus Lapa</span></span></div>
+      <div class="hero">
+        <img class="interlace-mark" src="../assets/img/logo-draw.svg" alt="Logo ELO Campus">
+        <h1>Seu acesso pode ser recuperado com segurança.</h1>
+        <p>Solicite novas instruções pelo e-mail cadastrado. Por segurança, a tela não informa se um endereço está registrado e nunca mostra senhas.</p>
+      </div>
+      <p class="brand-foot">Acesso seguro ao ELO Campus</p>
+    </section>
+    <section class="form-side" aria-labelledby="titulo-recuperacao">
+      <div class="mobile-brand"><img src="../assets/img/logo-draw.svg" alt=""><strong>ELO Campus</strong></div>
+      <div class="card">
+        <div class="card-head">
+          <div class="auth-feature-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m4 7 8 6 8-6"/><path d="M16.5 3.5 18 2l1.5 1.5"/></svg><span>Recuperação protegida</span></div>
+          <span class="auth-kicker"><span aria-hidden="true"></span> Recuperação de acesso</span>
+          <h2 id="titulo-recuperacao">Esqueci minha senha</h2>
+          <p>Informe o e-mail associado à sua conta.</p>
+        </div>
+        <div id="recuperacao-mensagem" class="alert alert-info" role="status" aria-live="polite" hidden></div>
+        <form id="recuperar-form" novalidate>
+          <div class="field">
+            <label for="email-recuperacao">E-mail institucional</label>
+            <input class="input" id="email-recuperacao" name="email" type="email" autocomplete="email" inputmode="email" maxlength="254" placeholder="voce@instituicao.edu.br" required autofocus>
+          </div>
+          <div class="recovery-note">Se a recuperação estiver habilitada, você receberá uma senha provisória por e-mail. Ela será temporária e deverá ser trocada no primeiro acesso.</div>
+          <button class="btn btn-primary" id="recuperar-btn" type="submit">Enviar instruções</button>
+        </form>
+        <nav class="recovery-actions" aria-label="Outras opções"><a href="../index.html">Voltar ao login</a><a href="cadastro.html">Criar conta</a><a href="privacidade.html">Aviso de privacidade</a></nav>
+      </div>
+    </section>
+  </main>
+  <script src="../assets/js/runtime-config.js"></script>
+  <script src="../assets/js/api.js"></script>
+  <script src="../assets/js/recuperar-senha.js"></script>
+</body>
+</html>

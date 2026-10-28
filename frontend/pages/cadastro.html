@@ -15,7 +15,7 @@
   <link rel="stylesheet" href="../assets/css/style.css">
   <link rel="stylesheet" href="../assets/css/login.css">
 </head>
-<body>
+<body class="auth-page auth-page-cadastro">
   <main class="login">
 
     <section class="brand-side" aria-label="Apresentação do sistema">
@@ -30,7 +30,7 @@
         <img class="interlace-mark" src="../assets/img/logo-draw.svg" alt="Logo ELO Campus, marca em degradê violeta e rosa">
 
         <h1>Crie sua conta e comece a solicitar equipamentos.</h1>
-        <p>Cadastre-se como discente, docente ou servidor para solicitar empréstimos, devolver itens e acompanhar seus registros.</p>
+        <p>Vincule seu cadastro institucional e receba uma senha provisória para ativar sua conta.</p>
       </div>
 
       <p class="brand-foot">Projeto de estágio — Desenvolvimento de Sistemas</p>
@@ -44,88 +44,39 @@
 
       <div class="card card-wide">
         <div class="card-head">
+          <div class="auth-feature-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0M18 8v6M15 11h6"/></svg><span>Etapa 1 · Identificação</span></div>
           <span class="auth-kicker"><span aria-hidden="true"></span> Novo cadastro</span>
           <h2 id="titulo-cadastro">Criar conta</h2>
-          <p>Preencha os dados abaixo. Contas administrativas são criadas apenas pela administração.</p>
+          <p>O autocadastro está disponível para discentes e docentes com um cadastro de solicitante ativo. Informe o código fornecido pela equipe.</p>
         </div>
 
         <div id="cadastro-erro" class="alert alert-error" role="alert" aria-live="polite" hidden></div>
+        <div id="cadastro-sucesso" class="alert alert-ok" role="status" aria-live="polite" hidden></div>
 
         <form id="cadastro-form" novalidate>
-          <fieldset class="access-picker">
-            <legend>Qual é o seu vínculo?</legend>
-            <div class="access-options access-options-3">
-              <label class="access-option">
-                <input type="radio" name="perfil" value="aluno" checked>
-                <span class="access-option-card">
-                  <span class="access-copy"><strong>Discente</strong><small>Aluno(a)</small></span>
-                  <span class="access-check" aria-hidden="true"></span>
-                </span>
-              </label>
-              <label class="access-option">
-                <input type="radio" name="perfil" value="professor">
-                <span class="access-option-card">
-                  <span class="access-copy"><strong>Docente</strong><small>Professor(a)</small></span>
-                  <span class="access-check" aria-hidden="true"></span>
-                </span>
-              </label>
-              <label class="access-option">
-                <input type="radio" name="perfil" value="servidor">
-                <span class="access-option-card">
-                  <span class="access-copy"><strong>Servidor</strong><small>Técnico-administrativo</small></span>
-                  <span class="access-check" aria-hidden="true"></span>
-                </span>
-              </label>
-            </div>
-          </fieldset>
-
           <div class="field">
             <label for="nome">Nome completo</label>
             <input class="input" id="nome" name="nome" type="text" autocomplete="name" placeholder="Digite seu nome completo" required autofocus>
-            <p class="field-erro" id="nome-erro"></p>
           </div>
-
-          <div class="form-grid-2">
-            <div class="field">
-              <label for="email">E-mail</label>
-              <input class="input" id="email" name="email" type="email" autocomplete="email" placeholder="voce@lapa.edu.br" required>
-              <p class="field-erro" id="email-erro"></p>
-            </div>
-            <div class="field">
-              <label for="matricula">Matrícula</label>
-              <input class="input" id="matricula" name="matricula" type="text" inputmode="text" placeholder="Sua matrícula" required>
-              <p class="field-erro" id="matricula-erro"></p>
-            </div>
-          </div>
-
           <div class="field">
-            <label for="usuario">Usuário</label>
-            <input class="input" id="usuario" name="usuario" type="text" autocomplete="username" placeholder="Escolha um nome de usuário" required>
-            <p class="field-erro" id="usuario-erro"></p>
+            <label for="email">E-mail</label>
+            <input class="input" id="email" name="email" type="email" autocomplete="email" placeholder="voce@instituicao.edu.br" required>
           </div>
-
-          <div class="form-grid-2">
-            <div class="field">
-              <label for="senha">Senha</label>
-              <div class="input-wrap">
-                <input class="input" id="senha" name="senha" type="password" autocomplete="new-password" placeholder="Mín. 6 caracteres" required>
-                <button class="input-toggle" id="senha-toggle" type="button" aria-controls="senha" aria-pressed="false">Mostrar</button>
-              </div>
-              <p class="field-erro" id="senha-erro"></p>
-            </div>
-            <div class="field">
-              <label for="senha2">Confirmar senha</label>
-              <input class="input" id="senha2" name="senha2" type="password" autocomplete="new-password" placeholder="Repita a senha" required>
-              <p class="field-erro" id="senha2-erro"></p>
-            </div>
+          <div class="field">
+            <label for="solicitante_id">Código do solicitante</label>
+            <input class="input" id="solicitante_id" name="solicitante_id" type="text" inputmode="numeric" pattern="[0-9]+" autocomplete="off" placeholder="Ex.: 30" aria-describedby="solicitante-ajuda" required>
+            <small class="muted" id="solicitante-ajuda">Este código é o ID do cadastro no ELO Campus, não necessariamente sua matrícula. A equipe precisa cadastrar você primeiro na área “Solicitantes”.</small>
           </div>
-
-          <button class="btn btn-primary" id="cadastro-btn" type="submit">Criar conta</button>
+          <button class="btn btn-primary" id="cadastro-btn" type="submit">Solicitar acesso</button>
         </form>
+        <div class="alert alert-info cadastro-prerequisito" role="note">
+          <strong>Ainda não tem o código?</strong> Não use sua matrícula como substituto. Solicite à equipe de atendimento que crie seu cadastro de solicitante e informe o código retornado pelo sistema.
+        </div>
 
         <p class="card-foot">
-          <span class="login-note">Cadastro de demonstração: os dados ficam salvos apenas neste navegador até a integração com o servidor.</span>
+          Após o cadastro, você receberá uma senha provisória por e-mail. Ela é válida por 24 horas e deverá ser trocada no primeiro acesso.
           Já tem uma conta? <a href="../index.html">Voltar para o login</a>
+          <span class="muted"> · </span><a href="privacidade.html">Aviso de privacidade</a>
         </p>
       </div>
     </section>

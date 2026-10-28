@@ -1,83 +1,89 @@
-/* ELO Campus — autenticação de demonstração e gestão da sessão local.
- * A validação real deve ser fornecida pelo backend/API. Os perfis abaixo são
- * apenas contas locais para demonstrar a navegação enquanto essa integração não existe.
- */
+/* ELO Campus — autenticação institucional. Senhas nunca são persistidas no navegador. */
 "use strict";
 
-const AUTH_MODE = "demo";
 const SESSION_KEY = "elo.sessao";
-const REMEMBER_KEY = "elo.sessao.lembrar";
+const REMEMBER_EMAIL_KEY = "elo.login.salvo";
 const DASHBOARD_URL = "pages/dashboard.html";
-const PERFIS_VALIDOS = new Set(["administrador", "operador", "aluno", "professor", "servidor"]);
-const PERFIS_EQUIPE = new Set(["administrador", "operador"]);
-const PERFIS_USUARIO = new Set(["aluno", "professor", "servidor"]);
+const PERFIS_VALIDOS = new Set(["administrador", "operador", "aluno", "professor"]);
 
-const CONTAS_DEMO = [
-  { login: "admin", senha: "admin123", nome: "Administrador", perfil: "administrador", email: "admin@instituicao.edu.br", telefone: "(77) 99999-0000", matricula: "ADM-0001", setor: "Direção", instituicao: "Instituição de Ensino", campus: "Campus Lapa" },
-  { login: "operador", senha: "operador123", nome: "Operador", perfil: "operador", email: "operador@instituicao.edu.br", telefone: "(77) 98888-1111", matricula: "SRV-0024", setor: "Coordenação de TI", instituicao: "Instituição de Ensino", campus: "Campus Lapa" },
-  { login: "aluno", senha: "aluno123", nome: "Mariana Costa", perfil: "aluno", email: "mariana@lapa.edu.br", matricula: "2024118", instituicao: "Instituição de Ensino", campus: "Campus Lapa" },
-  { login: "professor", senha: "professor123", nome: "Prof. Ricardo Alves", perfil: "professor", email: "ricardo.alves@lapa.edu.br", matricula: "SIAPE 1048873", instituicao: "Instituição de Ensino", campus: "Campus Lapa" },
-  { login: "servidor", senha: "servidor123", nome: "Servidor de demonstração", perfil: "servidor", email: "servidor@lapa.edu.br", matricula: "SRV-DEMO-01", setor: "Campus Lapa", instituicao: "Instituição de Ensino", campus: "Campus Lapa" },
-];
+function obterBaseApiAuth() {
+  return String(window.ELO_API_BASE_URL || "").replace(/\/+$/, "");
+}
 
-const CONTAS_KEY = "elo.contas.cadastradas";
-
-// Contas criadas na tela de cadastro (somente demonstração, salvas neste navegador).
-// Com o backend conectado, o cadastro deve ser enviado à API e este armazenamento removido.
-function contasCadastradas() {
+async function autenticar(email, senha) {
+  const base = obterBaseApiAuth();
+  if (!base) throw new Error("O serviço de autenticação não está configurado. Procure a equipe técnica.");
+  let resposta;
   try {
-    const lista = JSON.parse(localStorage.getItem(CONTAS_KEY) || "[]");
-    return Array.isArray(lista) ? lista : [];
-  } catch { return []; }
+    resposta = await fetch(`${base}/auth/login`, {
+      method: "POST",
+      headers: { Accept: "application/json", "Content-Type": "application/json" },
+      body: JSON.stringify({ email: String(email || "").trim().toLowerCase(), senha }),
+      cache: "no-store",
+      credentials: "omit",
+    });
+  } catch {
+    throw new Error("Não foi possível conectar ao servidor. Verifique a conexão e tente novamente.");
+  }
+  const corpo = await resposta.json().catch(() => ({}));
+  if (!resposta.ok) {
+    const erro = new Error(resposta.status === 500 ? "Ocorreu um erro interno. Tente novamente em instantes." : (corpo.erro || corpo.mensagem || "Não foi possível entrar. Confira suas credenciais e tente novamente."));
+    erro.status = resposta.status;
+    erro.codigo = corpo.codigo;
+    throw erro;
+  }
+  const usuarioBruto = corpo.usuario || {};
+  const chavesSecretas = new Set(["senha", "senhaprovisoria", "senhaatual", "novasenha", "password", "temporarypassword", "passwordhash", "senhahash", "token", "accesstoken", "refreshtoken", "resettoken", "tokenrecuperacao"]);
+  const limparCamposSecretos = (valor) => {
+    if (Array.isArray(valor)) return valor.map(limparCamposSecretos);
+    if (!valor || typeof valor !== "object") return valor;
+    return Object.fromEntries(Object.entries(valor)
+      .filter(([chave]) => !chavesSecretas.has(String(chave).toLowerCase().replace(/[_\s-]/g, "")))
+      .map(([chave, conteudo]) => [chave, limparCamposSecretos(conteudo)]));
+  };
+  const usuario = limparCamposSecretos(usuarioBruto);
+  const papelApi = String(usuario.papel || usuario.perfil || "").toLowerCase();
+  const perfil = ({ admin: "administrador", administrador: "administrador", operador: "operador", aluno: "aluno", professor: "professor" })[papelApi];
+  if (!corpo.token || !usuario.id || !perfil) throw new Error("A resposta de autenticação do servidor está incompleta. Procure a equipe técnica.");
+  return {
+    ...usuario,
+    usuario,
+    perfil,
+    login: usuario.email,
+    token: corpo.token,
+    nome: usuario.nome,
+    solicitante_id: usuario.solicitante_id,
+    deve_trocar_senha: Boolean(usuario.deve_trocar_senha),
+  };
 }
 
-function loginEmUso(login) {
-  const alvo = String(login || "").trim().toLowerCase();
-  return [...CONTAS_DEMO, ...contasCadastradas()].some((c) => String(c.login).toLowerCase() === alvo);
-}
-
-function cadastrarConta(dados) {
-  if (loginEmUso(dados.login)) throw new Error("Este usuário já está em uso. Escolha outro.");
-  const lista = contasCadastradas();
-  lista.push({ ...dados, instituicao: "Instituição de Ensino", campus: "Campus Lapa" });
-  localStorage.setItem(CONTAS_KEY, JSON.stringify(lista));
-}
-
-async function autenticar(login, senha) {
-  // Simula apenas latência visual; não representa autenticação institucional.
-  await new Promise((resolve) => setTimeout(resolve, 250));
-  const conta = [...CONTAS_DEMO, ...contasCadastradas()].find((item) => item.login === login && item.senha === senha);
-  if (!conta) throw new Error("Usuário ou senha incorretos. Confira os dados e tente novamente.");
-  const { senha: _senhaDaConta, ...dadosDaConta } = conta;
-  return { ...dadosDaConta, token: "demo" };
-}
-
-function salvarSessao(sessao, lembrar = false) {
-  const alvo = lembrar ? localStorage : sessionStorage;
-  alvo.setItem(SESSION_KEY, JSON.stringify(sessao));
-  if (lembrar) sessionStorage.removeItem(SESSION_KEY);
-  else localStorage.removeItem(SESSION_KEY);
+// Tokens ficam apenas na sessão atual do navegador, nunca em localStorage.
+function salvarSessao(sessao) {
+  sessionStorage.setItem(SESSION_KEY, JSON.stringify(sessao));
+  try { localStorage.removeItem(SESSION_KEY); } catch { /* armazenamento local pode estar bloqueado */ }
 }
 
 function obterSessao() {
-  for (const store of [sessionStorage, localStorage]) {
-    try {
-      const valor = store.getItem(SESSION_KEY);
-      if (valor) return JSON.parse(valor);
-    } catch { /* armazenamento indisponível ou conteúdo inválido */ }
+  try {
+    const atual = sessionStorage.getItem(SESSION_KEY);
+    if (atual) return JSON.parse(atual);
+  } catch {
+    try { sessionStorage.removeItem(SESSION_KEY); } catch { /* noop */ }
   }
+  // Tokens persistidos por versões antigas são invalidados e removidos, nunca restaurados.
+  try { localStorage.removeItem(SESSION_KEY); } catch { /* armazenamento local pode estar bloqueado */ }
   return null;
 }
 
 function limparSessao() {
-  sessionStorage.removeItem(SESSION_KEY);
-  localStorage.removeItem(SESSION_KEY);
+  try { sessionStorage.removeItem(SESSION_KEY); } catch { /* noop */ }
+  try { localStorage.removeItem(SESSION_KEY); } catch { /* noop */ }
 }
 
 function sair() {
   limparSessao();
-  localStorage.removeItem("elo.login.salvo");
-  window.location.href = "../index.html";
+  const caminho = window.location.pathname.includes("/pages/") ? "../index.html" : "index.html";
+  window.location.href = caminho;
 }
 
 (function inicializarLogin() {
@@ -89,46 +95,69 @@ function sair() {
   const login = document.getElementById("login");
   const senha = document.getElementById("senha");
   const toggle = document.getElementById("senha-toggle");
-  const lembrar = document.getElementById("lembrar");
-  const recuperar = document.getElementById("esqueci-senha");
-  const tiposAcesso = [...form.querySelectorAll('input[name="tipo-acesso"]')];
+  const lembrarEmail = document.getElementById("lembrar");
+
+  login.type = "email";
+  login.autocomplete = "username";
+  login.placeholder = "voce@instituicao.edu.br";
+  const label = form.querySelector('label[for="login"]');
+  if (label) label.textContent = "E-mail institucional";
+  const cartaoLogin = form.closest?.(".card");
+  const cabecalho = cartaoLogin?.querySelector(".card-head p");
+  if (cabecalho) cabecalho.textContent = "Entre com seu e-mail institucional e sua senha.";
+  const notaLogin = document.querySelector(".login-note");
+  if (notaLogin) notaLogin.textContent = "No primeiro acesso, use a senha provisória recebida por e-mail e crie sua senha pessoal.";
+  const seletor = form.querySelector(".access-picker");
+  if (seletor) seletor.hidden = true;
 
   const mostrarMensagem = (texto, tipo = "error") => {
     erro.textContent = texto;
     erro.className = `alert ${tipo === "info" ? "alert-info" : tipo === "ok" ? "alert-ok" : "alert-error"}`;
     erro.hidden = false;
   };
-  const tipoSelecionado = () => form.querySelector('input[name="tipo-acesso"]:checked')?.value || "usuario";
-  const acessoCombina = (perfil, tipo) => tipo === "administracao"
-    ? PERFIS_EQUIPE.has(String(perfil || "").toLowerCase())
-    : PERFIS_USUARIO.has(String(perfil || "").toLowerCase());
 
-  try {
-    const params = new URLSearchParams(window.location.search);
-    if (params.get("cadastro") === "ok") {
-      mostrarMensagem("Conta criada com sucesso! Entre com seu usuário e senha.", "ok");
-      const novo = sessionStorage.getItem("elo.cadastro.login");
-      if (novo) { login.value = novo; sessionStorage.removeItem("elo.cadastro.login"); }
-      window.history.replaceState(null, "", window.location.pathname);
-    }
-  } catch { /* a mensagem de boas-vindas é opcional */ }
+  const parametros = new URLSearchParams(window.location.search);
+  if (parametros.get("sessao") === "expirada") mostrarMensagem("Sua sessão expirou. Entre novamente.", "info");
+  if (parametros.get("cadastro") === "ok") mostrarMensagem("Solicitação recebida. Confira seu e-mail para obter a senha provisória.", "ok");
+  if (["sessao", "cadastro"].some((chave) => parametros.has(chave))) window.history.replaceState(null, "", window.location.pathname);
 
   const sessaoAtual = obterSessao();
   if (sessaoAtual && PERFIS_VALIDOS.has(String(sessaoAtual.perfil || "").toLowerCase())) {
-    window.location.replace(DASHBOARD_URL);
+    window.location.replace(sessaoAtual.deve_trocar_senha ? "pages/trocar-senha.html" : DASHBOARD_URL);
     return;
   }
   if (sessaoAtual) limparSessao();
 
   try {
-    const salvo = localStorage.getItem("elo.login.salvo");
-    if (salvo) {
-      login.value = salvo;
-      lembrar.checked = true;
+    const emailSalvo = localStorage.getItem(REMEMBER_EMAIL_KEY);
+    if (emailSalvo && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailSalvo)) {
+      login.value = emailSalvo;
+      lembrarEmail.checked = true;
+    } else if (emailSalvo) {
+      localStorage.removeItem(REMEMBER_EMAIL_KEY);
     }
-  } catch { /* a tela continua disponível mesmo sem persistência local */ }
+  } catch { /* a tela continua disponível se o armazenamento estiver bloqueado */ }
 
-  toggle.addEventListener("click", () => {
+  // Guarda somente o endereço de e-mail, nunca a senha ou o token.
+  const persistirEmailLembrado = () => {
+    try {
+      if (!lembrarEmail.checked) {
+        localStorage.removeItem(REMEMBER_EMAIL_KEY);
+        return;
+      }
+      const endereco = login.value.trim().toLowerCase();
+      if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(endereco)) {
+        localStorage.setItem(REMEMBER_EMAIL_KEY, endereco);
+      } else {
+        localStorage.removeItem(REMEMBER_EMAIL_KEY);
+      }
+    } catch { /* recurso opcional: o login não depende do armazenamento local */ }
+  };
+  lembrarEmail.addEventListener("change", persistirEmailLembrado);
+  login.addEventListener("input", () => { if (lembrarEmail.checked) persistirEmailLembrado(); });
+  login.addEventListener("blur", persistirEmailLembrado);
+
+  toggle?.addEventListener("click", () => {
     const mostrar = senha.type === "password";
     senha.type = mostrar ? "text" : "password";
     toggle.textContent = mostrar ? "Ocultar" : "Mostrar";
@@ -137,20 +166,12 @@ function sair() {
     senha.focus({ preventScroll: true });
   });
 
-  tiposAcesso.forEach((radio) => radio.addEventListener("change", () => {
-    erro.hidden = true;
-  }));
-
-  recuperar.addEventListener("click", () => {
-    mostrarMensagem("A recuperação de senha ainda não está conectada ao servidor. Procure a administração para recuperar o acesso.", "info");
-  });
-
   form.addEventListener("submit", async (evento) => {
     evento.preventDefault();
     erro.hidden = true;
-
-    if (!login.value.trim()) {
-      mostrarMensagem("Informe seu usuário ou matrícula.");
+    const email = login.value.trim().toLowerCase();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      mostrarMensagem("Informe um endereço de e-mail válido.");
       login.focus();
       return;
     }
@@ -163,26 +184,18 @@ function sair() {
     botao.disabled = true;
     botao.textContent = "Verificando…";
     try {
-      const sessao = await autenticar(login.value.trim(), senha.value);
-      const perfil = String(sessao.perfil || "").toLowerCase();
-      if (!PERFIS_VALIDOS.has(perfil)) {
-        throw new Error("O perfil vinculado à conta não é reconhecido. Procure a administração.");
-      }
-      if (!acessoCombina(perfil, tipoSelecionado())) {
-        throw new Error(tipoSelecionado() === "administracao"
-          ? "Esta conta não possui perfil administrativo. Selecione “Discente, docente ou servidor” ou procure a administração."
-          : "Esta conta pertence à equipe administrativa. Selecione “Administrador / TI” para continuar.");
-      }
-
-      salvarSessao(sessao, lembrar.checked);
-      if (lembrar.checked) localStorage.setItem("elo.login.salvo", login.value.trim());
-      else localStorage.removeItem("elo.login.salvo");
-      window.location.replace(DASHBOARD_URL);
+      const sessao = await autenticar(email, senha.value);
+      if (!PERFIS_VALIDOS.has(String(sessao.perfil || "").toLowerCase())) throw new Error("O perfil vinculado à conta não é reconhecido. Procure a equipe responsável.");
+      salvarSessao(sessao);
+      persistirEmailLembrado();
+      senha.value = "";
+      window.location.replace(sessao.deve_trocar_senha ? "pages/trocar-senha.html" : DASHBOARD_URL);
     } catch (falha) {
       mostrarMensagem(falha.message || "Não foi possível entrar. Tente novamente.");
       botao.disabled = false;
       botao.textContent = "Entrar";
-      senha.select();
+      senha.value = "";
+      senha.focus();
     }
   });
 })();

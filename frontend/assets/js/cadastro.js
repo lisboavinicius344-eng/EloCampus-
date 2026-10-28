@@ -1,74 +1,62 @@
-/* ELO Campus — tela de cadastro de usuário (discente, docente ou servidor).
- * Depende de auth.js (cadastrarConta, obterSessao). No modo demo a conta é salva
- * neste navegador; com o backend conectado, troque cadastrarConta por uma chamada à API.
- */
+/* Cadastro de aluno com senha provisória enviada pelo backend. */
 "use strict";
 
 (function inicializarCadastro() {
   const form = document.getElementById("cadastro-form");
   if (!form) return;
 
-  if (obterSessao()) { window.location.replace("dashboard.html"); return; }
-
   const erro = document.getElementById("cadastro-erro");
+  const sucesso = document.getElementById("cadastro-sucesso");
   const botao = document.getElementById("cadastro-btn");
-  const campos = ["nome", "email", "matricula", "usuario", "senha", "senha2"]
-    .reduce((acc, id) => ({ ...acc, [id]: document.getElementById(id) }), {});
-  const toggle = document.getElementById("senha-toggle");
+  const nome = document.getElementById("nome");
+  const email = document.getElementById("email");
+  const solicitanteId = document.getElementById("solicitante_id");
 
-  const marcar = (id, texto) => {
-    const msg = document.getElementById(`${id}-erro`);
-    msg.textContent = texto || "";
-    campos[id].setAttribute("aria-invalid", texto ? "true" : "false");
+  const mostrar = (el, texto, tipo) => {
+    el.textContent = texto;
+    el.className = `alert ${tipo === "ok" ? "alert-ok" : tipo === "info" ? "alert-info" : "alert-error"}`;
+    el.hidden = false;
   };
-
-  toggle.addEventListener("click", () => {
-    const mostrar = campos.senha.type === "password";
-    campos.senha.type = campos.senha2.type = mostrar ? "text" : "password";
-    toggle.textContent = mostrar ? "Ocultar" : "Mostrar";
-    toggle.setAttribute("aria-pressed", String(mostrar));
-    toggle.setAttribute("aria-label", mostrar ? "Ocultar senha" : "Mostrar senha");
-  });
-
-  form.addEventListener("input", (e) => { if (e.target.id in campos) marcar(e.target.id, ""); });
-
-  function validar() {
-    const v = Object.fromEntries(Object.entries(campos).map(([k, el]) => [k, el.value.trim()]));
-    const erros = {};
-    if (v.nome.split(/\s+/).filter(Boolean).length < 2) erros.nome = "Informe nome e sobrenome.";
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.email)) erros.email = "Informe um e-mail válido.";
-    if (v.matricula.length < 3) erros.matricula = "Informe sua matrícula.";
-    if (!/^[a-z0-9._-]{3,}$/i.test(v.usuario)) erros.usuario = "Mínimo 3 caracteres: letras, números, ponto, hífen ou _.";
-    else if (loginEmUso(v.usuario)) erros.usuario = "Este usuário já está em uso.";
-    if (campos.senha.value.length < 6) erros.senha = "A senha deve ter ao menos 6 caracteres.";
-    if (campos.senha2.value !== campos.senha.value) erros.senha2 = "As senhas não conferem.";
-    return { v, erros };
-  }
 
   form.addEventListener("submit", async (evento) => {
     evento.preventDefault();
     erro.hidden = true;
-    const { v, erros } = validar();
-    Object.keys(campos).forEach((id) => marcar(id, erros[id]));
-    const primeiro = Object.keys(campos).find((id) => erros[id]);
-    if (primeiro) { campos[primeiro].focus(); return; }
+    sucesso.hidden = true;
+    const dados = {
+      nome: nome.value.trim(),
+      email: email.value.trim().toLowerCase(),
+      solicitante_id: /^\d+$/.test(solicitanteId.value.trim()) ? Number(solicitanteId.value.trim()) : NaN
+    };
+    if (dados.nome.split(/\s+/).filter(Boolean).length < 2) {
+      mostrar(erro, "Informe seu nome completo."); nome.focus(); return;
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(dados.email)) {
+      mostrar(erro, "Informe um endereço de e-mail válido."); email.focus(); return;
+    }
+    if (!Number.isSafeInteger(dados.solicitante_id) || dados.solicitante_id < 1) {
+      mostrar(erro, "Informe um código de solicitante válido."); solicitanteId.focus(); return;
+    }
+    if (typeof ELO === "undefined" || ELO.modo() !== "api") {
+      mostrar(erro, "O cadastro por e-mail está disponível quando o site está conectado à API.");
+      return;
+    }
 
     botao.disabled = true;
-    botao.textContent = "Criando conta…";
+    botao.textContent = "Enviando solicitação…";
     try {
-      await new Promise((r) => setTimeout(r, 250)); // latência visual da demonstração
-      const perfil = form.querySelector('input[name="perfil"]:checked').value;
-      cadastrarConta({
-        login: v.usuario, senha: campos.senha.value, nome: v.nome, perfil,
-        email: v.email, matricula: v.matricula,
-      });
-      try { sessionStorage.setItem("elo.cadastro.login", v.usuario); } catch { /* opcional */ }
-      window.location.replace("../index.html?cadastro=ok");
+      const resposta = await ELO.cadastroAluno(dados);
+      const mensagem = resposta?.mensagem || resposta?.message || "Enviamos uma senha provisória para o seu e-mail.";
+      if (resposta?.email_enviado === false) {
+        mostrar(sucesso, `${mensagem} Sua conta foi criada, mas o e-mail não foi enviado. Procure a administração para receber a senha provisória.`, "info");
+      } else {
+        mostrar(sucesso, mensagem, "ok");
+      }
+      form.reset();
     } catch (falha) {
-      erro.textContent = falha.message || "Não foi possível criar a conta. Tente novamente.";
-      erro.hidden = false;
+      mostrar(erro, falha.message || "Não foi possível concluir o cadastro. Tente novamente.");
+    } finally {
       botao.disabled = false;
-      botao.textContent = "Criar conta";
+      botao.textContent = "Solicitar acesso";
     }
   });
 })();

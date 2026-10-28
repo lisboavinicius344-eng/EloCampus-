@@ -43,8 +43,8 @@ const EloUtil = {
   const usuarioFinal = ["aluno", "professor", "servidor"].includes(perfilAtual);
   const paginaAtual = document.body.dataset.pagina;
   const arquivoAtual = window.location.pathname.split("/").pop();
-  const paginasRestritas = ["movimentacoes.html", "usuarios.html", "relatorio.html", "servidor.html", "equipamento-form.html"];
-  const paginasUsuario = ["dashboard.html", "disponiveis.html", "consulta-qr-interno.html", "emprestimos.html", "novo-emprestimo.html", "devolucoes.html", "perfil.html"];
+  const paginasRestritas = ["movimentacoes.html", "usuarios.html", "solicitantes.html", "equipamento-form.html", "manutencoes.html", "categorias.html"];
+  const paginasUsuario = ["dashboard.html", "disponiveis.html", "consulta-qr-interno.html", "emprestimos.html", "novo-emprestimo.html", "reservas.html", "perfil.html", "trocar-senha.html"];
 
   // O controle de navegação evita acessos acidentais pela URL; segurança real
   // precisa ser aplicada no backend quando a autenticação institucional existir.
@@ -62,6 +62,12 @@ const EloUtil = {
     return;
   }
   if (!publico && paginasRestritas.includes(arquivoAtual) && !equipe) {
+    window.location.replace("dashboard.html");
+    return;
+  }
+  // A API limita a gestão de contas (/usuarios) ao administrador, embora
+  // operadores também possam gerir solicitantes.
+  if (!publico && arquivoAtual === "usuarios.html" && perfilAtual !== "administrador") {
     window.location.replace("dashboard.html");
     return;
   }
@@ -92,17 +98,19 @@ const EloUtil = {
     { id: "painel", rotulo: "Painel", icone: "home", href: "dashboard.html" },
     { grupo: "Acervo", itens: [
       { id: "equipamentos", rotulo: "Equipamentos", icone: "box", href: "equipamentos.html" },
+      { id: "categorias", rotulo: "Categorias", icone: "box", href: "categorias.html" },
       { id: "consulta-qr", rotulo: "Consulta por QR Code", icone: "qr", href: "consulta-qr-interno.html" },
     ]},
     { grupo: "Empréstimos e devoluções", itens: [
       { id: "emprestimos", rotulo: "Empréstimos", icone: "swap", href: "emprestimos.html" },
       { id: "devolucoes", rotulo: "Devoluções", icone: "undo", href: "devolucoes.html" },
+      { id: "reservas", rotulo: "Reservas", icone: "swap", href: "reservas.html" },
+      { id: "manutencoes", rotulo: "Manutenções", icone: "gear", href: "manutencoes.html" },
     ]},
     { grupo: "Administração", itens: [
+      { id: "solicitantes", rotulo: "Solicitantes", icone: "people", href: "solicitantes.html" },
       { id: "movimentacoes", rotulo: "Histórico de movimentações", icone: "swap", href: "movimentacoes.html", admin: true },
-      { id: "usuarios", rotulo: "Usuários", icone: "people", href: "usuarios.html", admin: true },
-      { id: "relatorios", rotulo: "Relatórios", icone: "chart", href: "relatorio.html", admin: true },
-      { id: "servidor", rotulo: "Servidor", icone: "server", href: "servidor.html", admin: true }
+      { id: "usuarios", rotulo: "Equipe do sistema", icone: "people-admin", href: "usuarios.html", admin: true }
     ]},
     { id: "perfil", rotulo: "Configuração do perfil", icone: "gear", href: "perfil.html" },
   ];
@@ -113,8 +121,8 @@ const EloUtil = {
     { id: "painel", rotulo: "Início", icone: "home", href: "dashboard.html" },
     { id: "disponiveis", rotulo: "Ver os equipamentos", icone: "box", href: "disponiveis.html" },
     { id: "consulta-qr", rotulo: "Consultar QR Code", icone: "qr", href: "consulta-qr-interno.html" },
-    { id: "pedir", rotulo: "Pedir empréstimo", icone: "swap", href: "novo-emprestimo.html" },
-    { id: "devolucoes", rotulo: "Devolver equipamentos", icone: "undo", href: "devolucoes.html" },
+    { id: "pedir", rotulo: "Reservar equipamento", icone: "swap", href: "novo-emprestimo.html" },
+    { id: "reservas", rotulo: "Minhas reservas", icone: "swap", href: "reservas.html" },
     { id: "emprestimos", rotulo: "Meus empréstimos", icone: "box", href: "emprestimos.html" },
   ];
   const NAV = usuarioFinal ? NAV_USUARIO : NAV_EQUIPE;
@@ -158,7 +166,7 @@ const EloUtil = {
     <span class="topbar-brand"><img src="../assets/img/logo.png" alt="">ELO Campus</span>`;
 
   if (usuarioFinal) {
-    document.querySelectorAll('a[href="equipamento-form.html"], a[href="movimentacoes.html"], a[href="relatorio.html"], a[href="usuarios.html"], a[href="servidor.html"]').forEach((el) => { el.hidden = true; el.style.display = "none"; });
+    document.querySelectorAll('a[href="equipamento-form.html"], a[href="movimentacoes.html"], a[href="usuarios.html"], a[href="solicitantes.html"]').forEach((el) => { el.hidden = true; el.style.display = "none"; });
     document.querySelectorAll('#editar, #retirar, #confirmar-exclusao, [data-editar], #btn-novo-usuario').forEach((el) => { el.hidden = true; el.disabled = true; el.style.display = "none"; });
   }
 

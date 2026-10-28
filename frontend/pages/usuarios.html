@@ -4,12 +4,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#0B1020">
-  <title>Usuários — ELO Campus</title>
+  <meta name="robots" content="noindex, nofollow">
+  <title>Equipe do sistema — ELO Campus</title>
   <link rel="icon" type="image/png" href="../assets/img/logo.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../assets/css/emprestimos.css">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../assets/css/style.css">
   <link rel="stylesheet" href="../assets/css/usuarios.css">
   <link rel="stylesheet" href="../assets/css/layout.css">
@@ -21,538 +21,51 @@
     <div class="content">
       <header class="topbar" id="topbar"></header>
       <main class="main">
-        <!-- Aviso da etapa 1 do novo empréstimo -->
-        <div class="card" id="aviso-fluxo" role="status" hidden>
-          <strong>Novo empréstimo · etapa 1 de 3</strong>
-          <div class="muted">Escolha o solicitante na lista e clique em “Novo empréstimo para ela”.</div>
-        </div>
-
         <header class="page-head">
           <div>
-            <h1>Usuários</h1>
-            <p>Quem retira equipamentos, quem acessa o sistema e o que cada perfil pode fazer.</p>
-          </div>
-          <div class="toolbar">
-            <label for="busca" class="sr-only">Buscar</label>
-            <input class="input" id="busca" type="search" placeholder="Buscar usuário">
-            <button class="btn" id="btn-novo-usuario" type="button">+ Novo usuário</button>
+            <h1>Equipe do sistema</h1>
+            <p>Gerencie contas de administradores e operadores. As senhas são pessoais e não ficam disponíveis para a equipe administrativa.</p>
           </div>
         </header>
 
-        <div class="filter-row">
-          <div class="tabs" role="tablist" aria-label="Filtro por vínculo" id="filtros">
-            <button class="tab" role="tab" aria-selected="true" type="button" data-filtro="todos">Todos</button>
-            <button class="tab" role="tab" aria-selected="false" type="button" data-filtro="aluno">Alunos</button>
-            <button class="tab" role="tab" aria-selected="false" type="button" data-filtro="professor">Professores</button>
-            <button class="tab" role="tab" aria-selected="false" type="button" data-filtro="servidor">Servidores</button>
-            <button class="tab" role="tab" aria-selected="false" type="button" data-filtro="acesso:Administrador">Administradores</button>
-            <button class="tab" role="tab" aria-selected="false" type="button" data-filtro="acesso:Estagiário">Estagiários</button>
-            <button class="tab" role="tab" aria-selected="false" type="button" data-filtro="acesso:Consulta">Consulta</button>
-          </div>
-        </div>
-
-        <!-- Perfil e permissões à esquerda, tabela à direita -->
-        <div class="split">
-
-          <div class="grow-1 stack">
-            <!-- Usuário selecionado (preenchido pela linha escolhida) -->
-            <aside class="card stack" id="detalhe" aria-label="Usuário selecionado" aria-live="polite">
-              <div class="item-head">
-                <div class="item-icon">
-                  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                </div>
-                <div>
-                  <h2 class="h-md" data-f="nome">Mariana Costa</h2>
-                  <div class="muted small" data-f="sub">Aluna · Matrícula 2024118</div>
-                </div>
+        <section class="stack" aria-labelledby="usuarios-api-titulo">
+          <section class="card stack">
+            <div>
+              <h2 class="h-md" id="usuarios-api-titulo">Criar conta da equipe</h2>
+              <p class="muted">A pessoa receberá uma senha provisória por e-mail e deverá criar a própria senha no primeiro acesso.</p>
+            </div>
+            <div id="usuarios-api-aviso" class="alert alert-info" role="status" aria-live="polite" hidden></div>
+            <form id="usuarios-api-form" class="stack" novalidate>
+              <div class="form-grid-2">
+                <div class="field"><label for="api-usuario-nome">Nome completo</label><input class="input input-block" id="api-usuario-nome" name="nome" autocomplete="name" maxlength="160" required></div>
+                <div class="field"><label for="api-usuario-email">E-mail institucional</label><input class="input input-block" id="api-usuario-email" name="email" type="email" autocomplete="email" maxlength="254" required></div>
               </div>
+              <div class="field"><label for="api-usuario-papel">Perfil</label><select class="input input-block" id="api-usuario-papel" name="papel" required><option value="operador">Operador</option><option value="admin">Administrador</option></select></div>
+              <div><button class="btn btn-primary" id="api-usuario-criar" type="submit">Criar conta e enviar instruções</button></div>
+            </form>
+            <p class="muted small">Privacidade: esta tela não solicita, armazena nem exibe senhas. Se o envio de e-mail falhar, será necessário corrigir o serviço de e-mail e reenviar as instruções.</p>
+          </section>
 
-              <div class="pills">
-                <span class="pill pill-ok" data-f="status">Situação regular</span>
-                <span class="pill pill-warn" data-f="perfil" hidden>Estagiário</span>
-              </div>
-
-              <div class="stack-sm">
-                <div class="kv"><span class="muted" data-f="k1">E-mail</span><strong data-f="v1">mariana@lapa.edu.br</strong></div>
-                <div class="kv"><span class="muted" data-f="k2">Telefone</span><strong data-f="v2">(11) 90000-0000</strong></div>
-                <div class="kv"><span class="muted" data-f="k3">Empréstimos no total</span><strong data-f="v3">14</strong></div>
-              </div>
-
-              <!-- Formulário de edição -->
-              <form class="stack" id="form-edicao" hidden novalidate>
-                <h2 class="h-sm" id="titulo-form-usuario">Editar usuário</h2>
-                <p class="alert alert-error" id="erro-edicao-usuario" role="alert" hidden></p>
-                <div class="field"><label for="ed-nome">Nome</label><input class="input input-block" id="ed-nome" name="nome" type="text" autocomplete="name" required></div>
-                <div class="field"><label for="ed-email">E-mail</label><input class="input input-block" id="ed-email" name="email" type="email"></div>
-                <div class="field" data-so="solicitante"><label for="ed-tel">Telefone</label><input class="input input-block" id="ed-tel" name="telefone" type="tel" autocomplete="tel"></div>
-                <div class="field" data-so="solicitante"><label for="ed-matricula">Matrícula / identificação</label><input class="input input-block" id="ed-matricula" name="matricula" type="text"></div>
-                <div class="field" data-so="solicitante"><label for="ed-vinculo">Vínculo</label>
-                  <select class="input input-block" id="ed-vinculo" name="vinculo">
-                    <option>Aluno</option><option>Aluna</option><option>Professor</option><option>Professora</option><option>Servidor</option><option>Servidora</option><option>Grupo</option><option>Perfil</option>
-                  </select></div>
-                <div class="field" data-so="sistema"><label for="ed-perfil">Perfil de acesso</label>
-                  <select class="input input-block" id="ed-perfil" name="perfil">
-                    <option>Administrador</option><option>Estagiário</option><option>Consulta</option>
-                  </select></div>
-                <div class="field" data-so="sistema"><label for="ed-status">Status</label>
-                  <select class="input input-block" id="ed-status" name="status">
-                    <option>Ativo</option><option>Convite pendente</option><option>Desativado</option>
-                  </select></div>
-                <div class="stack-sm">
-                  <button class="btn btn-block" type="submit">Salvar alterações</button>
-                  <button class="btn btn-line btn-block" type="button" id="ed-cancelar">Cancelar</button>
-                </div>
-              </form>
-
-              <!-- Somente solicitantes -->
-              <div class="stack" data-so="solicitante" id="bloco-vista-sol">
-                <h2 class="h-sm">Últimas movimentações</h2>
-                <ol class="timeline" id="movs">
-                  <li><span class="dot dot-purple"></span><div><strong>Retirou Notebook Dell Latitude</strong><div class="muted">14/10 · 14:40 · LAP-0142</div></div></li>
-                  <li><span class="dot dot-cyan"></span><div><strong>Devolveu Cabo HDMI 3 m</strong><div class="muted">08/10 · 08:10 · CAB-0045</div></div></li>
-                  <li><span class="dot dot-pink"></span><div><strong>Retirou Cabo HDMI 3 m</strong><div class="muted">07/10 · 16:20 · CAB-0045</div></div></li>
-                </ol>
-                <div class="stack-sm">
-                  <a class="btn btn-block" href="novo-emprestimo.html" data-novo-emprestimo>Novo empréstimo para ela</a>
-                  <button class="btn btn-line btn-block" id="editar-selecionado" type="button">Editar cadastro</button>
-                </div>
-              </div>
-            </aside>
-
-            <!-- Permissões · somente equipe do sistema -->
-            <section class="card" id="permissoes" aria-label="Permissões do perfil" hidden>
-              <h2 class="mb-16">Permissões</h2>
-              <p class="muted small" id="perm-dica">Use “Editar” para alterar as permissões.</p>
-              <div class="stack-sm">
-                <label class="check"><input type="checkbox" disabled name="permissoes" value="registrar-emprestimos"> Registrar empréstimos</label>
-                <label class="check"><input type="checkbox" disabled name="permissoes" value="registrar-devolucoes"> Registrar devoluções</label>
-                <label class="check"><input type="checkbox" disabled name="permissoes" value="cadastrar-equipamentos"> Cadastrar equipamentos</label>
-                <label class="check"><input type="checkbox" disabled name="permissoes" value="gerenciar-usuarios"> Gerenciar usuários</label>
-                <label class="check"><input type="checkbox" disabled name="permissoes" value="acessar-area-servidor"> Acessar área do servidor</label>
-              </div>
-              <div class="stack-sm mt-20" id="perm-acoes">
-                <button class="btn btn-line btn-block" type="button" id="btn-senha">Redefinir senha</button>
-              </div>
-            </section>
-          </div>
-
-          <!-- Tabela de usuários -->
-          <section class="card grow-2" aria-label="Lista de usuários">
+          <section class="card stack" aria-label="Contas da equipe">
+            <div class="row" style="align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap">
+              <div><h2 class="h-md">Contas cadastradas</h2><p class="muted">O status indica se a pessoa já concluiu o primeiro acesso. Nenhuma senha é exibida nesta listagem.</p></div>
+              <button class="btn btn-line" id="api-usuarios-atualizar" type="button">Atualizar lista</button>
+            </div>
             <div class="table-wrap">
-              <table id="tabela">
-                <thead>
-                  <tr>
-                    <th>Usuário</th><th>Perfil</th><th>Atividade</th><th>Status</th>
-                    <th><span class="sr-only">Ação</span></th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <!-- Solicitantes -->
-                  <tr data-tipo="aluno" data-grupo="solicitante" data-nome="Mariana Costa" data-sub="Aluna · Matrícula 2024118" data-matricula="2024118" data-vinculo="Aluna"
-                      data-status="Situação regular" data-pill="pill-ok" data-email="mariana@lapa.edu.br" data-telefone="(11) 90000-0000" data-total="14"
-                      data-mov='[["purple","Retirou Notebook Dell Latitude","14/10 · 14:40 · LAP-0142"],["cyan","Devolveu Cabo HDMI 3 m","08/10 · 08:10 · CAB-0045"],["pink","Retirou Cabo HDMI 3 m","07/10 · 16:20 · CAB-0045"]]'>
-                    <td><strong>Mariana Costa</strong><small>Matrícula 2024118</small></td>
-                    <td>Aluna</td><td>1 ativo</td>
-                    <td><span class="pill pill-ok">Regular</span></td>
-                    <td><button class="btn btn-sm btn-line" type="button" data-editar>Editar</button></td>
-                  </tr>
-                  <tr data-tipo="professor" data-grupo="solicitante" data-nome="Prof. Ricardo Alves" data-sub="Professor · SIAPE 1048873" data-vinculo="Professor"
-                      data-status="Devolução hoje" data-pill="pill-warn">
-                    <td><strong>Prof. Ricardo Alves</strong><small>SIAPE 1048873</small></td>
-                    <td>Professor</td><td>1 ativo</td>
-                    <td><span class="pill pill-warn">Devolução hoje</span></td>
-                    <td><button class="btn btn-sm btn-line" type="button" data-editar>Editar</button></td>
-                  </tr>
-                  <tr class="is-late" data-tipo="grupo" data-grupo="solicitante" data-nome="Grêmio Estudantil" data-sub="Grupo · Responsável: Pedro Nunes" data-vinculo="Grupo"
-                      data-status="Em atraso" data-pill="pill-late">
-                    <td><strong>Grêmio Estudantil</strong><small>Responsável: Pedro Nunes</small></td>
-                    <td>Grupo</td><td>1 ativo</td>
-                    <td><span class="pill pill-late">Em atraso</span></td>
-                    <td><button class="btn btn-sm btn-line" type="button" data-editar>Editar</button></td>
-                  </tr>
-                  <tr data-tipo="aluno" data-grupo="solicitante" data-nome="Juliana Rocha" data-sub="Aluna · Matrícula 2023076" data-matricula="2023076" data-vinculo="Aluna"
-                      data-status="Situação regular" data-pill="pill-ok">
-                    <td><strong>Juliana Rocha</strong><small>Matrícula 2023076</small></td>
-                    <td>Aluna</td><td>1 ativo</td>
-                    <td><span class="pill pill-ok">Regular</span></td>
-                    <td><button class="btn btn-sm btn-line" type="button" data-editar>Editar</button></td>
-                  </tr>
-                  <tr data-tipo="aluno" data-grupo="solicitante" data-nome="Lucas Ferreira" data-sub="Aluno · Matrícula 2024203" data-matricula="2024203" data-vinculo="Aluno"
-                      data-status="Situação regular" data-pill="pill-ok">
-                    <td><strong>Lucas Ferreira</strong><small>Matrícula 2024203</small></td>
-                    <td>Aluno</td><td>Nenhum</td>
-                    <td><span class="pill pill-ok">Regular</span></td>
-                    <td><button class="btn btn-sm btn-line" type="button" data-editar>Editar</button></td>
-                  </tr>
-                  <tr data-tipo="perfil" data-grupo="solicitante" data-nome="Coord. de Eventos" data-sub="Perfil · Setor administrativo" data-vinculo="Perfil"
-                      data-status="Situação regular" data-pill="pill-ok">
-                    <td><strong>Coord. de Eventos</strong><small>Setor administrativo</small></td>
-                    <td>Perfil</td><td>1 ativo</td>
-                    <td><span class="pill pill-ok">Regular</span></td>
-                    <td><button class="btn btn-sm btn-line" type="button" data-editar>Editar</button></td>
-                  </tr>
-
-                  <!-- Equipe do sistema -->
-                  <tr data-tipo="equipe" data-grupo="sistema" data-nome="Estagiário TI" data-sub="estagio.ti@lapa.edu.br" data-perfil="Estagiário"
-                      data-status="Ativo" data-pill="pill-ok" data-ultimo="Hoje · 14:38" data-cadastro="02/09/2026" data-registros="86"
-                      data-perm="registrar-emprestimos,registrar-devolucoes,cadastrar-equipamentos">
-                    <td><strong>Estagiário TI</strong><small>estagio.ti@lapa.edu.br</small></td>
-                    <td>Estagiário</td><td>Hoje · 14:38</td>
-                    <td><span class="pill pill-ok">Ativo</span></td>
-                    <td><button class="btn btn-sm btn-line" type="button" data-editar>Editar</button></td>
-                  </tr>
-                  <tr data-tipo="equipe" data-grupo="sistema" data-nome="Coordenação de TI" data-sub="coord.ti@lapa.edu.br" data-perfil="Administrador"
-                      data-status="Ativo" data-pill="pill-ok" data-ultimo="Hoje · 09:12"
-                      data-perm="registrar-emprestimos,registrar-devolucoes,cadastrar-equipamentos,gerenciar-usuarios,acessar-area-servidor">
-                    <td><strong>Coordenação de TI</strong><small>coord.ti@lapa.edu.br</small></td>
-                    <td>Administrador</td><td>Hoje · 09:12</td>
-                    <td><span class="pill pill-ok">Ativo</span></td>
-                    <td><button class="btn btn-sm btn-line" type="button" data-editar>Editar</button></td>
-                  </tr>
-                  <tr data-tipo="equipe" data-grupo="sistema" data-nome="Camila Duarte" data-sub="camila.duarte@lapa.edu.br" data-perfil="Estagiário"
-                      data-status="Ativo" data-pill="pill-ok" data-ultimo="14/10 · 17:50"
-                      data-perm="registrar-emprestimos,registrar-devolucoes">
-                    <td><strong>Camila Duarte</strong><small>camila.duarte@lapa.edu.br</small></td>
-                    <td>Estagiário</td><td>14/10 · 17:50</td>
-                    <td><span class="pill pill-ok">Ativo</span></td>
-                    <td><button class="btn btn-sm btn-line" type="button" data-editar>Editar</button></td>
-                  </tr>
-                  <tr data-tipo="equipe" data-grupo="sistema" data-nome="Biblioteca" data-sub="biblioteca@lapa.edu.br" data-perfil="Consulta"
-                      data-status="Convite pendente" data-pill="pill-warn" data-ultimo="12/10 · 10:05" data-perm="">
-                    <td><strong>Biblioteca</strong><small>biblioteca@lapa.edu.br</small></td>
-                    <td>Consulta</td><td>12/10 · 10:05</td>
-                    <td><span class="pill pill-warn">Convite pendente</span></td>
-                    <td><button class="btn btn-sm btn-line" type="button" data-editar>Editar</button></td>
-                  </tr>
-                  <tr class="is-late" data-tipo="equipe" data-grupo="sistema" data-nome="Rafael Teixeira" data-sub="rafael.teixeira@lapa.edu.br" data-perfil="Estagiário"
-                      data-status="Desativado" data-pill="pill-late" data-ultimo="28/09 · 16:20" data-perm="">
-                    <td><strong>Rafael Teixeira</strong><small>rafael.teixeira@lapa.edu.br</small></td>
-                    <td>Estagiário</td><td>28/09 · 16:20</td>
-                    <td><span class="pill pill-late">Desativado</span></td>
-                    <td><button class="btn btn-sm btn-line" type="button" data-editar>Editar</button></td>
-                  </tr>
-                </tbody>
+              <table>
+                <thead><tr><th>Nome</th><th>E-mail</th><th>Perfil</th><th>Primeiro acesso</th><th>Ações</th></tr></thead>
+                <tbody id="api-usuarios-tbody"><tr><td colspan="5">Carregando contas da API…</td></tr></tbody>
               </table>
             </div>
-            <p class="muted" id="vazio" hidden>Nenhum usuário encontrado.</p>
           </section>
-        </div>
+        </section>
       </main>
     </div>
   </div>
-  <script src="../assets/js/auth.js"></script>
-  <script src="../assets/js/layout.js"></script>
-  <script src="../assets/js/dados-demo.js"></script>
   <script src="../assets/js/runtime-config.js"></script>
   <script src="../assets/js/api.js"></script>
-  <script src="../assets/js/salz-actions.js"></script>
-  <script>
-    (function () {
-      var USER_STORAGE_KEY = 'elo.demo.usuarios';
-      var tbody = document.querySelector('#tabela tbody');
-      function escHtml(value) { return String(value == null ? '' : value).replace(/[&<>"']/g, function (c) { return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]); }); }
-      function montarLinha(registro) {
-        var d = registro.dataset || {}, sistema = d.grupo === 'sistema';
-        var attrs = Object.keys(d).map(function (k) { return ' data-' + k + '="' + escHtml(d[k]) + '"'; }).join('');
-        var classe = registro.className || '';
-        var linha2 = sistema ? (d.sub || '') : ((d.sub || '').split(' · ').slice(1).join(' · ') || d.sub || '');
-        var vinculo = sistema ? (d.perfil || '') : (d.vinculo || '');
-        var atividade = d.atividade || (sistema ? (d.ultimo || '—') : 'Nenhum');
-        var status = sistema ? (d.status || 'Ativo') : String(d.status || 'Situação regular').replace(/^Situação /, '');
-        return '<tr class="' + escHtml(classe) + '"' + attrs + '><td><strong>' + escHtml(d.nome || 'Usuário') + '</strong><small>' + escHtml(linha2) + '</small></td><td>' + escHtml(vinculo) + '</td><td>' + escHtml(atividade) + '</td><td><span class="pill ' + escHtml(d.pill || 'pill-ok') + '">' + escHtml(status) + '</span></td><td><button class="btn btn-sm btn-line" type="button" data-editar>Editar</button></td></tr>';
-      }
-      try {
-        var salvos = JSON.parse(localStorage.getItem(USER_STORAGE_KEY) || 'null');
-        if (Array.isArray(salvos) && salvos.length) tbody.innerHTML = salvos.map(montarLinha).join('');
-      } catch (e) { /* mantém os registros iniciais do HTML */ }
-      var linhas = Array.prototype.slice.call(document.querySelectorAll('#tabela tbody tr'));
-      var abas = Array.prototype.slice.call(document.querySelectorAll('.tabs .tab'));
-      var busca = document.getElementById('busca');
-      var painel = document.getElementById('detalhe');
-      var permissoes = document.getElementById('permissoes');
-      var form = document.getElementById('form-edicao');
-      var vazio = document.getElementById('vazio');
-      var vistaSol = document.getElementById('bloco-vista-sol');
-      var vistaCampos = [painel.querySelector('.pills'), painel.querySelector('.stack-sm')];
-      var filtro = 'todos', atual = null, editando = false;
-      var fluxo = new URLSearchParams(location.search).get('origem') === 'novo-emprestimo';
-      var PILL = { 'Ativo': 'pill-ok', 'Convite pendente': 'pill-warn', 'Desativado': 'pill-late' };
-
-      function f(n) { return painel.querySelector('[data-f="' + n + '"]'); }
-      function norm(t) { return (t || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, ''); }
-      function dado(tr, k) { return tr.dataset[k] || '—'; }
-      function ehSistema(tr) { return tr.dataset.grupo === 'sistema'; }
-      function tipoDe(v) {
-        v = norm(v);
-        return v.indexOf('alun') === 0 ? 'aluno' : v.indexOf('prof') === 0 ? 'professor'
-             : v.indexOf('serv') === 0 ? 'servidor' : v.indexOf('grupo') === 0 ? 'grupo' : 'perfil';
-      }
-      function persistirLinhas() {
-        try {
-          var dados = linhas.map(function (tr) {
-            if (!tr.dataset.atividade && tr.children[2]) tr.dataset.atividade = tr.children[2].textContent.trim();
-            var dataset = {}; Object.keys(tr.dataset).forEach(function (k) { dataset[k] = tr.dataset[k]; });
-            return { dataset: dataset, className: tr.className };
-          });
-          localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(dados));
-          return true;
-        } catch (e) { return false; }
-      }
-      function salvarAtividade(t, total) {
-        t.dataset.atividade = total ? total + (total === 1 ? ' empréstimo' : ' empréstimos') : 'Nenhum';
-        if (t.children[2]) t.children[2].textContent = t.dataset.atividade;
-      }
-      function atualizarHistoricoSolicitante(tr) {
-        var lista = document.getElementById('movs');
-        lista.innerHTML = '<li><div class="muted">Carregando movimentações registradas…</div></li>';
-        ELO.emprestimos().then(function (registros) {
-          if (atual !== tr || ehSistema(tr)) return;
-          var nomeNormalizado = norm(tr.dataset.nome);
-          var emprestimos = registros.filter(function (l) { return norm(l.solicitante && l.solicitante.nome) === nomeNormalizado; });
-          f('v3').textContent = emprestimos.length;
-          var eventos = [];
-          emprestimos.forEach(function (l) {
-            eventos.push({ quando: l.retirada, tipo: 'Retirou ' + l.equipamento.nome, detalhe: EloUtil.dataHora(l.retirada) + ' · ' + l.equipamento.patrimonio, classe: 'purple' });
-            if (l.devolvida) eventos.push({ quando: l.devolvida, tipo: 'Devolveu ' + l.equipamento.nome, detalhe: EloUtil.dataHora(l.devolvida) + ' · ' + l.equipamento.patrimonio + (l.condicaoDevolucao ? ' · ' + l.condicaoDevolucao : ''), classe: 'cyan' });
-          });
-          eventos.sort(function (a,b) { return new Date(b.quando) - new Date(a.quando); });
-          lista.innerHTML = eventos.length ? '' : '<li><div class="muted">Sem movimentações registradas para este solicitante.</div></li>';
-          eventos.forEach(function (m) {
-            var li = document.createElement('li'), dot = document.createElement('span'), box = document.createElement('div'), strong = document.createElement('strong'), detail = document.createElement('div');
-            dot.className = 'dot dot-' + m.classe; strong.textContent = m.tipo; detail.className = 'muted'; detail.textContent = m.detalhe;
-            box.appendChild(strong); box.appendChild(detail); li.appendChild(dot); li.appendChild(box); lista.appendChild(li);
-          });
-        }).catch(function () { if (atual === tr) lista.innerHTML = '<li><div class="muted">Não foi possível carregar as movimentações locais.</div></li>'; });
-      }
-
-      /* ---------- painel de detalhe ---------- */
-      function selecionar(tr) {
-        sairEdicao(true);
-        atual = tr;
-        var sistema = ehSistema(tr);
-        linhas.forEach(function (l) { l.removeAttribute('aria-selected'); });
-        tr.setAttribute('aria-selected', 'true');
-
-        f('nome').textContent = tr.dataset.nome;
-        f('sub').textContent = tr.dataset.sub;
-        var st = f('status'); st.textContent = tr.dataset.status; st.className = 'pill ' + tr.dataset.pill;
-        var pf = f('perfil'); pf.hidden = !sistema; if (sistema) pf.textContent = tr.dataset.perfil;
-
-        f('k1').textContent = sistema ? 'Último acesso' : 'E-mail';
-        f('k2').textContent = sistema ? 'Cadastro' : 'Telefone';
-        f('k3').textContent = sistema ? 'Registros feitos' : 'Empréstimos no total';
-        f('v1').textContent = sistema ? dado(tr, 'ultimo') : dado(tr, 'email');
-        f('v2').textContent = sistema ? dado(tr, 'cadastro') : dado(tr, 'telefone');
-        f('v3').textContent = sistema ? dado(tr, 'registros') : dado(tr, 'total');
-
-        vistaSol.hidden = sistema;
-        permissoes.hidden = !sistema;
-
-        if (sistema) {
-          var marcadas = (tr.dataset.perm || '').split(',');
-          permissoes.querySelectorAll('input[name="permissoes"]').forEach(function (c) { c.checked = marcadas.indexOf(c.value) !== -1; });
-        } else {
-          atualizarHistoricoSolicitante(tr);
-          var link = painel.querySelector('[data-novo-emprestimo]');
-          link.textContent = 'Novo empréstimo para ' + tr.dataset.nome;
-          link.dataset.nome = tr.dataset.nome; link.dataset.matricula = tr.dataset.matricula || ''; link.dataset.vinculo = tr.dataset.vinculo || '';
-        }
-      }
-
-      /* ---------- edição ---------- */
-      function entrarEdicao() {
-        if (!atual) return;
-        var sistema = ehSistema(atual);
-        editando = true;
-        vistaCampos.forEach(function (e) { e.hidden = true; });
-        vistaSol.hidden = true;
-        form.hidden = false;
-        form.querySelectorAll('[data-so]').forEach(function (e) { e.hidden = (e.dataset.so === 'sistema') !== sistema; });
-        document.getElementById('titulo-form-usuario').textContent = atual.dataset.novo === 'true' ? 'Novo usuário' : 'Editar usuário';
-        document.getElementById('erro-edicao-usuario').hidden = true;
-        document.getElementById('ed-nome').value = atual.dataset.nome || '';
-        document.getElementById('ed-email').value = sistema ? atual.dataset.sub : (atual.dataset.email || '');
-        if (sistema) {
-          document.getElementById('ed-perfil').value = atual.dataset.perfil;
-          document.getElementById('ed-status').value = atual.dataset.status;
-          permissoes.querySelectorAll('input[name="permissoes"]').forEach(function (c) { c.disabled = false; });
-          document.getElementById('perm-dica').textContent = 'Marque o que este perfil pode fazer e salve.';
-          document.getElementById('perm-acoes').hidden = true;
-        } else {
-          document.getElementById('ed-tel').value = atual.dataset.telefone || '';
-          document.getElementById('ed-matricula').value = atual.dataset.matricula || '';
-          document.getElementById('ed-vinculo').value = atual.dataset.vinculo || 'Aluno';
-        }
-        document.getElementById('ed-nome').focus();
-      }
-
-      function sairEdicao(semRestaurar) {
-        if (!editando) return;
-        var linhaEditada = atual;
-        editando = false;
-        form.hidden = true;
-        vistaCampos.forEach(function (e) { e.hidden = false; });
-        document.getElementById('erro-edicao-usuario').hidden = true;
-        permissoes.querySelectorAll('input[name="permissoes"]').forEach(function (c) { c.disabled = true; });
-        document.getElementById('perm-dica').textContent = 'Use “Editar” para alterar as permissões.';
-        document.getElementById('perm-acoes').hidden = false;
-        if (linhaEditada && linhaEditada.dataset.novo === 'true') {
-          linhas = linhas.filter(function (l) { return l !== linhaEditada; });
-          linhaEditada.remove();
-          atual = null;
-          persistirLinhas();
-          contar(); aplicar();
-          if (!semRestaurar) {
-            var primeira = linhas.filter(function (l) { return !l.hidden; })[0] || linhas[0];
-            if (primeira) selecionar(primeira);
-          }
-          return;
-        }
-        if (!semRestaurar && atual) selecionar(atual);
-      }
-
-      function salvar(e) {
-        e.preventDefault();
-        var nomeEl = document.getElementById('ed-nome');
-        var emailEl = document.getElementById('ed-email');
-        var erro = document.getElementById('erro-edicao-usuario');
-        var nome = nomeEl.value.trim();
-        erro.hidden = true;
-        nomeEl.removeAttribute('aria-invalid'); emailEl.removeAttribute('aria-invalid');
-        if (!nome) { erro.textContent = 'Informe o nome completo.'; erro.hidden = false; nomeEl.setAttribute('aria-invalid', 'true'); nomeEl.focus(); return; }
-        if (emailEl.value.trim() && emailEl.validity.typeMismatch) { erro.textContent = 'Informe um endereço de e-mail válido.'; erro.hidden = false; emailEl.setAttribute('aria-invalid', 'true'); emailEl.focus(); return; }
-        var tr = atual, tds = tr.children, sistema = ehSistema(tr);
-        var backup = { dataset: Object.assign({}, tr.dataset), html: tr.innerHTML, classe: tr.className };
-        var email = emailEl.value.trim();
-        tr.dataset.nome = nome;
-
-        if (sistema) {
-          var perfil = document.getElementById('ed-perfil').value, status = document.getElementById('ed-status').value;
-          tr.dataset.sub = email || tr.dataset.sub; tr.dataset.perfil = perfil; tr.dataset.status = status; tr.dataset.pill = PILL[status];
-          tr.dataset.perm = Array.prototype.map.call(permissoes.querySelectorAll('input[name="permissoes"]:checked'), function (c) { return c.value; }).join(',');
-          tds[0].innerHTML = '<strong></strong><small></small>'; tds[0].children[0].textContent = nome; tds[0].children[1].textContent = tr.dataset.sub;
-          tds[1].textContent = perfil;
-          tds[3].innerHTML = '<span class="pill ' + PILL[status] + '"></span>'; tds[3].firstChild.textContent = status;
-          tr.classList.toggle('is-late', status === 'Desativado');
-        } else {
-          var vinc = document.getElementById('ed-vinculo').value;
-          var matricula = document.getElementById('ed-matricula').value.trim();
-          var identificadorAnterior = (tr.dataset.sub.split('·').slice(1).join('·') || '').trim();
-          var resto = matricula ? ((tipoDe(vinc) === 'professor' || tipoDe(vinc) === 'servidor' ? 'Identificação ' : 'Matrícula ') + matricula) : (tr.dataset.novo === 'true' ? '' : identificadorAnterior);
-          tr.dataset.email = email; tr.dataset.telefone = document.getElementById('ed-tel').value.trim();
-          tr.dataset.matricula = matricula; tr.dataset.vinculo = vinc; tr.dataset.tipo = tipoDe(vinc);
-          tr.dataset.sub = vinc + (resto ? ' · ' + resto : '');
-          tds[0].innerHTML = '<strong></strong><small></small>'; tds[0].children[0].textContent = nome;
-          tds[0].children[1].textContent = resto;
-          tds[1].textContent = vinc;
-          tds[2].textContent = tr.dataset.atividade || 'Nenhum';
-          tds[3].innerHTML = '<span class="pill pill-ok">Regular</span>';
-          tr.dataset.status = 'Situação regular'; tr.dataset.pill = 'pill-ok';
-        }
-        delete tr.dataset.novo;
-        if (!persistirLinhas()) {
-          Object.keys(tr.dataset).forEach(function (k) { delete tr.dataset[k]; });
-          Object.keys(backup.dataset).forEach(function (k) { tr.dataset[k] = backup.dataset[k]; });
-          tr.innerHTML = backup.html; tr.className = backup.classe;
-          erro.textContent = 'Não foi possível salvar no armazenamento local. Verifique o espaço disponível e tente novamente.';
-          erro.hidden = false;
-          return;
-        }
-        editando = false; form.hidden = true;
-        vistaCampos.forEach(function (x) { x.hidden = false; });
-        permissoes.querySelectorAll('input[name="permissoes"]').forEach(function (c) { c.disabled = true; });
-        document.getElementById('perm-dica').textContent = 'Use “Editar” para alterar as permissões.';
-        document.getElementById('perm-acoes').hidden = false;
-        document.getElementById('titulo-form-usuario').textContent = 'Editar usuário';
-        selecionar(tr); contar(); aplicar();
-        if (window.ELOAviso) window.ELOAviso('Cadastro salvo nesta sessão local.', 'success');
-      }
-
-      /* ---------- filtros e busca ---------- */
-      function combina(tr, k) {
-        if (k === 'todos') return true;
-        if (k.indexOf('acesso:') === 0) return tr.dataset.perfil === k.slice(7);
-        return tr.dataset.tipo === k;
-      }
-      function aplicar() {
-        var q = norm(busca.value), n = 0;
-        linhas.forEach(function (tr) {
-          var ok = combina(tr, filtro) && (!q || norm(tr.textContent).indexOf(q) !== -1) && (!fluxo || tr.dataset.grupo === 'solicitante');
-          tr.hidden = !ok; if (ok) n++;
-        });
-        vazio.hidden = n > 0;
-      }
-      function contar() {
-        abas.forEach(function (a) {
-          if (!a.dataset.rotulo) a.dataset.rotulo = a.textContent.trim();
-          a.textContent = a.dataset.rotulo + ' · ' + linhas.filter(function (l) { return combina(l, a.dataset.filtro); }).length;
-        });
-      }
-      function escolherAba(k) {
-        filtro = k;
-        abas.forEach(function (a) { a.setAttribute('aria-selected', String(a.dataset.filtro === k)); });
-        aplicar();
-        var p = linhas.filter(function (l) { return !l.hidden; })[0];
-        if (p) selecionar(p);
-      }
-      abas.forEach(function (a) { a.addEventListener('click', function () { escolherAba(a.dataset.filtro); }); });
-      busca.addEventListener('input', aplicar);
-
-      function vincularLinha(tr) {
-        tr.addEventListener('click', function (e) {
-          selecionar(tr);
-          if (e.target.closest('[data-editar]')) entrarEdicao();
-        });
-      }
-      linhas.forEach(vincularLinha);
-      form.addEventListener('submit', salvar);
-      document.getElementById('editar-selecionado').addEventListener('click', entrarEdicao);
-      document.getElementById('btn-novo-usuario').addEventListener('click', function () {
-        if (fluxo || editando) return;
-        var tr = document.createElement('tr');
-        tr.dataset.tipo = 'aluno'; tr.dataset.grupo = 'solicitante'; tr.dataset.novo = 'true';
-        tr.dataset.nome = ''; tr.dataset.sub = 'Aluno'; tr.dataset.vinculo = 'Aluno'; tr.dataset.matricula = '';
-        tr.dataset.status = 'Situação regular'; tr.dataset.pill = 'pill-ok';
-        tr.dataset.email = ''; tr.dataset.telefone = ''; tr.dataset.total = '0'; tr.dataset.atividade = 'Nenhum'; tr.dataset.mov = '[]';
-        tr.innerHTML = '<td><strong>Novo usuário</strong><small>Cadastro não salvo</small></td><td>Aluno</td><td>Nenhum</td><td><span class="pill pill-ok">Regular</span></td><td><button class="btn btn-sm btn-line" type="button" data-editar>Editar</button></td>';
-        tbody.appendChild(tr); linhas.push(tr); vincularLinha(tr); contar(); aplicar(); selecionar(tr); entrarEdicao();
-      });
-      document.getElementById('ed-cancelar').addEventListener('click', function () { sairEdicao(); });
-
-      /* ---------- etapa 1 do novo empréstimo ---------- */
-      if (fluxo) {
-        document.getElementById('aviso-fluxo').hidden = false;
-        abas.filter(function (a) { return a.dataset.filtro.indexOf('acesso:') === 0; }).forEach(function (a) { a.hidden = true; });
-      }
-      document.addEventListener('click', function (e) {
-        var link = e.target.closest('[data-novo-emprestimo]');
-        if (!link) return;
-        e.preventDefault();
-        location.href = 'novo-emprestimo.html?' + new URLSearchParams({
-          nome: link.dataset.nome || f('nome').textContent.trim(),
-          matricula: link.dataset.matricula || '', vinculo: link.dataset.vinculo || ''
-        }).toString();
-      });
-
-      linhas.forEach(function (tr) { if (!tr.dataset.atividade && tr.children[2]) tr.dataset.atividade = tr.children[2].textContent.trim(); });
-      contar(); aplicar();
-      selecionar(linhas.filter(function (l) { return !l.hidden; })[0] || linhas[0]);
-      ELO.emprestimos().then(function (registros) {
-        linhas.filter(function (tr) { return tr.dataset.grupo === 'solicitante'; }).forEach(function (tr) {
-          var nome = norm(tr.dataset.nome);
-          var proprios = registros.filter(function (l) { return norm(l.solicitante && l.solicitante.nome) === nome; });
-          var ativos = proprios.filter(function (l) { return !l.devolvida; });
-          var atrasados = ativos.some(function (l) { return EloUtil.diasAtraso(l.prevista) > 0; });
-          salvarAtividade(tr, proprios.length);
-          if (atrasados) { tr.dataset.status = 'Em atraso'; tr.dataset.pill = 'pill-late'; }
-          else if (ativos.length) { tr.dataset.status = 'Devolução pendente'; tr.dataset.pill = 'pill-warn'; }
-          else { tr.dataset.status = 'Situação regular'; tr.dataset.pill = 'pill-ok'; }
-          tr.children[3].innerHTML = '<span class="pill ' + tr.dataset.pill + '"></span>'; tr.children[3].firstChild.textContent = String(tr.dataset.status).replace(/^Situação /, '');
-        });
-        persistirLinhas();
-        if (atual) selecionar(atual);
-      }).catch(function () {});
-    })();
-  </script>
+  <script src="../assets/js/auth.js"></script>
+  <script src="../assets/js/layout.js"></script>
+  <script src="../assets/js/usuarios-equipe.js"></script>
 </body>
 </html>

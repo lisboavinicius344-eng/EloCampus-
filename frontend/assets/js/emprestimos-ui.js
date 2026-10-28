@@ -312,7 +312,7 @@
         });
         registros = (await ELO.emprestimos()).filter(pertenceAoUsuario);
         desenharRecentes(); desenharFila();
-        aviso(mensagem, `${result.itens} ${result.itens === 1 ? "equipamento devolvido" : "equipamentos devolvidos"} às ${new Date(result.devolvidoEm).toLocaleTimeString("pt-BR", {hour:"2-digit",minute:"2-digit"})}. Alteração salva nesta demonstração local; não é um registro oficial do servidor.`, "ok");
+        aviso(mensagem, `${result.itens} ${result.itens === 1 ? "equipamento devolvido" : "equipamentos devolvidos"}. A devolução foi registrada no servidor.`, "ok");
         history.replaceState(null, "", location.pathname);
         revisar = false;
         form.reset();

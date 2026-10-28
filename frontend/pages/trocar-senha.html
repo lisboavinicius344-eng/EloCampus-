@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0B1020">
+  <title>Criar sua senha — ELO Campus</title>
+  <meta name="description" content="Crie sua senha pessoal para acessar o ELO Campus.">
+  <link rel="icon" type="image/png" href="../assets/img/logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="stylesheet" href="../assets/css/login.css">
+  <style>
+    .password-note{margin:.75rem 0;padding:.85rem 1rem;border:1px solid rgba(139,92,246,.28);border-radius:12px;background:rgba(139,92,246,.08);color:var(--text-secondary,#cbd5e1);font-size:.9rem;line-height:1.5}
+    #trocar-senha-form{display:grid;gap:1rem}
+    #trocar-senha-btn{width:100%;min-height:52px}
+  </style>
+</head>
+<body class="auth-page auth-page-password">
+  <main class="login">
+    <section class="brand-side" aria-label="Apresentação do sistema">
+      <div class="brand"><img src="../assets/img/logo.png" alt=""><span class="brand-name">ELO Campus<span class="brand-sub">Instituição - Campus Lapa</span></span></div>
+      <div class="hero">
+        <img class="interlace-mark" src="../assets/img/logo-draw.svg" alt="">
+        <h1>Seu acesso. Sua senha.</h1>
+        <p>Defina uma senha pessoal para proteger sua conta e continuar usando o ELO Campus.</p>
+      </div>
+      <p class="brand-foot">Projeto de estágio — Desenvolvimento de Sistemas</p>
+    </section>
+    <section class="form-side" aria-labelledby="titulo-senha">
+      <div class="mobile-brand"><img src="../assets/img/logo-draw.svg" alt=""><strong>ELO Campus</strong></div>
+      <div class="card">
+        <div class="card-head">
+          <div class="auth-feature-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 4.5 6v5.5c0 4.4 3 7.5 7.5 9.5 4.5-2 7.5-5.1 7.5-9.5V6z"/><path d="m9 12 2 2 4-4"/></svg><span>Etapa final · Proteção da conta</span></div>
+          <span class="auth-kicker"><span aria-hidden="true"></span> Primeiro acesso</span>
+          <h2 id="titulo-senha">Criar sua senha</h2>
+          <p>Use a senha provisória recebida por e-mail e escolha uma nova senha pessoal.</p>
+        </div>
+        <div class="password-note">Sua senha provisória expira após 24 horas. A nova senha precisa ter pelo menos 8 caracteres e ser diferente da provisória.</div>
+        <div id="trocar-senha-mensagem" class="alert alert-error" role="alert" aria-live="polite" hidden></div>
+        <form id="trocar-senha-form" novalidate>
+          <div class="field"><label for="senha-atual">Senha provisória atual</label><input class="input" id="senha-atual" name="senha_atual" type="password" autocomplete="current-password" required></div>
+          <div class="field"><label for="nova-senha">Nova senha</label><input class="input" id="nova-senha" name="nova_senha" type="password" autocomplete="new-password" minlength="8" required><small class="muted">Mínimo de 8 caracteres.</small></div>
+          <div class="field"><label for="confirmar-senha">Confirmar nova senha</label><input class="input" id="confirmar-senha" name="confirmar_senha" type="password" autocomplete="new-password" minlength="8" required></div>
+          <button class="btn btn-primary" id="trocar-senha-btn" type="submit">Salvar nova senha</button>
+        </form>
+        <p class="card-foot"><a href="../index.html" id="voltar-login">Voltar para o login</a></p>
+      </div>
+    </section>
+  </main>
+  <script src="../assets/js/runtime-config.js"></script>
+  <script src="../assets/js/api.js"></script>
+  <script src="../assets/js/auth.js"></script>
+  <script>
+    (() => {
+      const form = document.getElementById('trocar-senha-form');
+      const msg = document.getElementById('trocar-senha-mensagem');
+      const atual = document.getElementById('senha-atual');
+      const nova = document.getElementById('nova-senha');
+      const confirmar = document.getElementById('confirmar-senha');
+      const botao = document.getElementById('trocar-senha-btn');
+      const sessao = obterSessao();
+      function avisar(texto, ok = false) {
+        msg.textContent = texto;
+        msg.className = `alert ${ok ? 'alert-ok' : 'alert-error'}`;
+        msg.hidden = false;
+      }
+      if (!sessao?.token) {
+        avisar('Sua sessão não está disponível. Entre novamente e use a senha provisória recebida por e-mail.');
+        form.hidden = true;
+      } else if (ELO.modo() !== 'api') {
+        avisar('A troca de senha exige conexão com a API.');
+      }
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault(); msg.hidden = true;
+        if (!atual.value) { avisar('Informe sua senha provisória.'); atual.focus(); return; }
+        if (nova.value.length < 8) { avisar('A nova senha deve ter pelo menos 8 caracteres.'); nova.focus(); return; }
+        if (nova.value !== confirmar.value) { avisar('A confirmação não corresponde à nova senha.'); confirmar.focus(); return; }
+        if (nova.value === atual.value) { avisar('A nova senha deve ser diferente da senha provisória.'); nova.focus(); return; }
+        botao.disabled = true; botao.textContent = 'Salvando…';
+        try {
+          await ELO.trocarSenha({ senha_atual: atual.value, nova_senha: nova.value });
+          const atualizada = { ...obterSessao(), deve_trocar_senha: false };
+          salvarSessao(atualizada);
+          avisar('Senha criada com sucesso. Redirecionando para o painel…', true);
+          window.setTimeout(() => window.location.replace('dashboard.html'), 500);
+        } catch (falha) {
+          avisar(falha.message || 'Não foi possível trocar a senha. Confira os dados e tente novamente.');
+          botao.disabled = false; botao.textContent = 'Salvar nova senha';
+        }
+      });
+    })();
+  </script>
+</body>
+</html>

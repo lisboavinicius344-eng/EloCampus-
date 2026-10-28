@@ -44,6 +44,8 @@
       nome: campos.nome.value.trim(),
       patrimonio: normalizarPatrimonio(campos.patrimonio.value),
       categoria: campos.categoria.value.trim(),
+      categoria_id: categoriasApi.find(c => String(c.nome || "").trim().toLocaleLowerCase("pt-BR") === campos.categoria.value.trim().toLocaleLowerCase("pt-BR"))?.id || "",
+      elegibilidade: $("f-elegibilidade")?.value || "todos",
       setor: campos.setor.value.trim(),
       condicao: campos.condicao.value,
       observacoes: campos.observacoes.value.trim(),
@@ -57,7 +59,7 @@
     if (!d.patrimonio) m.patrimonio = "Informe o número de patrimônio.";
     else if (!/^[A-Z0-9][A-Z0-9._-]*$/.test(d.patrimonio))
       m.patrimonio = "Use apenas letras, números, hífen, ponto ou sublinhado.";
-    if (!d.categoria) m.categoria = "Informe o tipo ou categoria.";
+    if (!d.categoria) m.categoria = "Informe ou selecione uma categoria.";
     if (!d.setor) m.setor = "Informe o setor responsável.";
     if (!d.condicao) m.condicao = "Selecione a condição física.";
     return m;
@@ -124,17 +126,22 @@
   });
   $("remover-foto").addEventListener("click", () => { imagem = ""; foto.value = ""; fotoPreviewImg.removeAttribute("src"); fotoPreview.hidden = true; });
 
-  // Sugestões de tipo e setor a partir do que já existe (se falhar, segue sem elas)
+  // Sugestões de categoria e setor são opcionais: o formulário continua utilizável se a lista falhar.
+  let categoriasApi = [];
+  const preencher = (idLista, valores) => {
+    const lista = $(idLista);
+    if (!lista) return;
+    lista.innerHTML = [...new Set(valores.filter(Boolean))].sort((a,b)=>String(a).localeCompare(String(b),"pt-BR")).map(v=>`<option value="${esc(v)}"></option>`).join("");
+  };
+  try {
+    categoriasApi = (await ELO.categorias()) || [];
+    preencher("lista-categorias", categoriasApi.filter(c => c.ativo !== false).map(c => c.nome));
+  } catch { /* a API de equipamentos ainda pode aceitar uma categoria digitada */ }
   try {
     const lista = await ELO.equipamentos();
-    const preencher = (idLista, campo) => {
-      const valores = [...new Set(lista.map((e) => e[campo]).filter(Boolean))]
-        .sort((a, b) => a.localeCompare(b, "pt-BR"));
-      $(idLista).innerHTML = valores.map((v) => `<option value="${esc(v)}"></option>`).join("");
-    };
-    preencher("lista-categorias", "categoria");
-    preencher("lista-setores", "setor");
-  } catch { /* sugestões são opcionais */ }
+    preencher("lista-setores", lista.map(e=>e.setor));
+    if (!categoriasApi.length) preencher("lista-categorias", lista.map(e=>e.categoria));
+  } catch { /* sugestões de setor são opcionais */ }
 
   // Modo edição
   if (id) {
@@ -147,7 +154,8 @@
       const e = await ELO.equipamento(id);
       campos.nome.value = e.nome ?? "";
       campos.patrimonio.value = e.patrimonio ?? "";
-      campos.categoria.value = e.categoria ?? "";
+      campos.categoria.value = String(e.categoria || categoriasApi.find(c=>String(c.id) === String(e.categoria_id))?.nome || "");
+      if ($("f-elegibilidade")) $("f-elegibilidade").value = e.elegibilidade || "todos";
       campos.setor.value = e.setor ?? "";
       campos.condicao.value = e.condicao ?? "";
       campos.observacoes.value = e.observacoes ?? "";

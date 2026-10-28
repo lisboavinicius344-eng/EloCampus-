@@ -224,3 +224,136 @@ a.link-button:hover { text-decoration: underline; }
   .access-options-3 { grid-template-columns: 1fr; }
   .access-options-3 .access-option-card { flex-direction: row; align-items: center; }
 }
+
+
+/* Link discreto para transparência e privacidade nas telas públicas. */
+.privacy-link { margin: .8rem 0 0; text-align: center; font-size: .82rem; color: var(--muted); }
+.privacy-link a { color: var(--cyan); text-underline-offset: 3px; }
+.privacy-link a:hover { color: #67E8F9; }
+
+/* Identidade própria para cada etapa de autenticação. A estrutura continua compartilhada. */
+.auth-page { --auth-accent: #A78BFA; --auth-accent-rgb: 167,139,250; --auth-glow: rgba(139,92,246,.14); }
+.auth-page-login { --auth-accent: #A78BFA; --auth-accent-rgb: 167,139,250; --auth-glow: rgba(139,92,246,.16); }
+.auth-page-cadastro { --auth-accent: #5EEAD4; --auth-accent-rgb: 94,234,212; --auth-glow: rgba(20,184,166,.15); }
+.auth-page-recovery { --auth-accent: #FBBF24; --auth-accent-rgb: 251,191,36; --auth-glow: rgba(245,158,11,.12); }
+.auth-page-password { --auth-accent: #67E8F9; --auth-accent-rgb: 103,232,249; --auth-glow: rgba(6,182,212,.13); }
+.auth-page .brand-side {
+  background: radial-gradient(48rem 34rem at 0% 100%, var(--auth-glow), transparent 68%);
+}
+.auth-page .brand-side::before { border-color: rgba(var(--auth-accent-rgb), .18); }
+.auth-page .brand-side::after { background: var(--auth-glow); }
+.auth-page .card { border-color: rgba(var(--auth-accent-rgb), .25); overflow: hidden; }
+.auth-page .card::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, var(--auth-accent), rgba(34,211,238,.75), transparent);
+  opacity: .95;
+}
+.auth-page .auth-kicker { color: var(--auth-accent); }
+.auth-page .auth-kicker > span { background: var(--auth-accent); box-shadow: 0 0 0 .25rem rgba(var(--auth-accent-rgb), .12); }
+.auth-feature-icon {
+  display: flex;
+  align-items: center;
+  gap: .7rem;
+  width: fit-content;
+  max-width: 100%;
+  margin-bottom: .65rem;
+  padding: .55rem .75rem .55rem .55rem;
+  border: 1px solid rgba(var(--auth-accent-rgb), .25);
+  border-radius: 14px;
+  background: linear-gradient(110deg, rgba(var(--auth-accent-rgb), .12), rgba(9,14,28,.14));
+  color: var(--auth-accent);
+  font-size: .78rem;
+  font-weight: 700;
+  letter-spacing: .015em;
+}
+.auth-feature-icon svg {
+  flex: 0 0 31px;
+  width: 31px;
+  height: 31px;
+  padding: 6px;
+  border-radius: 9px;
+  background: rgba(var(--auth-accent-rgb), .13);
+}
+.auth-page-cadastro .hero h1 { text-wrap: pretty; }
+.auth-page-cadastro .card { box-shadow: 0 32px 90px -42px rgba(0,0,0,.92), 0 0 0 1px rgba(20,184,166,.045); }
+.auth-page-recovery .card { background: linear-gradient(145deg, rgba(22,23,39,.98), rgba(16,20,36,.98)); }
+.auth-page-recovery .recovery-note { border-color: rgba(var(--auth-accent-rgb),.25); background: rgba(var(--auth-accent-rgb),.06); }
+.auth-page-password .password-note { border-color: rgba(var(--auth-accent-rgb),.25); background: rgba(var(--auth-accent-rgb),.06); }
+.auth-page-cadastro #cadastro-btn { background-image: linear-gradient(105deg, #0F766E, #14B8A6); }
+.auth-page-cadastro #cadastro-btn:hover { filter: brightness(1.08); }
+.auth-page-recovery #recuperar-btn { background-image: linear-gradient(105deg, #B45309, #D97706); }
+.auth-page-recovery #recuperar-btn:hover { filter: brightness(1.08); }
+.auth-page-password #trocar-senha-btn { background-image: linear-gradient(105deg, #0E7490, #0891B2); }
+.auth-page-password #trocar-senha-btn:hover { filter: brightness(1.08); }
+.auth-page-cadastro .brand-foot::before,
+.auth-page-recovery .brand-foot::before,
+.auth-page-password .brand-foot::before {
+  content: "";
+  display: inline-block;
+  width: .45rem;
+  height: .45rem;
+  margin: 0 .55rem .08rem 0;
+  border-radius: 50%;
+  background: var(--auth-accent);
+  box-shadow: 0 0 0 .25rem rgba(var(--auth-accent-rgb), .1);
+}
+@media (max-width: 899px) {
+  .auth-page-cadastro .mobile-brand,
+  .auth-page-recovery .mobile-brand,
+  .auth-page-password .mobile-brand { color: var(--auth-accent); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .auth-feature-icon, .auth-page .card::before { transition: none; }
+}
+
+/* Restauração da paleta original da tela de login ELO Campus.
+   Mantém a estrutura responsiva atual, mas remove os realces cromáticos adicionados depois. */
+.auth-page-login.login,
+.auth-page-login .login {
+  background:
+    radial-gradient(60% 50% at 8% 0%, rgba(139, 92, 246, .22), transparent 70%),
+    radial-gradient(50% 45% at 100% 100%, rgba(34, 211, 238, .12), transparent 70%),
+    var(--bg);
+}
+.auth-page-login .brand-side {
+  background: none;
+  border-right-color: transparent;
+}
+.auth-page-login .brand-side::before,
+.auth-page-login .brand-side::after,
+.auth-page-login .form-side::before,
+.auth-page-login .card::before {
+  display: none;
+  content: none;
+}
+.auth-page-login .interlace-mark {
+  filter: drop-shadow(0 0 22px rgba(210, 40, 255, .38));
+}
+.auth-page-login .card {
+  background: var(--surface);
+  border-color: var(--border);
+  box-shadow: 0 30px 80px -30px rgba(0, 0, 0, .7), 0 0 0 1px rgba(139, 92, 246, .06);
+}
+.auth-page-login .auth-kicker { color: #C4B5FD; }
+.auth-page-login .auth-kicker > span {
+  background: var(--cyan);
+  box-shadow: 0 0 0 .25rem rgba(34, 211, 238, .1);
+}
+.auth-page-login .field label,
+.auth-page-login .access-picker legend { color: #CBD3E5; }
+.auth-page-login .access-option-card { background: rgba(8, 13, 26, .35); }
+.auth-page-login .access-option-card:hover { border-color: rgba(168, 85, 247, .62); }
+.auth-page-login .access-option > input:checked + .access-option-card {
+  border-color: var(--purple-light);
+  background: linear-gradient(145deg, rgba(139, 92, 246, .16), rgba(34, 211, 238, .045));
+  box-shadow: inset 0 0 0 1px rgba(168, 85, 247, .15);
+}
+.auth-page-login .access-icon { color: #C4B5FD; background: rgba(139, 92, 246, .14); }
+.auth-page-login .access-option > input:checked + .access-option-card .access-check {
+  border-color: #C4B5FD;
+  background: var(--purple-deep);
+  box-shadow: 0 0 0 2px rgba(139, 92, 246, .13);
+}
