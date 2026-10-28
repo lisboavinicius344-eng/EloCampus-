@@ -4,7 +4,6 @@
 
 (async function () {
   const $ = (id) => document.getElementById(id);
-  const { esc } = EloUtil;
 
   const id = new URLSearchParams(window.location.search).get("id");
   const form = $("eq-form");
@@ -33,23 +32,55 @@
   const fotoPreview = $("foto-preview");
   const fotoPreviewImg = $("foto-preview-img");
   let imagem = "";
+  let imagemAlterada = false;
+  async function reduzirImagem(arquivo, lado = 1280, qualidade = 0.85) {
+    const bitmap = await createImageBitmap(arquivo);
+    const escala = Math.min(1, lado / Math.max(bitmap.width, bitmap.height));
+    const canvas = document.createElement("canvas");
+    canvas.width = Math.max(1, Math.round(bitmap.width * escala));
+    canvas.height = Math.max(1, Math.round(bitmap.height * escala));
+    const contexto = canvas.getContext("2d");
+    if (!contexto) throw new Error("Não foi possível preparar a imagem.");
+    contexto.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+    if (typeof bitmap.close === "function") bitmap.close();
+    return canvas.toDataURL("image/jpeg", qualidade);
+  }
+  let identificadorPersonalizado = false;
+  let categoriasApi = [];
 
   const normalizarPatrimonio = (v) => v.trim().toUpperCase();
   const atualizarIdentificador = () => {
-    identificador.value = normalizarPatrimonio(campos.patrimonio.value);
+    if (!identificadorPersonalizado) {
+      identificador.value = normalizarPatrimonio(campos.patrimonio.value);
+    }
   };
+  identificador.addEventListener("input", () => {
+    identificadorPersonalizado = identificador.value.trim() !== "" &&
+      identificador.value.trim() !== normalizarPatrimonio(campos.patrimonio.value);
+  });
+  identificador.addEventListener("blur", () => {
+    if (!identificador.value.trim()) {
+      identificadorPersonalizado = false;
+      atualizarIdentificador();
+    }
+  });
 
   function lerDados() {
     return {
       nome: campos.nome.value.trim(),
       patrimonio: normalizarPatrimonio(campos.patrimonio.value),
       categoria: campos.categoria.value.trim(),
-      categoria_id: campos.categoria.value,
+      categoria_id: String(categoriasApi.find((c) =>
+        String(c.nome || "").trim().toLocaleLowerCase("pt-BR") === campos.categoria.value.trim().toLocaleLowerCase("pt-BR")
+        && c.ativo !== false
+      )?.id || ""),
       elegibilidade: $("f-elegibilidade")?.value || "todos",
       setor: campos.setor.value.trim(),
       condicao: campos.condicao.value,
       observacoes: campos.observacoes.value.trim(),
+      qr_code: identificador.value.trim() || normalizarPatrimonio(campos.patrimonio.value),
       imagem,
+      imagemAlterada,
     };
   }
 
@@ -59,7 +90,7 @@
     if (!d.patrimonio) m.patrimonio = "Informe o número de patrimônio.";
     else if (!/^[A-Z0-9][A-Z0-9._-]*$/.test(d.patrimonio))
       m.patrimonio = "Use apenas letras, números, hífen, ponto ou sublinhado.";
-    if (!d.categoria) m.categoria = "Selecione uma categoria cadastrada.";
+    if (!d.categoria) m.categoria = "Informe ou selecione o tipo ou categoria do equipamento.";
     if (!d.setor) m.setor = "Informe o setor responsável.";
     if (!d.condicao) m.condicao = "Selecione a condição física.";
     return m;
@@ -116,31 +147,55 @@
   };
   [campos.categoria, campos.condicao].forEach((campo) => campo.addEventListener("input", atualizarVisual));
   [campos.categoria, campos.condicao].forEach((campo) => campo.addEventListener("change", atualizarVisual));
-  foto.addEventListener("change", () => {
+  foto.addEventListener("change", async () => {
     const arquivo = foto.files?.[0];
     if (!arquivo) return;
-    if (!arquivo.type.startsWith("image/")) { foto.value = ""; mostrarErroGeral("Escolha um arquivo de imagem."); return; }
-    const leitor = new FileReader();
-    leitor.onload = () => { imagem = String(leitor.result || ""); fotoPreviewImg.src = imagem; fotoPreview.hidden = false; };
-    leitor.readAsDataURL(arquivo);
+    const tiposPermitidos = ["image/jpeg", "image/png", "image/webp", "image/gif"];
+    if (!tiposPermitidos.includes(arquivo.type)) {
+      foto.value = "";
+      mostrarErroGeral("Escolha uma imagem JPG, PNG, WebP ou GIF. SVG não é aceito.");
+      return;
+    }
+    try {
+      imagem = await reduzirImagem(arquivo);
+      imagemAlterada = true;
+      fotoPreviewImg.src = imagem;
+      fotoPreview.hidden = false;
+      erroGeral.hidden = true;
+    } catch {
+      foto.value = "";
+      mostrarErroGeral("Não foi possível ler essa imagem. Use JPG, PNG ou WebP.");
+    }
   });
-  $("remover-foto").addEventListener("click", () => { imagem = ""; foto.value = ""; fotoPreviewImg.removeAttribute("src"); fotoPreview.hidden = true; });
+  $("remover-foto").addEventListener("click", () => {
+    imagem = "";
+    imagemAlterada = true;
+    foto.value = "";
+    fotoPreviewImg.removeAttribute("src");
+    fotoPreview.hidden = true;
+  });
 
-  // Sugestões de tipo e setor a partir do que já existe (se falhar, segue sem elas)
-  let categoriasApi = [];
+  // Sugestões são auxiliares: falha numa listagem não deve bloquear o cadastro.
+  const preencher = (idLista, valores) => {
+    const lista = $(idLista);
+    if (!lista) return;
+    lista.replaceChildren(...[...new Set(valores.filter(Boolean))]
+      .sort((a, b) => a.localeCompare(b, "pt-BR"))
+      .map((v) => new Option(v, v)));
+  };
+
   try {
-    const lista = await ELO.equipamentos();
-    const preencher = (idLista, valores) => {
-      $(idLista).innerHTML = [...new Set(valores.filter(Boolean))].sort((a,b)=>a.localeCompare(b,"pt-BR")).map(v=>`<option value="${esc(v)}"></option>`).join("");
-    };
-    preencher("lista-setores", lista.map(e=>e.setor));
-    if (ELO.modo() === "api") {
-      categoriasApi = await ELO.categorias();
-      campos.categoria.replaceChildren(new Option("Selecione uma categoria", ""));
-      categoriasApi.filter(c=>c.ativo !== false).forEach(c => campos.categoria.add(new Option(c.nome, String(c.id))));
-      if (!categoriasApi.some(c=>c.ativo !== false)) { mostrarErroGeral("Não há categorias cadastradas. Cadastre uma categoria antes de incluir equipamentos."); }
-    } else preencher("lista-categorias", lista.map(e=>e.categoria));
-  } catch { /* sugestões são opcionais */ }
+    categoriasApi = await ELO.categorias();
+    preencher("lista-categorias", categoriasApi.filter(c => c.ativo !== false).map(c => c.nome));
+  } catch {
+    // A API também aceita uma categoria digitada; a lista é apenas uma sugestão.
+  }
+  try {
+    const listaEquipamentos = await ELO.equipamentos();
+    preencher("lista-setores", listaEquipamentos.map(e => e.setor));
+  } catch {
+    // Sugestões de setor não são obrigatórias para salvar.
+  }
 
   // Modo edição
   if (id) {
@@ -153,7 +208,15 @@
       const e = await ELO.equipamento(id);
       campos.nome.value = e.nome ?? "";
       campos.patrimonio.value = e.patrimonio ?? "";
-      campos.categoria.value = String(e.categoria_id ?? categoriasApi.find(c=>c.nome===e.categoria)?.id ?? "");
+      campos.categoria.value = String(e.categoria || categoriasApi.find(c => String(c.id) === String(e.categoria_id))?.nome || "");
+      const qrExistente = String(e.qr_code || e.codigo_qr || "").trim();
+      if (qrExistente && qrExistente !== normalizarPatrimonio(e.patrimonio || "")) {
+        identificador.value = qrExistente;
+        identificadorPersonalizado = true;
+      } else {
+        identificadorPersonalizado = false;
+        atualizarIdentificador();
+      }
       if ($("f-elegibilidade")) $("f-elegibilidade").value = e.elegibilidade || "todos";
       campos.setor.value = e.setor ?? "";
       campos.condicao.value = e.condicao ?? "";
