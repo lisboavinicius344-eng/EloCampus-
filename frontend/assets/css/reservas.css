@@ -46,3 +46,26 @@
   .reservas-page #res-form .btn { width: 100%; }
   .reservas-page .table-wrap { margin-inline: -.25rem; border-radius: 10px; }
 }
+
+
+/* Minhas reservas / administração de reservas: toolbar com hierarquia e respiro. */
+.reservas-toolbar {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(220px, 320px) auto;
+  align-items: end;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+.reservas-toolbar h2 { margin: 0; align-self: center; }
+.reservas-toolbar .field { margin: 0; }
+.reservas-toolbar .btn { min-width: 112px; }
+#res-form-wrap { margin-bottom: 0; }
+#res-form { gap: 1.15rem; }
+#res-form > .field, #res-form .api-grid { min-width: 0; }
+#res-form .api-grid { gap: 1rem; }
+#res-obs { min-height: 6.5rem; }
+@media (max-width: 760px) {
+  .reservas-toolbar { grid-template-columns: minmax(0,1fr); align-items: stretch; }
+  .reservas-toolbar .btn { width: 100%; }
+  #res-form .api-grid { grid-template-columns: minmax(0,1fr); }
+}
