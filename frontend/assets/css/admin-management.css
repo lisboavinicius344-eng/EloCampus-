@@ -1,0 +1,400 @@
+/* Acabamento administrativo: Equipe do sistema e Solicitações de acesso.
+   Mantém a identidade escura roxo/ciano e não altera os fluxos de API. */
+
+/* Equipe do sistema */
+body[data-pagina="usuarios"] .main,
+body[data-pagina="solicitacoes-acesso"] .main {
+  width: 100%;
+  max-width: 1500px;
+  min-width: 0;
+}
+
+body[data-pagina="usuarios"] .page-head,
+body[data-pagina="solicitacoes-acesso"] .page-head {
+  align-items: center;
+  margin-bottom: clamp(1.25rem, 2.5vw, 2rem);
+}
+
+body[data-pagina="usuarios"] .page-head > div,
+body[data-pagina="solicitacoes-acesso"] .page-head > div {
+  min-width: 0;
+  max-width: 900px;
+}
+
+body[data-pagina="usuarios"] .page-head p,
+body[data-pagina="solicitacoes-acesso"] .page-head p {
+  max-width: 76ch;
+  line-height: 1.65;
+}
+
+body[data-pagina="usuarios"] .stack {
+  display: grid;
+  gap: 1.25rem;
+  min-width: 0;
+}
+
+body[data-pagina="usuarios"] .stack > .card {
+  min-width: 0;
+  padding: clamp(1rem, 2.2vw, 1.65rem);
+  border: 1px solid var(--border);
+  border-radius: 22px;
+  background: linear-gradient(155deg, rgba(17, 24, 43, .98), rgba(13, 20, 37, .98));
+  box-shadow: 0 16px 38px rgba(0, 0, 0, .14);
+  gap: 1.15rem;
+}
+
+body[data-pagina="usuarios"] .h-md {
+  font-size: 1.18rem;
+  font-weight: 700;
+  line-height: 1.35;
+  margin-bottom: .3rem;
+}
+
+body[data-pagina="usuarios"] .muted {
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+body[data-pagina="usuarios"] #usuarios-api-form {
+  display: grid;
+  gap: 1rem;
+}
+
+body[data-pagina="usuarios"] .form-grid-2 {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+body[data-pagina="usuarios"] .field {
+  display: grid;
+  gap: .45rem;
+  min-width: 0;
+}
+
+body[data-pagina="usuarios"] .field > label {
+  color: #c5cde0;
+  font-size: .9rem;
+  font-weight: 600;
+}
+
+body[data-pagina="usuarios"] .input-block {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  min-height: 48px;
+  padding: .75rem .95rem;
+  border: 1px solid var(--border);
+  border-radius: 13px;
+  background: var(--surface-2);
+  color: var(--text);
+}
+
+body[data-pagina="usuarios"] select.input-block {
+  appearance: auto;
+  height: auto;
+  background-color: var(--surface-2);
+  color: var(--text);
+}
+
+body[data-pagina="usuarios"] #usuarios-api-form > div:last-child {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .75rem;
+}
+
+body[data-pagina="usuarios"] .small {
+  font-size: .82rem;
+}
+
+body[data-pagina="usuarios"] #usuarios-api-aviso {
+  overflow-wrap: anywhere;
+}
+
+body[data-pagina="usuarios"] .table-wrap {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  border: 1px solid rgba(41, 52, 77, .8);
+  border-radius: 14px;
+  background: rgba(9, 14, 27, .35);
+  -webkit-overflow-scrolling: touch;
+}
+
+body[data-pagina="usuarios"] .table-wrap table {
+  width: 100%;
+  min-width: 720px;
+  border-collapse: separate;
+  border-spacing: 0;
+  text-align: left;
+}
+
+body[data-pagina="usuarios"] .table-wrap th {
+  padding: .9rem 1rem;
+  color: #c5cde0;
+  background: rgba(139, 92, 246, .09);
+  font-size: .78rem;
+  font-weight: 700;
+  letter-spacing: .035em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+body[data-pagina="usuarios"] .table-wrap td {
+  padding: .9rem 1rem;
+  border-top: 1px solid rgba(41, 52, 77, .72);
+  color: #e5e9f4;
+  font-size: .9rem;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+  vertical-align: middle;
+}
+
+body[data-pagina="usuarios"] .table-wrap tbody tr:hover td {
+  background: rgba(139, 92, 246, .055);
+}
+
+body[data-pagina="usuarios"] .table-wrap td:last-child {
+  min-width: 190px;
+}
+
+body[data-pagina="usuarios"] .pill {
+  display: inline-flex;
+  align-items: center;
+  max-width: 100%;
+  padding: .35rem .65rem;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  font-size: .78rem;
+  font-weight: 700;
+  line-height: 1.35;
+  white-space: normal;
+}
+
+body[data-pagina="usuarios"] .pill-ok {
+  color: #6ee7b7;
+  background: rgba(52, 211, 153, .1);
+  border-color: rgba(52, 211, 153, .25);
+}
+
+body[data-pagina="usuarios"] .pill-warn {
+  color: #fbbf24;
+  background: rgba(251, 191, 36, .1);
+  border-color: rgba(251, 191, 36, .25);
+}
+
+body[data-pagina="usuarios"] .btn-sm {
+  min-height: 38px;
+  padding: .6rem .9rem;
+  border-radius: 11px;
+  font-size: .82rem;
+  white-space: normal;
+}
+
+body[data-pagina="usuarios"] .btn-line {
+  border: 1px solid var(--border);
+  background: transparent;
+  color: #d8dff0;
+  box-shadow: none;
+}
+
+body[data-pagina="usuarios"] .btn-ghost {
+  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, .025);
+  color: #d8dff0;
+  box-shadow: none;
+}
+
+/* Solicitações de acesso */
+body[data-pagina="solicitacoes-acesso"] .access-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: start;
+  gap: 1rem;
+  min-width: 0;
+}
+
+body[data-pagina="solicitacoes-acesso"] .access-grid > .card {
+  min-width: 0;
+  padding: clamp(1rem, 2vw, 1.45rem);
+  border: 1px solid var(--border);
+  border-radius: 22px;
+  background: linear-gradient(155deg, rgba(17, 24, 43, .98), rgba(13, 20, 37, .98));
+  box-shadow: 0 16px 38px rgba(0, 0, 0, .14);
+}
+
+body[data-pagina="solicitacoes-acesso"] .access-grid > .card:only-child {
+  grid-column: 1 / -1;
+}
+
+body[data-pagina="solicitacoes-acesso"] .access-card {
+  display: grid;
+  align-content: start;
+  gap: 1.1rem;
+}
+
+body[data-pagina="solicitacoes-acesso"] .access-card-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: .85rem;
+  padding-bottom: .9rem;
+  border-bottom: 1px solid rgba(41, 52, 77, .75);
+}
+
+body[data-pagina="solicitacoes-acesso"] .access-card-head > div {
+  min-width: 0;
+}
+
+body[data-pagina="solicitacoes-acesso"] .access-card-head h2 {
+  font-size: 1.08rem;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+body[data-pagina="solicitacoes-acesso"] .access-meta {
+  margin-top: .45rem;
+  color: var(--muted);
+  font-size: .84rem;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+
+body[data-pagina="solicitacoes-acesso"] .pill {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  padding: .3rem .65rem;
+  border-radius: 999px;
+  font-size: .77rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+body[data-pagina="solicitacoes-acesso"] .pill-warn {
+  color: #fbbf24;
+  background: rgba(251, 191, 36, .1);
+  border: 1px solid rgba(251, 191, 36, .25);
+}
+
+body[data-pagina="solicitacoes-acesso"] .access-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: .85rem;
+  min-width: 0;
+}
+
+body[data-pagina="solicitacoes-acesso"] .access-fields .field {
+  display: grid;
+  gap: .4rem;
+  min-width: 0;
+}
+
+body[data-pagina="solicitacoes-acesso"] .access-fields .field > label {
+  color: #c5cde0;
+  font-size: .85rem;
+  font-weight: 600;
+}
+
+body[data-pagina="solicitacoes-acesso"] .access-fields .input,
+body[data-pagina="solicitacoes-acesso"] .access-fields textarea,
+body[data-pagina="solicitacoes-acesso"] .access-fields select {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  min-height: 44px;
+  padding: .65rem .8rem;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface-2);
+  color: var(--text);
+  font: inherit;
+}
+
+body[data-pagina="solicitacoes-acesso"] .access-fields textarea {
+  min-height: 82px;
+  resize: vertical;
+}
+
+body[data-pagina="solicitacoes-acesso"] .access-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: .65rem;
+  padding-top: .25rem;
+}
+
+body[data-pagina="solicitacoes-acesso"] .access-actions .btn {
+  min-height: 42px;
+  padding: .7rem 1rem;
+  border-radius: 12px;
+  font-size: .88rem;
+}
+
+body[data-pagina="solicitacoes-acesso"] .access-actions .btn-ghost {
+  border: 1px solid var(--border);
+  background: transparent;
+  color: #d8dff0;
+  box-shadow: none;
+}
+
+body[data-pagina="solicitacoes-acesso"] .access-password {
+  display: grid;
+  gap: .8rem;
+  padding: 1rem;
+  border: 1px solid rgba(245, 158, 11, .38);
+  border-radius: 14px;
+  background: rgba(245, 158, 11, .07);
+  overflow-wrap: anywhere;
+}
+
+body[data-pagina="solicitacoes-acesso"] .access-password code {
+  display: block;
+  width: fit-content;
+  max-width: 100%;
+  padding: .6rem .75rem;
+  border: 1px solid rgba(245, 158, 11, .25);
+  border-radius: 8px;
+  background: rgba(0, 0, 0, .2);
+  font-size: 1rem;
+  overflow-wrap: anywhere;
+  user-select: all;
+}
+
+body[data-pagina="solicitacoes-acesso"] #solicitacoes-aviso {
+  margin-bottom: 1rem;
+  overflow-wrap: anywhere;
+}
+
+body[data-pagina="solicitacoes-acesso"] #solicitacoes-aviso[hidden] {
+  display: none;
+}
+
+@media (max-width: 1100px) {
+  body[data-pagina="solicitacoes-acesso"] .access-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 760px) {
+  body[data-pagina="usuarios"] .form-grid-2,
+  body[data-pagina="solicitacoes-acesso"] .access-fields {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  body[data-pagina="usuarios"] .page-head,
+  body[data-pagina="solicitacoes-acesso"] .page-head {
+    align-items: stretch;
+  }
+
+  body[data-pagina="usuarios"] .page-head .btn,
+  body[data-pagina="solicitacoes-acesso"] .page-head .btn {
+    width: 100%;
+  }
+
+  body[data-pagina="usuarios"] #usuarios-api-form > div:last-child .btn,
+  body[data-pagina="solicitacoes-acesso"] .access-actions .btn {
+    flex: 1 1 100%;
+    width: 100%;
+  }
+}
