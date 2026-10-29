@@ -359,7 +359,7 @@ const ELO = {
       throw erro;
     }
   },
-  trocarSenha: (dados) => requisitar("/auth/trocar-senha", { metodo: "POST", corpo: { nova_senha: String(dados.nova_senha || "") } }),
+  trocarSenha: (dados) => requisitar("/auth/trocar-senha", { metodo: "POST", corpo: { nova_senha: String(dados.nova_senha || ""), ...(dados.senha_atual ? { senha_atual: String(dados.senha_atual) } : {}) } }),
   usuarios: async () => (await requisitar("/usuarios")).usuarios,
   criarUsuario: (dados) => requisitar("/usuarios", { metodo: "POST", corpo: { nome: String(dados.nome || "").trim(), email: String(dados.email || "").trim().toLowerCase(), papel: dados.papel } }),
   reenviarSenha: (id) => requisitar(`/usuarios/${encodeURIComponent(id)}/reenviar-senha`, { metodo: "PATCH" }),

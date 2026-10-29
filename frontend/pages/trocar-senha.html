@@ -4,14 +4,14 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#0B1020">
-  <title>Criar sua senha — ELO Campus</title>
+  <title>Alterar senha — ELO Campus</title>
   <meta name="description" content="Crie sua senha pessoal para acessar o ELO Campus.">
   <link rel="icon" type="image/png" href="../assets/img/logo.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../assets/css/style.css?v=2026.10.29.4">
-  <link rel="stylesheet" href="../assets/css/login.css?v=2026.10.29.4">
+  <link rel="stylesheet" href="../assets/css/style.css?v=2026.10.29.5">
+  <link rel="stylesheet" href="../assets/css/login.css?v=2026.10.29.5">
   <style>
     .password-note{margin:.75rem 0;padding:.85rem 1rem;border:1px solid rgba(139,92,246,.28);border-radius:12px;background:rgba(139,92,246,.08);color:var(--text-secondary,#cbd5e1);font-size:.9rem;line-height:1.5}
     #trocar-senha-form{display:grid;gap:1rem}
@@ -41,6 +41,7 @@
         <div class="password-note">A senha provisória vale para um único acesso. Se você sair antes de criar sua senha, use “Esqueci minha senha” na tela de login para solicitar novas instruções. A nova senha deve ter pelo menos 8 caracteres.</div>
         <div id="trocar-senha-mensagem" class="alert alert-error" role="alert" aria-live="polite" hidden></div>
         <form id="trocar-senha-form" novalidate>
+          <div class="field" id="campo-senha-atual" hidden><label for="senha-atual">Senha atual</label><input class="input" id="senha-atual" name="senha_atual" type="password" autocomplete="current-password"></div>
           <div class="field"><label for="nova-senha">Nova senha</label><input class="input" id="nova-senha" name="nova_senha" type="password" autocomplete="new-password" minlength="8" required><small class="muted">Mínimo de 8 caracteres.</small></div>
           <div class="field"><label for="confirmar-senha">Confirmar nova senha</label><input class="input" id="confirmar-senha" name="confirmar_senha" type="password" autocomplete="new-password" minlength="8" required></div>
           <button class="btn btn-primary" id="trocar-senha-btn" type="submit">Salvar nova senha</button>
@@ -49,43 +50,71 @@
       </div>
     </section>
   </main>
-  <script src="../assets/js/runtime-config.js?v=2026.10.29.4"></script>
-  <script src="../assets/js/api.js?v=2026.10.29.4"></script>
-  <script src="../assets/js/auth.js?v=2026.10.29.4"></script>
+  <script src="../assets/js/runtime-config.js?v=2026.10.29.5"></script>
+  <script src="../assets/js/api.js?v=2026.10.29.5"></script>
+  <script src="../assets/js/auth.js?v=2026.10.29.5"></script>
   <script>
     (() => {
       const form = document.getElementById('trocar-senha-form');
       const msg = document.getElementById('trocar-senha-mensagem');
+      const atual = document.getElementById('senha-atual');
+      const campoAtual = document.getElementById('campo-senha-atual');
       const nova = document.getElementById('nova-senha');
       const confirmar = document.getElementById('confirmar-senha');
       const botao = document.getElementById('trocar-senha-btn');
+      const titulo = document.getElementById('titulo-senha');
       const sessao = obterSessao();
+      const primeiroAcesso = Boolean(sessao?.deve_trocar_senha);
+
+      campoAtual.hidden = primeiroAcesso;
+      titulo.textContent = primeiroAcesso ? 'Criar sua senha' : 'Alterar senha';
+      const cabecalho = titulo.closest('.card-head')?.querySelector('p');
+      if (cabecalho) cabecalho.textContent = primeiroAcesso
+        ? 'Defina uma senha pessoal para concluir o primeiro acesso ao ELO Campus.'
+        : 'Confirme sua senha atual e escolha uma nova senha para sua conta.';
+      const nota = document.querySelector('.password-note');
+      if (nota) nota.textContent = primeiroAcesso
+        ? 'A senha provisória vale para um único acesso. Se você sair antes de criar sua senha, use “Esqueci minha senha” na tela de login para solicitar novas instruções. A nova senha deve ter pelo menos 8 caracteres.'
+        : 'A nova senha deve ter pelo menos 8 caracteres. Se não lembrar sua senha atual, use “Esqueci minha senha” na tela de login.';
+      const kicker = document.querySelector('.auth-kicker');
+      if (kicker) kicker.innerHTML = '<span aria-hidden="true"></span> ' + (primeiroAcesso ? 'Primeiro acesso' : 'Segurança da conta');
+
       function avisar(texto, ok = false) {
         msg.textContent = texto;
         msg.className = `alert ${ok ? 'alert-ok' : 'alert-error'}`;
         msg.hidden = false;
       }
+
       if (!sessao?.token) {
-        avisar('Sua sessão de primeiro acesso não está disponível. Se a senha provisória já foi utilizada, use “Esqueci minha senha” para solicitar novas instruções.');
+        avisar('Entre novamente para alterar a senha. Se você ainda não criou sua senha ou não se lembra dela, use “Esqueci minha senha” na tela de login.');
         form.hidden = true;
       } else if (ELO.modo() !== 'api') {
         avisar('A troca de senha exige conexão com a API.');
       }
+
       form.addEventListener('submit', async (e) => {
-        e.preventDefault(); msg.hidden = true;
+        e.preventDefault();
+        msg.hidden = true;
+        if (!primeiroAcesso && !atual.value) {
+          avisar('Informe a senha atual.');
+          atual.focus();
+          return;
+        }
         if (nova.value.length < 8) { avisar('A nova senha deve ter pelo menos 8 caracteres.'); nova.focus(); return; }
         if (nova.value !== confirmar.value) { avisar('A confirmação não corresponde à nova senha.'); confirmar.focus(); return; }
-        botao.disabled = true; botao.textContent = 'Salvando…';
+        botao.disabled = true;
+        botao.textContent = 'Salvando…';
         try {
-          await ELO.trocarSenha({ nova_senha: nova.value });
+          await ELO.trocarSenha({ nova_senha: nova.value, senha_atual: primeiroAcesso ? undefined : atual.value });
           limparSessao();
-          avisar('Senha criada com sucesso. Entre novamente com sua nova senha.', true);
-          botao.textContent = 'Senha criada';
+          avisar('Senha atualizada com sucesso. Entre novamente com sua nova senha.', true);
+          botao.textContent = 'Senha atualizada';
           botao.disabled = true;
           window.setTimeout(() => window.location.replace('../index.html'), 900);
         } catch (falha) {
           avisar(falha.message || 'Não foi possível trocar a senha. Confira os dados e tente novamente.');
-          botao.disabled = false; botao.textContent = 'Salvar nova senha';
+          botao.disabled = false;
+          botao.textContent = 'Salvar nova senha';
         }
       });
     })();
