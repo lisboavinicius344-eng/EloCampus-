@@ -43,7 +43,7 @@ const EloUtil = {
   const usuarioFinal = ["aluno", "professor"].includes(perfilAtual);
   const paginaAtual = document.body.dataset.pagina;
   const arquivoAtual = window.location.pathname.split("/").pop();
-  const paginasRestritas = ["movimentacoes.html", "usuarios.html", "solicitantes.html", "relatorio.html", "servidor.html", "equipamento-form.html", "manutencoes.html", "categorias.html"];
+  const paginasRestritas = ["movimentacoes.html", "usuarios.html", "solicitantes.html", "relatorio.html", "servidor.html", "equipamento-form.html", "manutencoes.html", "categorias.html", "solicitacoes-acesso.html"];
   const paginasUsuario = ["dashboard.html", "disponiveis.html", "consulta-qr-interno.html", "emprestimos.html", "novo-emprestimo.html", "reservas.html", "perfil.html", "trocar-senha.html"];
 
   // O controle de navegação evita acessos acidentais pela URL; segurança real
@@ -67,7 +67,7 @@ const EloUtil = {
   }
   // A API limita a gestão de contas (/usuarios) ao administrador, embora
   // operadores também possam gerir solicitantes.
-  if (!publico && arquivoAtual === "usuarios.html" && perfilAtual !== "administrador") {
+  if (!publico && ["usuarios.html", "solicitacoes-acesso.html"].includes(arquivoAtual) && perfilAtual !== "administrador") {
     window.location.replace("dashboard.html");
     return;
   }
@@ -110,6 +110,7 @@ const EloUtil = {
     ]},
     { grupo: "Administração", itens: [
       { id: "solicitantes", rotulo: "Solicitantes", icone: "people", href: "solicitantes.html" },
+      { id: "solicitacoes-acesso", rotulo: "Solicitações de acesso", icone: "people-admin", href: "solicitacoes-acesso.html", admin: true },
       { id: "movimentacoes", rotulo: "Histórico de movimentações", icone: "swap", href: "movimentacoes.html", admin: true },
       { id: "usuarios", rotulo: "Equipe do sistema", icone: "people-admin", href: "usuarios.html", admin: true }
     ]},
@@ -135,7 +136,8 @@ const EloUtil = {
     if (!itemPermitido(i)) return "";
     const ativo = i.id === atual;
     const icon = svg(i.icone);
-    return `<li><a class="nav-item${ativo ? " is-active" : ""}" href="${i.href}"${ativo ? ' aria-current="page"' : ""}>${icon}<span>${i.rotulo}</span></a></li>`;
+    const badge = i.id === "solicitacoes-acesso" ? '<span class="nav-count" id="solicitacoes-pendentes-count" hidden></span>' : "";
+    return `<li><a class="nav-item${ativo ? " is-active" : ""}" href="${i.href}"${ativo ? ' aria-current="page"' : ""}>${icon}<span>${i.rotulo}</span>${badge}</a></li>`;
   };
   const itens = NAV.map((item) => {
     if (!item.grupo) return itemHtml(item);
@@ -166,6 +168,17 @@ const EloUtil = {
   document.getElementById("topbar").innerHTML = `
     <button class="topbar-btn" type="button" id="btn-menu" aria-controls="sidebar" aria-expanded="false" aria-label="Abrir menu">${svg("menu")}</button>
     <span class="topbar-brand"><img src="../assets/img/logo.png" alt="">ELO Campus</span>`;
+
+  if (perfilAtual === "administrador" && typeof ELO !== "undefined" && typeof ELO.solicitacoesAcesso === "function") {
+    ELO.solicitacoesAcesso("pendente").then((pendentes) => {
+      const contador = document.getElementById("solicitacoes-pendentes-count");
+      if (!contador) return;
+      const total = Array.isArray(pendentes) ? pendentes.length : 0;
+      contador.textContent = String(total);
+      contador.hidden = total === 0;
+      contador.setAttribute("aria-label", `${total} solicitações pendentes`);
+    }).catch(() => { /* menu permanece utilizável se a rota não estiver disponível */ });
+  }
 
   if (usuarioFinal) {
     document.querySelectorAll('a[href="equipamento-form.html"], a[href="movimentacoes.html"], a[href="relatorio.html"], a[href="usuarios.html"], a[href="solicitantes.html"], a[href="servidor.html"]').forEach((el) => { el.hidden = true; el.style.display = "none"; });

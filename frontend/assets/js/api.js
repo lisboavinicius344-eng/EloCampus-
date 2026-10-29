@@ -45,8 +45,8 @@ const normalizarEmprestimo = (emprestimo = {}) => {
     const atrasado = !devolvida && emprestimo.status === "em_andamento" && prevista && new Date(prevista).valueOf() < Date.now();
     const condicaoDevolucaoApi = String(item.estado_na_devolucao ?? emprestimo.estado_na_devolucao ?? "").toLowerCase();
     const condicaoDevolucao = ({
-      bom: "Perfeito", perfeito: "Perfeito", regular: "Incompleto", incompleto: "Incompleto",
-      danificado: "Com avaria", avaria: "Com avaria", com_avaria: "Com avaria",
+      bom: "Bom", perfeito: "Bom", regular: "Regular", incompleto: "Regular",
+      danificado: "Danificado", avaria: "Danificado", com_avaria: "Danificado",
     })[condicaoDevolucaoApi.replace(/[\s-]+/g, "_")] || (item.estado_na_devolucao ?? emprestimo.estado_na_devolucao ?? "");
     return {
       ...emprestimo,
@@ -82,16 +82,16 @@ const normalizarEmprestimo = (emprestimo = {}) => {
 
 // Remove secrets from parsed API responses before exposing objects to page code.
 // The backend must also avoid returning secrets at all; DevTools can still show raw HTTP responses.
-function sanitizarResposta(valor) {
-  if (Array.isArray(valor)) return valor.map(sanitizarResposta);
+function sanitizarResposta(valor, opcoes = {}) {
+  if (Array.isArray(valor)) return valor.map((item) => sanitizarResposta(item, opcoes));
   if (!valor || typeof valor !== "object") return valor;
   const sensiveis = new Set([
     "senha", "senhaprovisoria", "senhaatual", "novasenha", "password", "temporarypassword",
     "passwordhash", "senhahash", "token", "accesstoken", "refreshtoken", "resettoken", "tokenrecuperacao",
   ]);
   return Object.fromEntries(Object.entries(valor)
-    .filter(([chave]) => !sensiveisTem(chave, sensiveis))
-    .map(([chave, conteudo]) => [chave, sanitizarResposta(conteudo)]));
+    .filter(([chave]) => !sensiveisTem(chave, sensiveis) || (opcoes.permitirSenhaProvisoriaUnica && String(chave).toLowerCase().replace(/[_\s-]/g, "") === "senhaprovisoria"))
+    .map(([chave, conteudo]) => [chave, sanitizarResposta(conteudo, opcoes)]));
 }
 function sensiveisTem(chave, sensiveis) {
   const normalizada = String(chave).toLowerCase().replace(/[_\s-]/g, "");
@@ -138,7 +138,7 @@ async function requisitar(caminho, opcoes = {}) {
     erro.campo = corpoBruto?.campo;
     throw erro;
   }
-  return sanitizarResposta(corpoBruto);
+  return sanitizarResposta(corpoBruto, { permitirSenhaProvisoriaUnica: Boolean(opcoes.permitirSenhaProvisoriaUnica) });
 }
 
 const ELO = {
@@ -186,10 +186,18 @@ const ELO = {
       solicitanteId = solicitantes.find((pessoa) => String(pessoa.nome || "").trim().toLocaleLowerCase("pt-BR") === String(dados.solicitante).trim().toLocaleLowerCase("pt-BR"))?.id;
     }
     if (!solicitanteId) throw new Error("Não foi possível identificar o cadastro do solicitante. Confira se ele está cadastrado e ativo.");
+    const prazo = new Date(dados.prevista);
+    const agora = new Date();
+    const limite = new Date(agora); limite.setDate(limite.getDate() + 15);
+    if (Number.isNaN(prazo.valueOf()) || prazo <= agora || prazo > limite) throw new Error("A devolução do empréstimo deve ser futura e ocorrer em até 15 dias.");
+    const emprestimosAtuais = await ELO.emprestimos();
+    if (emprestimosAtuais.some((item) => item.situacao === "atrasado" && String(item.solicitante?.id ?? "") === String(solicitanteId))) {
+      throw new Error("Este solicitante tem equipamento em atraso. Regularize a devolução antes de registrar outro empréstimo.");
+    }
     return requisitar("/emprestimos", { metodo: "POST", corpo: {
-      solicitante_id: Number(solicitanteId),
+      solicitante_id: String(solicitanteId),
       equipamentos: (dados.equipamentos || []).map(Number),
-      data_prevista_devolucao: new Date(dados.prevista).toISOString(),
+      data_prevista_devolucao: prazo.toISOString(),
       observacoes: [dados.finalidade, dados.observacoes].filter(Boolean).join(" — ") || null,
     } });
   },
@@ -295,6 +303,7 @@ const ELO = {
       tipo: String(dados.tipo || "").trim().toLowerCase(),
       setor: String(dados.setor || "").trim() || null,
       email: String(dados.email || "").trim().toLowerCase() || null,
+      matricula: String(dados.matricula || "").trim() || null,
       telefone: String(dados.telefone || "").trim() || null,
     },
   }),
@@ -305,6 +314,7 @@ const ELO = {
       tipo: String(dados.tipo || "").trim().toLowerCase(),
       setor: String(dados.setor || "").trim() || null,
       email: String(dados.email || "").trim().toLowerCase() || null,
+      matricula: String(dados.matricula || "").trim() || null,
       telefone: String(dados.telefone || "").trim() || null,
     },
   }),
@@ -319,9 +329,24 @@ const ELO = {
   manutencoes: async () => (await requisitar("/manutencoes")).manutencoes,
   abrirManutencao: (dados) => requisitar("/manutencoes", { metodo: "POST", corpo: dados }),
   finalizarManutencao: (id, dados) => requisitar(`/manutencoes/${encodeURIComponent(id)}/finalizar`, { metodo: "PATCH", corpo: dados }),
-  cadastroAluno: (dados) => requisitar("/auth/cadastro-aluno", { metodo: "POST", semAutenticacao: true, naoRedirecionar401: true, corpo: {
-    nome: String(dados.nome || "").trim(), email: String(dados.email || "").trim().toLowerCase(), solicitante_id: Number(dados.solicitante_id),
+  solicitarAcesso: (dados) => requisitar("/auth/solicitar-acesso", { metodo: "POST", semAutenticacao: true, naoRedirecionar401: true, corpo: {
+    nome: String(dados.nome || "").trim(),
+    email: String(dados.email || "").trim().toLowerCase(),
+    ...(dados.tipo ? { tipo: String(dados.tipo).trim().toLowerCase() } : {}),
+    ...(String(dados.matricula || "").trim() ? { matricula: String(dados.matricula).trim() } : {}),
+    ...(String(dados.mensagem || "").trim() ? { mensagem: String(dados.mensagem).trim() } : {}),
   } }),
+  solicitacoesAcesso: async (status = "pendente") => {
+    const resposta = await requisitar(`/solicitacoes-acesso?status=${encodeURIComponent(status)}`);
+    if (Array.isArray(resposta)) return resposta;
+    return Array.isArray(resposta?.solicitacoes) ? resposta.solicitacoes : Array.isArray(resposta?.solicitacoes_acesso) ? resposta.solicitacoes_acesso : [];
+  },
+  aprovarSolicitacaoAcesso: (id, dados = {}) => requisitar(`/solicitacoes-acesso/${encodeURIComponent(String(id))}/aprovar`, {
+    metodo: "POST", corpo: dados, permitirSenhaProvisoriaUnica: true,
+  }),
+  recusarSolicitacaoAcesso: (id, motivo = "") => requisitar(`/solicitacoes-acesso/${encodeURIComponent(String(id))}/recusar`, {
+    metodo: "POST", corpo: motivo.trim() ? { motivo: motivo.trim() } : {},
+  }),
   solicitarRecuperacaoSenha: async (email) => {
     try {
       return await requisitar("/auth/esqueci-senha", { metodo: "POST", semAutenticacao: true, naoRedirecionar401: true, corpo: { email: String(email || "").trim().toLowerCase() } });
@@ -334,7 +359,7 @@ const ELO = {
       throw erro;
     }
   },
-  trocarSenha: (dados) => requisitar("/auth/trocar-senha", { metodo: "POST", corpo: { senha_atual: dados.senha_atual, nova_senha: dados.nova_senha } }),
+  trocarSenha: (dados) => requisitar("/auth/trocar-senha", { metodo: "POST", corpo: { nova_senha: String(dados.nova_senha || "") } }),
   usuarios: async () => (await requisitar("/usuarios")).usuarios,
   criarUsuario: (dados) => requisitar("/usuarios", { metodo: "POST", corpo: { nome: String(dados.nome || "").trim(), email: String(dados.email || "").trim().toLowerCase(), papel: dados.papel } }),
   reenviarSenha: (id) => requisitar(`/usuarios/${encodeURIComponent(id)}/reenviar-senha`, { metodo: "PATCH" }),

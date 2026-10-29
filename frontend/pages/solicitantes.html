@@ -10,9 +10,9 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../assets/css/style.css">
-  <link rel="stylesheet" href="../assets/css/layout.css">
-  <link rel="stylesheet" href="../assets/css/solicitantes.css">
+  <link rel="stylesheet" href="../assets/css/style.css?v=2026.10.29.2">
+  <link rel="stylesheet" href="../assets/css/layout.css?v=2026.10.29.2">
+  <link rel="stylesheet" href="../assets/css/solicitantes.css?v=2026.10.29.2">
 </head>
 <body data-pagina="solicitantes">
   <div class="app">
@@ -36,12 +36,12 @@
               <span class="solicitante-icon" aria-hidden="true">＋</span>
               <div>
                 <h2 id="solicitante-form-titulo">Novo solicitante</h2>
-                <p class="muted">O cadastro é separado da conta de acesso ao site.</p>
+                <p class="muted">O registro da pessoa e a conta de acesso são acompanhados separadamente.</p>
               </div>
             </div>
             <div class="solicitante-help">
               <strong>Por que isso é necessário?</strong>
-              <p>O cadastro de solicitante é separado do login. Apenas discentes/alunos e docentes/professores usam o código para criar uma conta. Servidores, técnicos e externos ficam cadastrados para a equipe identificar no empréstimo e não têm autocadastro previsto nesta API.</p>
+              <p>O cadastro de solicitante é separado do login. Alunos e professores precisam ter e-mail cadastrado. O acesso é solicitado na tela pública e aprovado pela administração; não há código para o solicitante informar.</p>
             </div>
             <form id="solicitante-form" class="stack" novalidate>
               <input id="solicitante-form-id" type="hidden">
@@ -64,8 +64,12 @@
                 <input class="input input-block" id="solicitante-setor" name="setor" maxlength="100" autocomplete="organization">
               </div>
               <div class="field">
-                <label for="solicitante-email">E-mail</label>
+                <label for="solicitante-email">E-mail <span class="muted">(obrigatório para aluno/professor)</span></label>
                 <input class="input input-block" id="solicitante-email" name="email" type="email" maxlength="254" autocomplete="email">
+              </div>
+              <div class="field">
+                <label for="solicitante-matricula">Matrícula / SIAPE</label>
+                <input class="input input-block" id="solicitante-matricula" name="matricula" type="text" maxlength="80" autocomplete="off">
               </div>
               <div class="field">
                 <label for="solicitante-telefone">Telefone</label>
@@ -82,14 +86,14 @@
             <div class="solicitante-list-heading">
               <div>
                 <h2 id="solicitante-lista-titulo">Cadastros existentes</h2>
-                <p class="muted">O código é o ID devolvido pela API — não é necessariamente a matrícula institucional.</p>
+                <p class="muted">O ID é gerado pelo banco e não substitui a matrícula institucional.</p>
               </div>
               <span class="solicitante-count" id="solicitante-contagem" aria-live="polite">—</span>
             </div>
             <div class="solicitante-filters">
               <div class="field">
                 <label for="solicitante-busca">Pesquisar</label>
-                <input class="input input-block" id="solicitante-busca" type="search" placeholder="Nome, código ou e-mail" autocomplete="off">
+                <input class="input input-block" id="solicitante-busca" type="search" placeholder="Nome, ID, matrícula ou e-mail" autocomplete="off">
               </div>
               <div class="field">
                 <label for="solicitante-status">Situação</label>
@@ -113,20 +117,20 @@
             </div>
             <div class="table-wrap">
               <table class="table solicitantes-table">
-                <thead><tr><th>Código</th><th>Solicitante</th><th>Vínculo</th><th>Contato</th><th>Situação</th><th>Ações</th></tr></thead>
-                <tbody id="solicitantes-tbody"><tr><td colspan="6" class="estado-vazio">Carregando cadastros da API…</td></tr></tbody>
+                <thead><tr><th>ID</th><th>Solicitante</th><th>Vínculo</th><th>Matrícula / SIAPE</th><th>Contato</th><th>Conta</th><th>Situação</th><th>Ações</th></tr></thead>
+                <tbody id="solicitantes-tbody"><tr><td colspan="8" class="estado-vazio">Carregando cadastros da API…</td></tr></tbody>
               </table>
             </div>
-            <p class="muted small solicitante-table-note">Contas de acesso são gerenciadas separadamente. Nunca informe ou solicite senhas nesta tela.</p>
+            <p class="muted small solicitante-table-note">A coluna “Conta” indica se já existe uma conta de acesso vinculada. Nunca informe ou solicite senhas nesta tela.</p>
           </section>
         </section>
       </main>
     </div>
   </div>
-  <script src="../assets/js/runtime-config.js"></script>
-  <script src="../assets/js/api.js"></script>
-  <script src="../assets/js/auth.js"></script>
-  <script src="../assets/js/layout.js"></script>
-  <script src="../assets/js/solicitantes-manager.js"></script>
+  <script src="../assets/js/runtime-config.js?v=2026.10.29.2"></script>
+  <script src="../assets/js/api.js?v=2026.10.29.2"></script>
+  <script src="../assets/js/auth.js?v=2026.10.29.2"></script>
+  <script src="../assets/js/layout.js?v=2026.10.29.2"></script>
+  <script src="../assets/js/solicitantes-manager.js?v=2026.10.29.2"></script>
 </body>
 </html>

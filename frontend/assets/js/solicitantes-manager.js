@@ -72,7 +72,7 @@
       const ativo = item.ativo !== false;
       const porStatus = filtroStatus.value === "todos" || (filtroStatus.value === "ativos" && ativo) || (filtroStatus.value === "inativos" && !ativo);
       const porTipo = !filtroTipo.value || normalizar(item.tipo) === filtroTipo.value;
-      const texto = normalizar([item.id, item.nome, tipos[normalizar(item.tipo)] || item.tipo, item.tipo, item.setor, item.email, item.telefone].join(" "));
+      const texto = normalizar([item.id, item.nome, tipos[normalizar(item.tipo)] || item.tipo, item.tipo, item.matricula, item.setor, item.email, item.telefone].join(" "));
       return porStatus && porTipo && (!termo || texto.includes(termo));
     });
   }
@@ -84,7 +84,7 @@
     if (!filtrados.length) {
       const linha = document.createElement("tr");
       const mensagem = elemento("td", solicitantes.length ? "Nenhum solicitante corresponde aos filtros." : "Nenhum solicitante cadastrado na API.", "estado-vazio");
-      mensagem.colSpan = 6;
+      mensagem.colSpan = 8;
       linha.appendChild(mensagem);
       tbody.appendChild(linha);
       return;
@@ -92,7 +92,7 @@
 
     filtrados.forEach((item) => {
       const linha = document.createElement("tr");
-      celula(linha, `#${item.id}`, "solicitante-code");
+      celula(linha, String(item.id ?? "—"), "solicitante-code");
 
       const pessoa = document.createElement("td");
       pessoa.appendChild(elemento("span", item.nome || "Nome não informado", "solicitante-primary"));
@@ -100,10 +100,16 @@
       linha.appendChild(pessoa);
 
       celula(linha, tipos[normalizar(item.tipo)] || item.tipo || "—");
+      celula(linha, item.matricula || "—");
       const contato = document.createElement("td");
       contato.appendChild(elemento("span", item.email || "Sem e-mail", "solicitante-primary"));
       contato.appendChild(elemento("span", item.telefone || "Sem telefone", "solicitante-secondary"));
       linha.appendChild(contato);
+
+      const conta = document.createElement("td");
+      const temConta = item.tem_conta === true || item.tem_conta === 1 || ["true", "1"].includes(String(item.tem_conta).toLowerCase());
+      conta.appendChild(elemento("span", temConta ? "Conta criada" : "Sem conta", `solicitante-status ${temConta ? "is-active" : "is-inactive"}`));
+      linha.appendChild(conta);
 
       const ativo = item.ativo !== false;
       const status = document.createElement("td");
@@ -126,7 +132,7 @@
     tbody.replaceChildren();
     const carregando = document.createElement("tr");
     const celulaCarregando = elemento("td", "Consultando solicitantes na API…", "estado-vazio");
-    celulaCarregando.colSpan = 6;
+    celulaCarregando.colSpan = 8;
     carregando.appendChild(celulaCarregando);
     tbody.appendChild(carregando);
     try {
@@ -139,7 +145,7 @@
       tbody.replaceChildren();
       const linha = document.createElement("tr");
       const mensagem = elemento("td", "Não foi possível carregar os solicitantes. Confirme a sessão e se a API disponibiliza GET /solicitantes para este perfil.", "estado-vazio");
-      mensagem.colSpan = 6;
+      mensagem.colSpan = 8;
       linha.appendChild(mensagem);
       tbody.appendChild(linha);
       contagem.textContent = "—";
@@ -151,6 +157,7 @@
 
   function limparFormulario() {
     form.reset();
+    $("solicitante-matricula").value = "";
     formId.value = "";
     tipo.value = "aluno";
     $("solicitante-form-titulo").textContent = "Novo solicitante";
@@ -165,6 +172,7 @@
     tipo.value = tipos[normalizar(item.tipo)] ? normalizar(item.tipo) : "aluno";
     setor.value = item.setor || "";
     email.value = item.email || "";
+    $("solicitante-matricula").value = item.matricula || "";
     telefone.value = item.telefone || "";
     $("solicitante-form-titulo").textContent = `Editar solicitante #${item.id}`;
     submit.textContent = "Salvar alterações";
@@ -199,6 +207,7 @@
       tipo: tipo.value,
       setor: setor.value.trim(),
       email: email.value.trim().toLowerCase(),
+      matricula: $("solicitante-matricula").value.trim(),
       telefone: telefone.value.trim(),
     };
     if (dados.nome.split(/\s+/).filter(Boolean).length < 2) {
@@ -207,8 +216,11 @@
     if (!Object.prototype.hasOwnProperty.call(tipos, dados.tipo)) {
       mostrarAviso("Selecione um vínculo válido.", "error"); tipo.focus(); return;
     }
+    if (["aluno", "professor"].includes(dados.tipo) && !dados.email) {
+      mostrarAviso("O e-mail é obrigatório para aluno e professor.", "error"); email.focus(); return;
+    }
     if (dados.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(dados.email)) {
-      mostrarAviso("Informe um e-mail válido ou deixe o campo vazio.", "error"); email.focus(); return;
+      mostrarAviso("Informe um e-mail válido.", "error"); email.focus(); return;
     }
 
     ocupada = true;
@@ -220,17 +232,8 @@
       const registro = resposta?.solicitante || resposta?.data?.solicitante || null;
       if (id) {
         mostrarAviso(resposta?.mensagem || `Cadastro do solicitante #${id} atualizado.`, "ok");
-      } else if (registro?.id != null) {
-        const podeCriarConta = ["aluno", "professor"].includes(dados.tipo);
-        const proximoPasso = podeCriarConta
-          ? ` Informe o código ${registro.id} à pessoa para que ela possa criar a conta de acesso.`
-          : " Este tipo de solicitante será usado pela equipe ao registrar empréstimos; o contrato atual não prevê autocadastro para esse vínculo.";
-        mostrarAviso(`${resposta?.mensagem || "Solicitante cadastrado."} Código do solicitante: ${registro.id}.${proximoPasso}`, "ok");
       } else {
-        const proximoPasso = ["aluno", "professor"].includes(dados.tipo)
-          ? " Após a API retornar o código do cadastro, informe-o à pessoa para o autocadastro."
-          : " Este registro será usado pela equipe nos empréstimos; o login não é criado nesta etapa.";
-        mostrarAviso(`${resposta?.mensagem || "Solicitante cadastrado."}${proximoPasso}`, "ok");
+        mostrarAviso(resposta?.mensagem || "Solicitante cadastrado.", "ok");
       }
       limparFormulario();
       await carregar({ silencioso: true });

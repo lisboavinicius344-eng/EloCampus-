@@ -4,16 +4,16 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#0B1020">
-  <title>Criar conta — ELO Campus</title>
-  <meta name="description" content="Cadastro de usuário do sistema de controle de equipamentos e empréstimos — Instituição - Campus Lapa.">
+  <title>Solicitar acesso — ELO Campus</title>
+  <meta name="description" content="Solicitação de acesso ao sistema de controle de equipamentos e empréstimos — Instituição - Campus Lapa.">
   <link rel="icon" type="image/png" href="../assets/img/logo.png">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-  <link rel="stylesheet" href="../assets/css/style.css">
-  <link rel="stylesheet" href="../assets/css/login.css">
+  <link rel="stylesheet" href="../assets/css/style.css?v=2026.10.29.2">
+  <link rel="stylesheet" href="../assets/css/login.css?v=2026.10.29.2">
 </head>
 <body class="auth-page auth-page-cadastro">
   <main class="login">
@@ -29,8 +29,8 @@
       <div class="hero">
         <img class="interlace-mark" src="../assets/img/logo-draw.svg" alt="Logo ELO Campus, marca em degradê violeta e rosa">
 
-        <h1>Crie sua conta e comece a solicitar equipamentos.</h1>
-        <p>Vincule seu cadastro institucional e receba uma senha provisória para ativar sua conta.</p>
+        <h1>Solicite acesso ao ELO Campus.</h1>
+        <p>Envie seus dados institucionais. A equipe responsável analisará a solicitação e orientará o primeiro acesso.</p>
       </div>
 
       <p class="brand-foot">Projeto de estágio — Desenvolvimento de Sistemas</p>
@@ -44,10 +44,10 @@
 
       <div class="card card-wide">
         <div class="card-head">
-          <div class="auth-feature-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0M18 8v6M15 11h6"/></svg><span>Etapa 1 · Identificação</span></div>
-          <span class="auth-kicker"><span aria-hidden="true"></span> Novo cadastro</span>
-          <h2 id="titulo-cadastro">Criar conta</h2>
-          <p>O autocadastro está disponível para discentes e docentes com um cadastro de solicitante ativo. Informe o código fornecido pela equipe.</p>
+          <div class="auth-feature-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0M18 8v6M15 11h6"/></svg><span>Solicitação de acesso</span></div>
+          <span class="auth-kicker"><span aria-hidden="true"></span> Acesso institucional</span>
+          <h2 id="titulo-cadastro">Solicitar acesso</h2>
+          <p>Preencha os dados abaixo. A solicitação será encaminhada à equipe responsável para análise.</p>
         </div>
 
         <div id="cadastro-erro" class="alert alert-error" role="alert" aria-live="polite" hidden></div>
@@ -63,18 +63,24 @@
             <input class="input" id="email" name="email" type="email" autocomplete="email" placeholder="voce@instituicao.edu.br" required>
           </div>
           <div class="field">
-            <label for="solicitante_id">Código do solicitante</label>
-            <input class="input" id="solicitante_id" name="solicitante_id" type="text" inputmode="numeric" pattern="[0-9]+" autocomplete="off" placeholder="Ex.: 30" aria-describedby="solicitante-ajuda" required>
-            <small class="muted" id="solicitante-ajuda">Este código é o ID do cadastro no ELO Campus, não necessariamente sua matrícula. A equipe precisa cadastrar você primeiro na área “Solicitantes”.</small>
+            <label for="tipo">Vínculo institucional</label>
+            <select class="input" id="tipo" name="tipo" required>
+              <option value="aluno">Aluno</option>
+              <option value="professor">Professor</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="matricula">Matrícula / SIAPE (opcional)</label>
+            <input class="input" id="matricula" name="matricula" type="text" autocomplete="off" maxlength="80" placeholder="Informe sua matrícula ou SIAPE">
+          </div>
+          <div class="field">
+            <label for="mensagem">Mensagem (opcional)</label>
+            <textarea class="input" id="mensagem" name="mensagem" rows="3" maxlength="1000" placeholder="Informações adicionais para a equipe"></textarea>
           </div>
           <button class="btn btn-primary" id="cadastro-btn" type="submit">Solicitar acesso</button>
         </form>
-        <div class="alert alert-info cadastro-prerequisito" role="note">
-          <strong>Ainda não tem o código?</strong> Não use sua matrícula como substituto. Solicite à equipe de atendimento que crie seu cadastro de solicitante e informe o código retornado pelo sistema.
-        </div>
-
         <p class="card-foot">
-          Após o cadastro, você receberá uma senha provisória por e-mail. Ela é válida por 24 horas e deverá ser trocada no primeiro acesso.
+          Após a análise, a equipe informará o resultado. Se o acesso for aprovado, as instruções serão enviadas conforme o fluxo institucional.
           Já tem uma conta? <a href="../index.html">Voltar para o login</a>
           <span class="muted"> · </span><a href="privacidade.html">Aviso de privacidade</a>
         </p>
@@ -83,9 +89,9 @@
 
   </main>
 
-  <script src="../assets/js/runtime-config.js"></script>
-  <script src="../assets/js/api.js"></script>
-  <script src="../assets/js/auth.js"></script>
-  <script src="../assets/js/cadastro.js"></script>
+  <script src="../assets/js/runtime-config.js?v=2026.10.29.2"></script>
+  <script src="../assets/js/api.js?v=2026.10.29.2"></script>
+  <script src="../assets/js/auth.js?v=2026.10.29.2"></script>
+  <script src="../assets/js/cadastro.js?v=2026.10.29.2"></script>
 </body>
 </html>

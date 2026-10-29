@@ -29,6 +29,9 @@ const context = {
     if (url.endsWith('/emprestimos') && (!options.method || options.method === 'GET')) {
       return { ok: true, status: 200, json: async () => ({ emprestimos: [loan] }) };
     }
+    if (url.endsWith('/emprestimos') && options.method === 'POST') {
+      return { ok: true, status: 201, json: async () => ({ emprestimo: { id: 99 } }) };
+    }
     if (url.endsWith('/emprestimos/41') && (!options.method || options.method === 'GET')) {
       return { ok: true, status: 200, json: async () => ({ emprestimo: loan }) };
     }
@@ -37,6 +40,12 @@ const context = {
     }
     if (url.endsWith('/consulta-qr/CODE-001')) {
       return { ok: true, status: 200, json: async () => ({ equipamento: { id: 1, nome: 'Projetor' } }) };
+    }
+    if (url.endsWith('/auth/solicitar-acesso') && options.method === 'POST') {
+      return { ok: true, status: 200, json: async () => ({ mensagem: 'Solicitação recebida.' }) };
+    }
+    if (url.endsWith('/solicitacoes-acesso/uuid%2Fid/aprovar') && options.method === 'POST') {
+      return { ok: true, status: 200, json: async () => ({ mensagem: 'Aprovada.', email_enviado: false, senha_provisoria: 'TEMP-ONLY-123', access_token: 'must-not-leak' }) };
     }
     throw new Error(`Unexpected test request: ${url}`);
   },
@@ -73,6 +82,23 @@ vm.runInContext(fs.readFileSync(path.join(__dirname, '../frontend/assets/js/api.
   context.testSession = { token: 'staff-token', perfil: 'operador' };
   await vm.runInContext('ELO.consultaQr("CODE-001")', context);
   assert.equal(requests.at(-1).options.headers.Authorization, 'Bearer staff-token', 'staff can request restricted QR details');
+
+  requests.length = 0;
+  await vm.runInContext('ELO.registrarEmprestimo({ solicitante_id: \"3f6c1e2a-9b7d-4c11-8a22-123456789abc\", equipamentos: [101], prevista: \"2026-11-05T18:00:00-03:00\" })', context);
+  const loanBody = JSON.parse(requests.at(-1).options.body);
+  assert.equal(loanBody.solicitante_id, '3f6c1e2a-9b7d-4c11-8a22-123456789abc', 'UUID person IDs remain strings in loan requests');
+  assert.equal(typeof loanBody.solicitante_id, 'string');
+
+  requests.length = 0;
+  await vm.runInContext('ELO.solicitarAcesso({ nome: \"Ana Silva\", email: \"ANA@EXAMPLE.ORG\", tipo: \"aluno\", matricula: \"0000123\" })', context);
+  assert.equal(JSON.parse(requests.at(-1).options.body).email, 'ana@example.org', 'access request normalizes email');
+  assert.equal(JSON.parse(requests.at(-1).options.body).matricula, '0000123', 'matricula remains a string with leading zeroes');
+
+  requests.length = 0;
+  const approval = await vm.runInContext('ELO.aprovarSolicitacaoAcesso(\"uuid/id\", { tipo: \"aluno\" })', context);
+  assert.equal(requests.at(-1).url, 'https://example.test/api/solicitacoes-acesso/uuid%2Fid/aprovar', 'person/request IDs are URL-encoded as text');
+  assert.equal(approval.senha_provisoria, 'TEMP-ONLY-123', 'provisional password is preserved only for approval response');
+  assert.equal(approval.access_token, undefined, 'other secrets remain sanitized');
 
   console.log('ELO Campus API smoke tests: PASS');
 })().catch((error) => {

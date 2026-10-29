@@ -139,7 +139,7 @@
           campoSolicitante.removeAttribute("readonly"); campoSolicitante.type = "text";
           const select = document.createElement("select"); select.id = "solicitante-id-select"; select.className = campoSolicitante.className; select.required = true;
           select.add(new Option("Selecione um solicitante", ""));
-          solicitantesDisponiveis.forEach(x => select.add(new Option(`${x.nome} · código ${x.id}`, String(x.id))));
+          solicitantesDisponiveis.forEach(x => select.add(new Option(`${x.nome} · ${x.matricula || x.id}`, String(x.id))));
           campoSolicitante.hidden = true; campoSolicitante.required = false; campoSolicitante.parentElement.insertBefore(select, campoSolicitante);
           select.addEventListener("change", () => { const x=solicitantesDisponiveis.find(y=>String(y.id)===select.value); campoSolicitante.value=x?.nome||""; $("resumo-solicitante").textContent=x?`${x.nome} · #${x.id}`:"—"; });
         } catch (e) { mostrarMensagem(`Não foi possível carregar solicitantes: ${e.message}`); }
@@ -163,12 +163,26 @@
 
   // A retirada inicia com a hora local do navegador, mas não há relógio na interface.
   const agora = new Date();
-  const prevista = new Date(agora); prevista.setDate(prevista.getDate() + 1); prevista.setHours(18, 0, 0, 0);
-  if (!$('retirada').value) $('retirada').value = dataLocalInput(agora);
+  const inicioPadrao = new Date(agora); if (usuarioFinal) inicioPadrao.setHours(inicioPadrao.getHours() + 1);
+  const prevista = new Date(inicioPadrao); prevista.setDate(prevista.getDate() + 1); prevista.setHours(18, 0, 0, 0);
+  const maxData = new Date(usuarioFinal ? agora : agora); maxData.setDate(maxData.getDate() + (usuarioFinal ? 30 : 15));
+  $("retirada").min = dataLocalInput(usuarioFinal ? inicioPadrao : agora);
+  $("retirada").max = dataLocalInput(usuarioFinal ? maxData : agora);
+  $("devolucao").min = dataLocalInput(usuarioFinal ? inicioPadrao : agora);
+  if (!$('retirada').value) $('retirada').value = dataLocalInput(inicioPadrao);
   if (!$('devolucao').value) $('devolucao').value = dataLocalInput(prevista);
+  const ajustarLimiteDevolucao = () => {
+    const base = new Date($("retirada").value || inicioPadrao);
+    const limite = new Date(base); limite.setDate(limite.getDate() + (usuarioFinal ? 7 : 15));
+    $("devolucao").min = dataLocalInput(usuarioFinal ? base : agora);
+    $("devolucao").max = dataLocalInput(limite);
+    if ($("devolucao").value && new Date($("devolucao").value) > limite) $("devolucao").value = dataLocalInput(limite);
+  };
+  ajustarLimiteDevolucao();
   atualizarResumo();
   campoSolicitante.addEventListener("input", () => { $("resumo-solicitante").textContent = campoSolicitante.value.split(" · ")[0] || "—"; });
-  [$("retirada"), $("devolucao")].forEach((el) => el.addEventListener("change", atualizarResumo));
+  $("retirada").addEventListener("change", () => { ajustarLimiteDevolucao(); atualizarResumo(); });
+  $("devolucao").addEventListener("change", atualizarResumo);
   botaoAdd.addEventListener("click", adicionarEquipamento);
   campoEquipamento.addEventListener("keydown", (event) => { if (event.key === "Enter") { event.preventDefault(); adicionarEquipamento(); } });
   listaEquipamentos.addEventListener("click", (event) => {
@@ -186,9 +200,12 @@
     const retirada = new Date($("retirada").value);
     const devolucao = new Date($("devolucao").value);
     if (!Number.isFinite(retirada.getTime()) || !Number.isFinite(devolucao.getTime()) || devolucao <= retirada) return mostrarMensagem("A devolução prevista deve ocorrer depois da retirada.");
+    const limiteDias = usuarioFinal ? 7 : 15; const limitePeriodo = new Date(retirada); limitePeriodo.setDate(limitePeriodo.getDate() + limiteDias);
+    if (usuarioFinal && (retirada <= agora || retirada > maxData)) return mostrarMensagem("A reserva deve começar no futuro e ser feita com no máximo 30 dias de antecedência.");
+    if (devolucao > limitePeriodo) return mostrarMensagem(usuarioFinal ? "A reserva pode durar no máximo 7 dias." : "O prazo máximo de empréstimo é de 15 dias.");
     dadosParaConfirmar = {
       solicitante: usuarioFinal ? String(sessaoAtual?.nome || "").trim() : campoSolicitante.value.trim(),
-      solicitante_id: usuarioFinal ? undefined : Number($("solicitante-id-select")?.value),
+      solicitante_id: usuarioFinal ? undefined : String($("solicitante-id-select")?.value || ""),
       matricula: usuarioFinal ? String(sessaoAtual?.matricula || "") : (parametrosIniciais.get("matricula") || ""),
       vinculo: usuarioFinal ? vinculosPerfil[perfilAtual] : campoVinculo.value,
       equipamentos: selecionados.map((e) => e.id),
@@ -208,6 +225,10 @@
     if (!dadosParaConfirmar) return mostrarMensagem("Revise os dados antes de confirmar.");
     const botao = $("confirmar-emprestimo"); botao.disabled = true;
     try {
+      const emprestimosAtuais = await ELO.emprestimos();
+      const idSolicitanteSelecionado = usuarioFinal ? String(sessaoAtual?.solicitante_id ?? "") : String(dadosParaConfirmar.solicitante_id ?? "");
+      const temAtraso = emprestimosAtuais.some((item) => item.situacao === "atrasado" && (!idSolicitanteSelecionado || String(item.solicitante?.id ?? "") === idSolicitanteSelecionado));
+      if (temAtraso) throw new Error("Há equipamento em atraso vinculado a este solicitante. Regularize a devolução antes de reservar ou retirar outro equipamento.");
       if (usuarioFinal) {
         await ELO.criarReserva({ equipamentos: dadosParaConfirmar.equipamentos.map(Number), data_inicio: dadosParaConfirmar.retirada, data_fim: dadosParaConfirmar.prevista, observacoes: [dadosParaConfirmar.finalidade, dadosParaConfirmar.observacoes].filter(Boolean).join(" — ") || null });
         location.href = "reservas.html?salvo=registrado";

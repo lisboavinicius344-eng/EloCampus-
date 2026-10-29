@@ -238,7 +238,7 @@
       abas.forEach((a) => a.setAttribute("aria-selected", String(a.dataset.periodo === periodo)));
       corpoRecentes.innerHTML = devolvidos.length ? devolvidos.map((l) => {
         const cond = l.condicaoDevolucao || "Não informada";
-        const pill = cond === "Com avaria" ? "pill-late" : cond === "Incompleto" ? "pill-warn" : "pill-ok";
+        const pill = cond === "Danificado" ? "pill-late" : cond === "Regular" ? "pill-warn" : "pill-ok";
         const pessoa = usuarioFinal
           ? `<td>${esc(l.solicitante.nome)}<small>registrado no seu perfil</small></td>`
           : `<td>${esc(l.solicitante.nome)}<small>recebido por ${esc(l.responsavelDevolucao || "—")}</small></td>`;
@@ -251,7 +251,7 @@
       fila.innerHTML = aguardando.length ? aguardando.map((l) => `<li><div class="queue-time">${new Date(l.prevista).toLocaleTimeString("pt-BR", {hour:"2-digit",minute:"2-digit"})}</div><div class="queue-info"><strong>${esc(l.equipamento.nome)}</strong><div class="muted small">${esc(l.solicitante.nome)} · ${esc(l.equipamento.patrimonio)}</div></div><button class="btn btn-sm" type="button" data-receber="${esc(l.id)}">${usuarioFinal ? "Registrar" : "Receber"}</button></li>`).join("") : '<li class="muted">Nenhum equipamento com devolução prevista para hoje.</li>';
       $("devolvidos-hoje").textContent = registros.filter((l) => l.devolvida && mesmoDia(l.devolvida, hoje)).length;
       $("aguardando-hoje").textContent = aguardando.length;
-      $("com-avaria").textContent = registros.filter((l) => l.devolvida && l.condicaoDevolucao === "Com avaria").length;
+      $("com-avaria").textContent = registros.filter((l) => l.devolvida && l.condicaoDevolucao === "Danificado").length;
     }
     function desenharItensRetorno(prefill, selecionarTodos = false) {
       itensContainer.innerHTML = "";
@@ -275,7 +275,7 @@
         form.insertBefore(el, $("mensagem-devolucao"));
       }
       const alvo = $("revisao-devolucao");
-      alvo.innerHTML = `<strong>Revise antes de confirmar</strong><p>${selecionados.length} item(ns) será(ão) devolvido(s): ${selecionados.map((l) => esc(l.equipamento.nome + " · " + l.equipamento.patrimonio)).join("; ")}</p><p>Condição: ${esc(form.querySelector('input[name="condicao"]:checked')?.value || "Perfeito")}. A hora da operação será registrada no momento da confirmação.</p>`;
+      alvo.innerHTML = `<strong>Revise antes de confirmar</strong><p>${selecionados.length} item(ns) será(ão) devolvido(s): ${selecionados.map((l) => esc(l.equipamento.nome + " · " + l.equipamento.patrimonio)).join("; ")}</p><p>Condição: ${esc(({bom:"Bom",regular:"Regular",danificado:"Danificado"})[form.querySelector('input[name="condicao"]:checked')?.value || "bom"] || "Bom")}. A hora da operação será registrada no momento da confirmação.</p>`;
       revisar = true; $("confirmar-devolucao").textContent = "Confirmar devolução";
     }
 
@@ -302,7 +302,7 @@
       try {
         const result = await ELO.registrarDevolucao({
           itens: selecionados.map((l) => ({ emprestimoId: l.emprestimoId, equipamentoId: l.equipamento?.id ?? l.id })),
-          condicao: form.querySelector('input[name="condicao"]:checked')?.value || "Perfeito",
+          condicao: form.querySelector('input[name="condicao"]:checked')?.value || "bom",
           observacoes: $("obs").value,
           acessoriosConferidos: $("acessorios-conferidos").checked,
           equipamentoConferido: $("equipamento-conferido").checked,

@@ -1,6 +1,6 @@
 # Revisão técnica do front-end — ELO Campus
 
-**Versão:** `2026.10.29.1`  
+**Versão:** `2026.10.29.2`  
 **Base:** pacote `EloCampus--main` recebido em 29/10/2026.
 
 ## Correções consolidadas
@@ -15,7 +15,7 @@
 - Corrigidos textos de estado vazio e confirmação que ainda mencionavam gravação local, apesar de a aplicação usar a API.
 - Criado um ícone específico para categorias, corrigido o destino de fallback do link de edição de equipamento e removido um script legado não utilizado que simulava operações.
 - Removido `container_name` fixo do Docker Compose para reduzir conflitos com contêineres antigos.
-- Atualizada a versão dos recursos para `2026.10.29.1`.
+- Atualizada a versão dos recursos para `2026.10.29.2`.
 
 ## Verificações executadas
 
@@ -25,11 +25,12 @@
 - Teste automatizado da normalização de um empréstimo com dois equipamentos.
 - Teste automatizado de devolução de apenas um item, incluindo o valor de condição enviado à API.
 - Teste automatizado de consulta QR Code verificando que usuários comuns não enviam token para o endpoint público e que a equipe autenticada pode solicitar detalhes restritos.
+- Testes de integração simulada para solicitação de acesso, preservação de matrícula com zeros à esquerda, IDs UUID como texto e sanitização da senha provisória.
 - Para repetir os testes: `node tests/api-contract-smoke.cjs` (requer Node.js, sem dependências externas).
 
 ## Dependências ainda externas ao front-end
 
-- A recuperação automática de senha depende de `POST /auth/esqueci-senha`, rota que não constava no contrato de API fornecido.
+- A recuperação automática de senha continua dependendo da rota de recuperação configurada no backend.
 - A edição persistente do perfil depende de uma rota de API ainda não documentada.
 - O backend deve validar todos os papéis e permissões; as restrições no front-end são apenas de navegação.
 - A instituição precisa confirmar as regras de privacidade, retenção e tratamento de dados antes de considerar o aviso de privacidade definitivo.
