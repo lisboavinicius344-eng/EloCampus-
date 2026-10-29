@@ -12,9 +12,9 @@
         rel="stylesheet"
     >
 
-    <link rel="stylesheet" href="../assets/css/style.css?v=2026.10.29.2">
-    <link rel="stylesheet" href="../assets/css/layout.css?v=2026.10.29.2">
-    <link rel="stylesheet" href="../assets/css/perfil.css?v=2026.10.29.2">
+    <link rel="stylesheet" href="../assets/css/style.css?v=2026.10.29.4">
+    <link rel="stylesheet" href="../assets/css/layout.css?v=2026.10.29.4">
+    <link rel="stylesheet" href="../assets/css/perfil.css?v=2026.10.29.4">
 </head>
 <body data-pagina="perfil">
     <div class="app">
@@ -32,12 +32,12 @@
                 </div>
 
                 <section class="panel profile-panel" aria-labelledby="titulo-dados-conta">
-                    <p class="muted">A API atual não disponibiliza a gravação de alterações de perfil. Estes dados são somente para consulta; você pode alterar sua senha nesta tela.</p>
+                    <p class="muted">Atualize seus dados pessoais. O e-mail institucional e a matrícula são somente para consulta.</p>
                     <div class="profile-avatar" id="profile-avatar" aria-hidden="true">?</div>
                     <div class="form-grid">
                         <div class="field">
                             <label for="nome">Nome completo</label>
-                            <input class="input" id="nome" readonly aria-readonly="true">
+                            <input class="input" id="nome" maxlength="160" autocomplete="name">
                         </div>
                         <div class="field">
                             <label for="email">E-mail institucional</label>
@@ -47,7 +47,17 @@
                             <label for="perfil">Perfil de acesso</label>
                             <input class="input" id="perfil" readonly aria-readonly="true">
                         </div>
+                        <div class="field" id="campo-telefone" hidden>
+                            <label for="telefone">Telefone</label>
+                            <input class="input" id="telefone" type="tel" maxlength="30" placeholder="(77) 99999-0000" autocomplete="tel">
+                        </div>
+                        <div class="field" id="campo-matricula" hidden>
+                            <label for="matricula">Matrícula</label>
+                            <input class="input" id="matricula" readonly aria-readonly="true">
+                        </div>
                     </div>
+                    <div class="alert" id="perfil-mensagem" role="status" hidden></div>
+                    <button class="btn btn-primary" id="perfil-salvar" type="button">Salvar alterações</button>
                     <div class="form-actions">
                         <a class="btn btn-line" href="trocar-senha.html">Alterar minha senha</a>
                         <a class="btn btn-ghost" href="dashboard.html">Voltar ao painel</a>
@@ -58,10 +68,10 @@
         </div>
     </div>
 
-    <script src="../assets/js/auth.js?v=2026.10.29.2"></script>
-    <script src="../assets/js/layout.js?v=2026.10.29.2"></script>
-    <script src="../assets/js/runtime-config.js?v=2026.10.29.2"></script>
-  <script src="../assets/js/api.js?v=2026.10.29.2"></script>
-    <script src="../assets/js/perfil.js?v=2026.10.29.2"></script>
+    <script src="../assets/js/auth.js?v=2026.10.29.4"></script>
+    <script src="../assets/js/layout.js?v=2026.10.29.4"></script>
+    <script src="../assets/js/runtime-config.js?v=2026.10.29.4"></script>
+  <script src="../assets/js/api.js?v=2026.10.29.4"></script>
+    <script src="../assets/js/perfil.js?v=2026.10.29.4"></script>
 </body>
 </html>

@@ -165,8 +165,8 @@ const ELO = {
       throw erro;
     }
   },
-  perfil: async () => obterSessao()?.usuario || obterSessao() || {},
-  salvarPerfil: async () => { throw new Error("A API ainda não disponibiliza edição de perfil. Nenhuma alteração foi salva."); },
+  perfil: async () => (await requisitar("/auth/perfil")).perfil,
+  salvarPerfil: async (dados) => (await requisitar("/auth/perfil", { metodo: "PUT", corpo: dados })).perfil,
   emprestimos: async () => {
     const resposta = await requisitar("/emprestimos");
     if (!Array.isArray(resposta?.emprestimos)) throw new Error("A resposta da API de empréstimos está fora do contrato esperado. Confirme se GET /emprestimos retorna { emprestimos: [...] }.");

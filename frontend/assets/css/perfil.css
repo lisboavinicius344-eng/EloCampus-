@@ -104,3 +104,21 @@
   margin-bottom: 0.8rem;
   font-size: 0.9rem;
 }
+
+
+/* Edição do perfil — campos editáveis e feedback da API. */
+.profile-panel #perfil-salvar {
+  margin-top: 1rem;
+  min-width: 190px;
+}
+.profile-panel #perfil-mensagem {
+  margin-top: 1rem;
+}
+.profile-panel [hidden] {
+  display: none !important;
+}
+@media (max-width: 640px) {
+  .profile-panel #perfil-salvar {
+    width: 100%;
+  }
+}

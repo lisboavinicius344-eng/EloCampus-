@@ -14,3 +14,12 @@
 
 ## Limitações de validação
 Os testes locais não substituem a verificação contra a API real. Confirme o formato exato das respostas de `GET /solicitacoes-acesso`, os nomes dos campos de data da reserva e as permissões configuradas no servidor antes de publicar.
+
+
+## Atualização adicional — perfil editável (29/10/2026)
+
+- `GET /auth/perfil` agora alimenta a tela de perfil; `PUT /auth/perfil` salva nome e telefone quando o papel permite.
+- O e-mail continua somente leitura; matrícula é exibida somente quando retornada pela API e também permanece somente leitura.
+- A tela apresenta feedback de carregamento/salvamento e atualiza o nome da sessão após sucesso.
+- Os recursos referenciados nas páginas HTML receberam cache-busting `v=2026.10.29.4`.
+- Validar no ambiente integrado que a resposta de `GET/PUT /auth/perfil` tenha o objeto `{ perfil }` e a lista `editaveis`, conforme o contrato do backend.
