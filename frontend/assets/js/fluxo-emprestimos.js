@@ -41,6 +41,14 @@
   const nomeData = (e) => `${e.nome} — ${e.patrimonio}`;
   const vinculosPerfil = { aluno: "Aluno", professor: "Professor", servidor: "Servidor" };
 
+  if (!usuarioFinal) {
+    // A retirada efetiva é registrada pelo servidor no momento da operação; não aceite uma data local que a API ignora.
+    const retirada = $("retirada");
+    if (retirada) retirada.readOnly = true;
+    const labelRetirada = document.querySelector('label[for="retirada"]');
+    if (labelRetirada) labelRetirada.textContent = "Retirada (registrada pelo servidor)";
+  }
+
   if (usuarioFinal) {
     const nomeSessao = String(sessaoAtual?.nome || "").trim();
     campoSolicitante.value = nomeSessao;
@@ -102,7 +110,9 @@
     atualizarResumo();
   }
   function atualizarResumo() {
-    $("resumo-retirada").textContent = formatarCampoData($("retirada").value);
+    $("resumo-retirada").textContent = usuarioFinal
+      ? formatarCampoData($("retirada").value)
+      : "No momento da confirmação (horário do servidor)";
     $("resumo-devolucao").textContent = formatarCampoData($("devolucao").value);
   }
   function adicionarEquipamento() {
@@ -187,7 +197,7 @@
       finalidade: $("finalidade").value,
       observacoes: $("obs").value.trim(),
     };
-    resumoReview.innerHTML = `<div class="stack-sm">${usuarioFinal ? "" : `<div class="summary-row"><span>Solicitante</span><strong>${esc(dadosParaConfirmar.solicitante)}</strong></div><div class="summary-row"><span>Vínculo</span><strong>${esc(dadosParaConfirmar.vinculo)}</strong></div><div class="summary-row"><span>Retirada</span><strong>${esc(formatarCampoData($("retirada").value))}</strong></div>`}<div class="summary-row"><span>Devolução prevista</span><strong>${esc(formatarCampoData($("devolucao").value))}</strong></div><div><strong>Equipamentos</strong><ul>${selecionados.map((e) => `<li>${esc(e.nome)} · ${esc(e.patrimonio)}</li>`).join("")}</ul></div>${dadosParaConfirmar.observacoes ? `<p><strong>Observações:</strong> ${esc(dadosParaConfirmar.observacoes)}</p>` : ""}</div><p class="muted">${usuarioFinal ? "Seu pedido será enviado ao servidor para análise da equipe. O equipamento só estará liberado após aprovação e registro da retirada." : "A confirmação enviará a retirada para registro no sistema oficial."}</p>`;
+    resumoReview.innerHTML = `<div class="stack-sm">${usuarioFinal ? "" : `<div class="summary-row"><span>Solicitante</span><strong>${esc(dadosParaConfirmar.solicitante)}</strong></div><div class="summary-row"><span>Vínculo</span><strong>${esc(dadosParaConfirmar.vinculo)}</strong></div><div class="summary-row"><span>Retirada</span><strong>No momento da confirmação (horário do servidor)</strong></div>`}<div class="summary-row"><span>Devolução prevista</span><strong>${esc(formatarCampoData($("devolucao").value))}</strong></div><div><strong>Equipamentos</strong><ul>${selecionados.map((e) => `<li>${esc(e.nome)} · ${esc(e.patrimonio)}</li>`).join("")}</ul></div>${dadosParaConfirmar.observacoes ? `<p><strong>Observações:</strong> ${esc(dadosParaConfirmar.observacoes)}</p>` : ""}</div><p class="muted">${usuarioFinal ? "Seu pedido será enviado ao servidor para análise da equipe. O equipamento só estará liberado após aprovação e registro da retirada." : "A confirmação enviará a retirada para registro no sistema oficial."}</p>`;
     form.hidden = true;
     formReview.hidden = false;
     $("confirmar-emprestimo").focus();

@@ -77,6 +77,7 @@ const EloUtil = {
   const ICONES = {
     home: '<path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/>',
     box: '<path d="M21 8 12 3 3 8v8l9 5 9-5z"/><path d="m3 8 9 5 9-5M12 13v8"/>',
+    categories: '<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>',
     qr: '<path d="M3 3h6v6H3zM15 3h6v6h-6zM3 15h6v6H3z"/><path d="M15 15h2v2h-2zM19 15h2v6h-6v-2M11 3v2M11 9v2M3 11h2M9 11v2M11 15v2M11 21h2M15 11h2M21 11v2"/>',
     swap: '<path d="M7 7h13l-4-4M17 17H4l4 4"/>',
     undo: '<path d="M9 14 4 9l5-5"/><path d="M4 9h10a6 6 0 0 1 0 12h-3"/>',
@@ -98,7 +99,7 @@ const EloUtil = {
     { id: "painel", rotulo: "Painel", icone: "home", href: "dashboard.html" },
     { grupo: "Acervo", itens: [
       { id: "equipamentos", rotulo: "Equipamentos", icone: "box", href: "equipamentos.html" },
-      { id: "categorias", rotulo: "Categorias", icone: "box", href: "categorias.html" },
+      { id: "categorias", rotulo: "Categorias", icone: "categories", href: "categorias.html" },
       { id: "consulta-qr", rotulo: "Consulta por QR Code", icone: "qr", href: "consulta-qr-interno.html" },
     ]},
     { grupo: "Empréstimos e devoluções", itens: [

@@ -10,7 +10,7 @@ const estadoApi = (valor) => String(valor || "bom").toLowerCase().normalize("NFD
 const normalizarEquipamento = (equipamento = {}) => ({
   ...equipamento,
   patrimonio: equipamento.numero_patrimonio ?? equipamento.patrimonio ?? "",
-  categoria: equipamento.categoria ?? "",
+  categoria: typeof equipamento.categoria === "string" ? equipamento.categoria : (equipamento.categoria?.nome ?? equipamento.categoria_nome ?? ""),
   condicao: estadoFrontend(equipamento.estado_conservacao ?? equipamento.condicao),
   situacao: equipamento.situacao || ({ disponivel: "disponivel", emprestado: "emprestado", manutencao: "manutencao", baixado: "inativo" }[equipamento.status] || "disponivel"),
   base: equipamento.status === "baixado" ? "inativo" : equipamento.status,
@@ -21,29 +21,63 @@ const normalizarEquipamento = (equipamento = {}) => ({
 });
 
 const normalizarEmprestimo = (emprestimo = {}) => {
-  const item = (emprestimo.itens || [])[0] || {};
-  const previsto = emprestimo.data_prevista_devolucao ? new Date(emprestimo.data_prevista_devolucao) : null;
-  const atrasado = emprestimo.status === "em_andamento" && previsto instanceof Date && !Number.isNaN(previsto.valueOf()) && previsto.valueOf() < Date.now();
-  return {
-    ...emprestimo,
-    emprestimoId: emprestimo.id,
-    equipamento: {
-      id: item.equipamento_id ?? emprestimo.equipamento_id,
-      nome: item.equipamento || emprestimo.equipamento || "Equipamento",
-      patrimonio: item.numero_patrimonio || emprestimo.numero_patrimonio || "",
-      categoria: item.categoria || "",
-      setor: item.setor || "",
-      condicao: estadoFrontend(item.estado_na_retirada),
-    },
-    solicitante: { id: emprestimo.solicitante_id, nome: emprestimo.solicitante || "—", vinculo: "", matricula: "" },
-    retirada: emprestimo.data_emprestimo,
-    prevista: emprestimo.data_prevista_devolucao,
-    devolvida: item.data_devolucao || (emprestimo.status === "concluido" ? emprestimo.data_devolucao : null),
-    registradoPor: emprestimo.usuario_responsavel || "—",
-    observacoes: emprestimo.observacoes || "",
-    situacao: emprestimo.status === "concluido" || item.data_devolucao ? "devolvido" : emprestimo.status === "cancelado" ? "cancelado" : atrasado ? "atrasado" : "emprestado",
-    itens: emprestimo.itens || [],
-  };
+  const itens = Array.isArray(emprestimo.itens) && emprestimo.itens.length
+    ? emprestimo.itens
+    : [{
+        equipamento_id: emprestimo.equipamento_id,
+        equipamento: emprestimo.equipamento,
+        numero_patrimonio: emprestimo.numero_patrimonio,
+        categoria: emprestimo.categoria,
+        setor: emprestimo.setor,
+        data_devolucao: emprestimo.data_devolucao,
+        estado_na_devolucao: emprestimo.estado_na_devolucao,
+      }];
+  const solicitante = emprestimo.solicitante && typeof emprestimo.solicitante === "object"
+    ? emprestimo.solicitante
+    : {};
+  return itens.map((item) => {
+    const equipamentoId = item.equipamento_id ?? item.equipamento?.id ?? emprestimo.equipamento_id;
+    const nomeEquipamento = typeof item.equipamento === "string"
+      ? item.equipamento
+      : item.equipamento?.nome ?? item.equipamento_nome ?? emprestimo.equipamento?.nome ?? emprestimo.equipamento ?? "Equipamento";
+    const prevista = emprestimo.data_prevista_devolucao;
+    const devolvida = item.data_devolucao || (emprestimo.status === "concluido" ? emprestimo.data_devolucao : null);
+    const atrasado = !devolvida && emprestimo.status === "em_andamento" && prevista && new Date(prevista).valueOf() < Date.now();
+    const condicaoDevolucaoApi = String(item.estado_na_devolucao ?? emprestimo.estado_na_devolucao ?? "").toLowerCase();
+    const condicaoDevolucao = ({
+      bom: "Perfeito", perfeito: "Perfeito", regular: "Incompleto", incompleto: "Incompleto",
+      danificado: "Com avaria", avaria: "Com avaria", com_avaria: "Com avaria",
+    })[condicaoDevolucaoApi.replace(/[\s-]+/g, "_")] || (item.estado_na_devolucao ?? emprestimo.estado_na_devolucao ?? "");
+    return {
+      ...emprestimo,
+      id: equipamentoId ?? emprestimo.id,
+      emprestimoId: emprestimo.id,
+      equipamento: {
+        id: equipamentoId,
+        nome: nomeEquipamento,
+        patrimonio: item.numero_patrimonio ?? item.patrimonio ?? emprestimo.numero_patrimonio ?? "",
+        categoria: item.categoria ?? item.categoria_nome ?? emprestimo.categoria ?? "",
+        setor: item.setor ?? emprestimo.setor ?? "",
+        condicao: estadoFrontend(item.estado_na_retirada ?? emprestimo.estado_na_retirada),
+      },
+      solicitante: {
+        id: emprestimo.solicitante_id ?? solicitante.id,
+        nome: typeof emprestimo.solicitante === "string" ? emprestimo.solicitante : solicitante.nome ?? emprestimo.solicitante_nome ?? "—",
+        vinculo: emprestimo.vinculo ?? solicitante.tipo ?? solicitante.vinculo ?? "",
+        matricula: emprestimo.matricula ?? solicitante.matricula ?? solicitante.numero_funcional ?? "",
+      },
+      retirada: emprestimo.data_emprestimo,
+      prevista,
+      devolvida,
+      responsavelDevolucao: item.usuario_devolucao ?? item.usuario_recebeu ?? emprestimo.usuario_devolucao ?? emprestimo.usuario_recebeu ?? "—",
+      condicaoDevolucao,
+      registradoPor: emprestimo.usuario_responsavel || emprestimo.usuario_nome || "—",
+      observacoes: emprestimo.observacoes || "",
+      observacoesDevolucao: item.observacoes_devolucao ?? item.observacoes ?? "",
+      situacao: devolvida ? "devolvido" : emprestimo.status === "cancelado" ? "cancelado" : atrasado ? "atrasado" : "emprestado",
+      itens: emprestimo.itens || [],
+    };
+  });
 };
 
 // Remove secrets from parsed API responses before exposing objects to page code.
@@ -116,8 +150,10 @@ const ELO = {
   consultaQr: async (codigo) => {
     const caminho = `/consulta-qr/${encodeURIComponent(String(codigo || "").trim())}`;
     const sessao = typeof obterSessao === "function" ? obterSessao() : null;
-    // A consulta é pública, mas uma sessão válida de equipe recebe os detalhes do empréstimo atual.
-    if (!sessao?.token) return requisitar(caminho, { semAutenticacao: true, naoRedirecionar401: true });
+    const papel = String(sessao?.perfil || sessao?.usuario?.papel || "").toLowerCase();
+    const equipe = Boolean(sessao?.token) && ["admin", "administrador", "operador"].includes(papel);
+    // A consulta é pública para visitantes e usuários comuns; só a equipe recebe o token para pedir detalhes restritos.
+    if (!equipe) return requisitar(caminho, { semAutenticacao: true, naoRedirecionar401: true });
     try {
       return await requisitar(caminho, { naoRedirecionar401: true });
     } catch (erro) {
@@ -131,7 +167,11 @@ const ELO = {
   },
   perfil: async () => obterSessao()?.usuario || obterSessao() || {},
   salvarPerfil: async () => { throw new Error("A API ainda não disponibiliza edição de perfil. Nenhuma alteração foi salva."); },
-  emprestimos: async () => (await requisitar("/emprestimos")).emprestimos.map(normalizarEmprestimo),
+  emprestimos: async () => {
+    const resposta = await requisitar("/emprestimos");
+    if (!Array.isArray(resposta?.emprestimos)) throw new Error("A resposta da API de empréstimos está fora do contrato esperado. Confirme se GET /emprestimos retorna { emprestimos: [...] }.");
+    return resposta.emprestimos.flatMap(normalizarEmprestimo);
+  },
   movimentacoes: async () => (await requisitar("/historico")).map((movimento) => ({
     id: movimento.id, quando: movimento.data_movimentacao, tipo: movimento.tipo_movimentacao,
     classe: movimento.tipo_movimentacao,
@@ -155,27 +195,66 @@ const ELO = {
   },
   registrarDevolucao: async (dados) => {
     const lista = (await requisitar("/emprestimos")).emprestimos || [];
-    const ids = new Set((dados.itens || []).map(String));
-    const alvos = lista.filter((emprestimo) => ids.has(String(emprestimo.id)) || ids.has(String(emprestimo.equipamento_id)));
-    if (!alvos.length) throw new Error("Não foi possível relacionar os itens selecionados aos empréstimos. Atualize a página.");
+    const selecoes = (dados.itens || []).map((item) => typeof item === "object" && item !== null
+      ? { emprestimoId: item.emprestimoId == null ? null : String(item.emprestimoId), equipamentoId: String(item.equipamentoId ?? item.id ?? "") }
+      : { emprestimoId: null, equipamentoId: String(item) });
+    if (!selecoes.length || selecoes.some((item) => !item.equipamentoId)) {
+      throw new Error("Selecione pelo menos um equipamento para devolver.");
+    }
+    const candidatos = lista.filter((emprestimo) => selecoes.some((selecao) => {
+      if (selecao.emprestimoId && String(emprestimo.id) !== selecao.emprestimoId) return false;
+      return (emprestimo.itens || []).some((item) => String(item.equipamento_id ?? item.equipamento?.id ?? "") === selecao.equipamentoId);
+    }));
+    // Se o endpoint de listagem não inclui os itens, usa o ID do empréstimo enviado pela interface.
+    const idsEmprestimos = new Set([
+      ...candidatos.map((item) => String(item.id)),
+      ...selecoes.map((item) => item.emprestimoId).filter(Boolean),
+    ]);
+    if (!idsEmprestimos.size) throw new Error("Não foi possível relacionar os equipamentos selecionados aos empréstimos. Atualize a página.");
+    const condicaoEscolhida = String(dados.condicao || "bom").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[\s-]+/g, "_");
+    const estadoDevolucao = ({
+      perfeito: "bom", bom: "bom", tudo_certo: "bom",
+      incompleto: "regular", regular: "regular", falta_acessorio: "regular",
+      com_avaria: "danificado", avaria: "danificado", danificado: "danificado", ha_algum_problema: "danificado",
+    })[condicaoEscolhida] || "bom";
     let feitos = 0;
-    for (const emprestimo of alvos) {
-      const detalhe = (await requisitar(`/emprestimos/${encodeURIComponent(emprestimo.id)}`)).emprestimo;
+    const falhas = [];
+    for (const idEmprestimo of idsEmprestimos) {
+      let resposta;
+      try {
+        resposta = await requisitar(`/emprestimos/${encodeURIComponent(idEmprestimo)}`);
+      } catch (erro) {
+        const selecionadosDoEmprestimo = selecoes.filter((selecao) => !selecao.emprestimoId || selecao.emprestimoId === String(idEmprestimo));
+        selecionadosDoEmprestimo.forEach((selecao) => falhas.push({ ...selecao, mensagem: erro.message }));
+        continue;
+      }
+      const detalhe = resposta?.emprestimo;
+      if (!detalhe) continue;
       for (const item of detalhe.itens || []) {
-        if ((ids.has(String(item.equipamento_id)) || ids.has(String(emprestimo.id))) && !item.data_devolucao) {
-          await requisitar(`/emprestimos/${encodeURIComponent(emprestimo.id)}/itens/${encodeURIComponent(item.equipamento_id)}/devolver`, {
+        const equipamentoId = String(item.equipamento_id ?? item.equipamento?.id ?? "");
+        const selecionado = selecoes.some((selecao) =>
+          selecao.equipamentoId === equipamentoId && (!selecao.emprestimoId || selecao.emprestimoId === String(idEmprestimo))
+        );
+        if (!selecionado || item.data_devolucao) continue;
+        try {
+          await requisitar(`/emprestimos/${encodeURIComponent(idEmprestimo)}/itens/${encodeURIComponent(equipamentoId)}/devolver`, {
             metodo: "PATCH",
             corpo: {
-              estado_na_devolucao: estadoApi(dados.condicao || "bom"),
+              estado_na_devolucao: estadoDevolucao,
               observacoes: [dados.observacoes, dados.acessoriosConferidos ? "Acessórios conferidos" : "", dados.equipamentoConferido ? "Equipamento conferido" : "", dados.assinaturaRecebida ? "Assinatura recebida" : ""].filter(Boolean).join("; ") || null,
             },
           });
           feitos += 1;
+        } catch (erro) {
+          falhas.push({ emprestimoId: String(idEmprestimo), equipamentoId, mensagem: erro.message });
         }
       }
     }
-    if (!feitos) throw new Error("Nenhum item pendente de devolução foi encontrado.");
-    return { itens: feitos };
+    if (!feitos && falhas.length) {
+      throw new Error(`Nenhum item foi devolvido. ${falhas[0].mensagem || "Confira os dados e tente novamente."}`);
+    }
+    if (!feitos) throw new Error("Nenhum dos itens selecionados está pendente de devolução.");
+    return { itens: feitos, falhas };
   },
   removerEquipamento: (id) => requisitar(`/equipamentos/${encodeURIComponent(id)}/inativar`, { metodo: "PATCH" }),
   salvarEquipamento: async (d, id) => {
