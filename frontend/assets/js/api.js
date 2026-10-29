@@ -189,9 +189,8 @@ const ELO = {
       observacoes: d.observacoes || null,
       elegibilidade: d.elegibilidade || "todos",
     };
-    if (d.categoria_id) corpo.categoria_id = Number(d.categoria_id);
-    else corpo.categoria = String(d.categoria || "").trim();
-    if (d.imagemAlterada) corpo.imagem = d.imagem || null; // null remove a foto existente
+    // A API exige uma categoria já cadastrada; a foto não é guardada pela API e por isso não é enviada.
+    corpo.categoria_id = Number(d.categoria_id);
     return (await requisitar(id ? `/equipamentos/${encodeURIComponent(id)}` : "/equipamentos", {
       metodo: id ? "PUT" : "POST",
       corpo,

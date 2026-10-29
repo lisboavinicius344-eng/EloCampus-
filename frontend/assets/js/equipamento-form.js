@@ -28,25 +28,9 @@
     observacoes: $("e-obs"),
   };
   const identificador = $("f-identificador");
-  const foto = $("f-foto");
-  const fotoPreview = $("foto-preview");
-  const fotoPreviewImg = $("foto-preview-img");
-  let imagem = "";
-  let imagemAlterada = false;
-  async function reduzirImagem(arquivo, lado = 1280, qualidade = 0.85) {
-    const bitmap = await createImageBitmap(arquivo);
-    const escala = Math.min(1, lado / Math.max(bitmap.width, bitmap.height));
-    const canvas = document.createElement("canvas");
-    canvas.width = Math.max(1, Math.round(bitmap.width * escala));
-    canvas.height = Math.max(1, Math.round(bitmap.height * escala));
-    const contexto = canvas.getContext("2d");
-    if (!contexto) throw new Error("Não foi possível preparar a imagem.");
-    contexto.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
-    if (typeof bitmap.close === "function") bitmap.close();
-    return canvas.toDataURL("image/jpeg", qualidade);
-  }
   let identificadorPersonalizado = false;
   let categoriasApi = [];
+  const textoCategoria = () => campos.categoria.selectedOptions[0]?.textContent.trim() || "";
 
   const normalizarPatrimonio = (v) => v.trim().toUpperCase();
   const atualizarIdentificador = () => {
@@ -69,18 +53,13 @@
     return {
       nome: campos.nome.value.trim(),
       patrimonio: normalizarPatrimonio(campos.patrimonio.value),
-      categoria: campos.categoria.value.trim(),
-      categoria_id: String(categoriasApi.find((c) =>
-        String(c.nome || "").trim().toLocaleLowerCase("pt-BR") === campos.categoria.value.trim().toLocaleLowerCase("pt-BR")
-        && c.ativo !== false
-      )?.id || ""),
+      categoria: campos.categoria.value ? textoCategoria() : "",
+      categoria_id: campos.categoria.value,
       elegibilidade: $("f-elegibilidade")?.value || "todos",
       setor: campos.setor.value.trim(),
       condicao: campos.condicao.value,
       observacoes: campos.observacoes.value.trim(),
       qr_code: identificador.value.trim() || normalizarPatrimonio(campos.patrimonio.value),
-      imagem,
-      imagemAlterada,
     };
   }
 
@@ -90,7 +69,7 @@
     if (!d.patrimonio) m.patrimonio = "Informe o número de patrimônio.";
     else if (!/^[A-Z0-9][A-Z0-9._-]*$/.test(d.patrimonio))
       m.patrimonio = "Use apenas letras, números, hífen, ponto ou sublinhado.";
-    if (!d.categoria) m.categoria = "Informe ou selecione o tipo ou categoria do equipamento.";
+    if (!d.categoria_id) m.categoria = "Selecione uma categoria. Se não houver nenhuma, crie uma com “Nova categoria”.";
     if (!d.setor) m.setor = "Informe o setor responsável.";
     if (!d.condicao) m.condicao = "Selecione a condição física.";
     return m;
@@ -130,7 +109,7 @@
   campos.patrimonio.addEventListener("input", atualizarIdentificador);
 
   const atualizarVisual = () => {
-    const categoria = campos.categoria.value.trim().toLowerCase();
+    const categoria = campos.categoria.value ? textoCategoria().toLowerCase() : "";
     const condicao = campos.condicao.value;
     const visual = $("tipo-visual");
     if (!categoria || !condicao) { visual.hidden = true; return; }
@@ -147,34 +126,6 @@
   };
   [campos.categoria, campos.condicao].forEach((campo) => campo.addEventListener("input", atualizarVisual));
   [campos.categoria, campos.condicao].forEach((campo) => campo.addEventListener("change", atualizarVisual));
-  foto.addEventListener("change", async () => {
-    const arquivo = foto.files?.[0];
-    if (!arquivo) return;
-    const tiposPermitidos = ["image/jpeg", "image/png", "image/webp", "image/gif"];
-    if (!tiposPermitidos.includes(arquivo.type)) {
-      foto.value = "";
-      mostrarErroGeral("Escolha uma imagem JPG, PNG, WebP ou GIF. SVG não é aceito.");
-      return;
-    }
-    try {
-      imagem = await reduzirImagem(arquivo);
-      imagemAlterada = true;
-      fotoPreviewImg.src = imagem;
-      fotoPreview.hidden = false;
-      erroGeral.hidden = true;
-    } catch {
-      foto.value = "";
-      mostrarErroGeral("Não foi possível ler essa imagem. Use JPG, PNG ou WebP.");
-    }
-  });
-  $("remover-foto").addEventListener("click", () => {
-    imagem = "";
-    imagemAlterada = true;
-    foto.value = "";
-    fotoPreviewImg.removeAttribute("src");
-    fotoPreview.hidden = true;
-  });
-
   // Sugestões são auxiliares: falha numa listagem não deve bloquear o cadastro.
   const preencher = (idLista, valores) => {
     const lista = $(idLista);
@@ -184,12 +135,61 @@
       .map((v) => new Option(v, v)));
   };
 
+  // Monta a lista de categorias ativas; "selecionar" mantém ou define a opção escolhida.
+  function montarCategorias(selecionar = campos.categoria.value, extra = null) {
+    const ativas = categoriasApi.filter((c) => c.ativo !== false);
+    if (extra && !ativas.some((c) => String(c.id) === String(extra.id))) ativas.push(extra);
+    ativas.sort((a, b) => String(a.nome).localeCompare(String(b.nome), "pt-BR"));
+    campos.categoria.replaceChildren(
+      new Option(ativas.length ? "Selecione uma categoria" : "Nenhuma categoria cadastrada", ""),
+      ...ativas.map((c) => new Option(c.nome, String(c.id)))
+    );
+    campos.categoria.value = selecionar ? String(selecionar) : "";
+  }
+
   try {
     categoriasApi = await ELO.categorias();
-    preencher("lista-categorias", categoriasApi.filter(c => c.ativo !== false).map(c => c.nome));
-  } catch {
-    // A API também aceita uma categoria digitada; a lista é apenas uma sugestão.
+    montarCategorias("");
+  } catch (err) {
+    montarCategorias("");
+    mostrarErroGeral(err.message || "Não foi possível carregar as categorias.");
   }
+
+  // Criação rápida de categoria, sem sair do formulário
+  const painelNova = $("nova-categoria");
+  const botaoNova = $("nova-categoria-btn");
+  const erroNova = $("nc-erro");
+  botaoNova.addEventListener("click", () => {
+    painelNova.hidden = !painelNova.hidden;
+    botaoNova.setAttribute("aria-expanded", String(!painelNova.hidden));
+    if (!painelNova.hidden) $("nc-nome").focus();
+  });
+  $("nc-salvar").addEventListener("click", async () => {
+    const nome = $("nc-nome").value.trim();
+    erroNova.textContent = "";
+    if (!nome) { erroNova.textContent = "Informe o nome da categoria."; $("nc-nome").focus(); return; }
+    const salvar = $("nc-salvar");
+    salvar.disabled = true;
+    try {
+      const r = await ELO.criarCategoria({ nome, descricao: $("nc-desc").value });
+      categoriasApi = await ELO.categorias();
+      const criada = r?.categoria || categoriasApi.find((c) =>
+        String(c.nome || "").trim().toLocaleLowerCase("pt-BR") === nome.toLocaleLowerCase("pt-BR"));
+      montarCategorias(criada?.id ?? "");
+      spansErro.categoria.textContent = "";
+      campos.categoria.removeAttribute("aria-invalid");
+      atualizarVisual();
+      $("nc-nome").value = "";
+      $("nc-desc").value = "";
+      painelNova.hidden = true;
+      botaoNova.setAttribute("aria-expanded", "false");
+      campos.categoria.focus();
+    } catch (err) {
+      erroNova.textContent = err.message;
+    } finally {
+      salvar.disabled = false;
+    }
+  });
   try {
     const listaEquipamentos = await ELO.equipamentos();
     preencher("lista-setores", listaEquipamentos.map(e => e.setor));
@@ -208,7 +208,9 @@
       const e = await ELO.equipamento(id);
       campos.nome.value = e.nome ?? "";
       campos.patrimonio.value = e.patrimonio ?? "";
-      campos.categoria.value = String(e.categoria || categoriasApi.find(c => String(c.id) === String(e.categoria_id))?.nome || "");
+      const idCat = e.categoria_id ?? categoriasApi.find((c) => c.nome === e.categoria)?.id ?? "";
+      // Categoria já desativada continua aparecendo para não perder o vínculo ao editar.
+      montarCategorias(idCat, idCat !== "" ? { id: idCat, nome: e.categoria || `Categoria #${idCat}` } : null);
       const qrExistente = String(e.qr_code || e.codigo_qr || "").trim();
       if (qrExistente && qrExistente !== normalizarPatrimonio(e.patrimonio || "")) {
         identificador.value = qrExistente;
@@ -221,8 +223,6 @@
       campos.setor.value = e.setor ?? "";
       campos.condicao.value = e.condicao ?? "";
       campos.observacoes.value = e.observacoes ?? "";
-      imagem = e.imagem || e.foto || "";
-      if (imagem) { fotoPreviewImg.src = imagem; fotoPreview.hidden = false; }
       atualizarIdentificador();
       atualizarVisual();
       botao.disabled = false;

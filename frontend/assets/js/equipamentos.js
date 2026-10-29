@@ -76,7 +76,9 @@
               <td data-label="Setor">${esc(e.setor)}</td>
               <td data-label="Condição"><span class="cond cond-${esc(cond)}">${esc(e.condicao)}</span></td>
               <td data-label="Situação"><span class="badge badge-${s.cls}">${s.rotulo}</span></td>
-              <td class="col-acao"><a class="btn btn-ghost btn-sm" href="${href}">Ver detalhes</a></td>
+              <td class="col-acao"><a class="btn btn-ghost btn-sm" href="${href}">Ver detalhes</a>${
+                e.situacao === "inativo" ? "" : ` <button class="btn btn-ghost btn-sm" type="button" data-retirar="${esc(e.id)}">Retirar de uso</button>`
+              }</td>
             </tr>`;
           }).join("")}
         </tbody>
@@ -112,12 +114,41 @@
     render();
   });
 
+  function avisar(texto, tipo = "ok") {
+    document.getElementById("aviso")?.remove();
+    $("filtros").insertAdjacentHTML("beforebegin",
+      `<div class="alert alert-${tipo}" id="aviso" role="status" style="margin-bottom:1.25rem">${esc(texto)}</div>`);
+  }
+
+  // "Retirar de uso" → ELO.removerEquipamento(id) → PATCH /equipamentos/<id>/inativar
+  $("lista").addEventListener("click", async (ev) => {
+    const botao = ev.target.closest("[data-retirar]");
+    if (!botao) return;
+    const eq = todos.find((e) => String(e.id) === botao.dataset.retirar);
+    if (!eq) return;
+    if (!confirm(`Retirar “${eq.nome}” de uso? O histórico do equipamento será preservado.`)) return;
+    botao.disabled = true;
+    try {
+      await ELO.removerEquipamento(eq.id);
+      todos = await ELO.equipamentos();
+      render();
+      avisar("Equipamento retirado de uso; histórico preservado.");
+    } catch (err) {
+      botao.disabled = false;
+      avisar(err.message || "Não foi possível retirar o equipamento de uso.", "error");
+    }
+  });
+
   // Confirmação vinda do formulário (equipamentos.html?salvo=criado|editado)
   const salvo = new URLSearchParams(window.location.search).get("salvo");
-  if (["criado", "editado", "removido", "arquivado"].includes(salvo)) {
-    const mensagem = salvo === "criado" ? "Equipamento salvo localmente." : salvo === "editado" ? "Alterações salvas localmente." : salvo === "arquivado" ? "Equipamento retirado de uso; histórico preservado." : "Equipamento retirado com segurança.";
-    $("filtros").insertAdjacentHTML("beforebegin",
-      `<div class="alert alert-ok" role="status" style="margin-bottom:1.25rem">${mensagem} A alteração está neste navegador e não foi enviada a um servidor.</div>`);
+  const mensagens = {
+    criado: "Equipamento cadastrado.",
+    editado: "Alterações salvas.",
+    arquivado: "Equipamento retirado de uso; histórico preservado.",
+    removido: "Equipamento retirado de uso.",
+  };
+  if (mensagens[salvo]) {
+    avisar(mensagens[salvo]);
     history.replaceState(null, "", window.location.pathname);
   }
 
