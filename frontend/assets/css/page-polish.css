@@ -187,3 +187,83 @@ button.btn, a.btn { min-height: 44px; line-height: 1.25; white-space: normal; }
   .table-wrap { border-radius: .8rem; }
   .table-wrap table { min-width: 620px; }
 }
+
+
+/* Ajustes pontuais solicitados: ações, tabelas longas e legibilidade dos fluxos. */
+.api-actions, .api-actions > .btn, .api-actions > button,
+.page-head .toolbar, .page-head .toolbar > .btn,
+#man-refresh, #cat-refresh, #res-refresh, #solicitantes-atualizar,
+#mov-limpar-filtros, #limpar-filtros {
+  flex: 0 0 auto;
+  width: auto;
+  min-width: max-content;
+  white-space: nowrap;
+}
+#man-refresh, #cat-refresh, #res-refresh, #solicitantes-atualizar,
+#mov-limpar-filtros, #limpar-filtros {
+  min-height: 42px;
+  padding-inline: 1rem;
+}
+/* Evita que um ID longo consuma a largura dos botões de ação. */
+.solicitantes-table { table-layout: auto; }
+.solicitantes-table th:last-child,
+.solicitantes-table td:last-child { min-width: 170px; width: 1%; }
+.solicitantes-table .solicitante-code {
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  max-width: 14rem;
+  min-width: 8rem;
+  font-size: .78rem;
+  line-height: 1.4;
+}
+.solicitante-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: .55rem;
+  flex-wrap: nowrap;
+  min-width: 160px;
+}
+.solicitante-actions .btn {
+  flex: 0 0 auto;
+  min-width: 76px;
+  min-height: 38px;
+  padding: 0 .8rem;
+  white-space: nowrap;
+}
+/* Mantém a barra de manutenção alinhada e sem comprimir Atualizar. */
+[data-pagina="manutencoes"] .card > .row {
+  display: flex;
+  align-items: flex-end !important;
+  gap: 1rem !important;
+  flex-wrap: wrap;
+}
+[data-pagina="manutencoes"] .card > .row h2 { margin: 0 auto 0 0; }
+[data-pagina="manutencoes"] .card > .row .field { min-width: min(100%, 12rem); margin: 0; }
+[data-pagina="manutencoes"] #man-refresh { margin-left: auto; }
+/* Categorias: ações do formulário com respiro entre os botões. */
+#cat-form .api-actions { display: flex; align-items: center; flex-wrap: wrap; gap: .75rem; margin-top: .35rem; }
+#cat-form .api-actions .btn { min-height: 44px; }
+/* A etapa de revisão deve ter contraste e hierarquia claras. */
+.split .summary button[type="submit"] {
+  min-height: 48px;
+  padding: .85rem 1.1rem;
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1.35;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  box-shadow: 0 8px 22px rgba(124, 58, 237, .22);
+}
+#revisao-emprestimo { gap: 1rem; }
+#revisao-emprestimo h2 { margin-bottom: .15rem; }
+#revisao-emprestimo #resumo-revisao { line-height: 1.65; overflow-wrap: anywhere; }
+#revisao-emprestimo .stack-sm { display: flex; flex-wrap: wrap; gap: .75rem; }
+#revisao-emprestimo .stack-sm .btn { min-height: 44px; padding: .7rem 1rem; }
+@media (max-width: 700px) {
+  .solicitantes-table th:last-child, .solicitantes-table td:last-child { min-width: 160px; }
+  .solicitante-actions { flex-wrap: wrap; }
+  [data-pagina="manutencoes"] .card > .row h2 { width: 100%; }
+  [data-pagina="manutencoes"] #man-refresh { margin-left: 0; }
+}

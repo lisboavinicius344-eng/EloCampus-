@@ -77,6 +77,9 @@ const EloUtil = {
   const ICONES = {
     home: '<path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/>',
     box: '<path d="M21 8 12 3 3 8v8l9 5 9-5z"/><path d="m3 8 9 5 9-5M12 13v8"/>',
+    wrench: '<path d="M14.7 6.3a5 5 0 0 0-6.4 6.4L3 18l3 3 5.3-5.3a5 5 0 0 0 6.4-6.4L14 12l-2-2z"/><path d="m16 4 4 4"/>',
+    clipboard: '<rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4.5V3h6v1.5M8 10h8M8 14h8M8 18h5"/>',
+    qrscan: '<path d="M4 8V4h4M16 4h4v4M20 16v4h-4M8 20H4v-4"/><rect x="7" y="7" width="4" height="4"/><rect x="15" y="7" width="2" height="2"/><path d="M15 13h2v2h-2zM18 16h2M13 18v2"/>',
     categories: '<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>',
     qr: '<path d="M3 3h6v6H3zM15 3h6v6h-6zM3 15h6v6H3z"/><path d="M15 15h2v2h-2zM19 15h2v6h-6v-2M11 3v2M11 9v2M3 11h2M9 11v2M11 15v2M11 21h2M15 11h2M21 11v2"/>',
     swap: '<path d="M7 7h13l-4-4M17 17H4l4 4"/>',
@@ -106,7 +109,7 @@ const EloUtil = {
       { id: "emprestimos", rotulo: "Empréstimos", icone: "swap", href: "emprestimos.html" },
       { id: "devolucoes", rotulo: "Devoluções", icone: "undo", href: "devolucoes.html" },
       { id: "reservas", rotulo: "Reservas", icone: "swap", href: "reservas.html" },
-      { id: "manutencoes", rotulo: "Manutenções", icone: "gear", href: "manutencoes.html" },
+      { id: "manutencoes", rotulo: "Manutenções", icone: "wrench", href: "manutencoes.html" },
     ]},
     { grupo: "Administração", itens: [
       { id: "solicitantes", rotulo: "Solicitantes", icone: "people", href: "solicitantes.html" },
@@ -123,10 +126,10 @@ const EloUtil = {
   const NAV_USUARIO = [
     { id: "painel", rotulo: "Início", icone: "home", href: "dashboard.html" },
     { id: "disponiveis", rotulo: "Ver os equipamentos", icone: "box", href: "disponiveis.html" },
-    { id: "consulta-qr", rotulo: "Consultar QR Code", icone: "qr", href: "consulta-qr-interno.html" },
+    { id: "consulta-qr", rotulo: "Consultar QR Code", icone: "qrscan", href: "consulta-qr-interno.html" },
     { id: "pedir", rotulo: "Reservar equipamento", icone: "swap", href: "novo-emprestimo.html" },
     { id: "reservas", rotulo: "Minhas reservas", icone: "swap", href: "reservas.html" },
-    { id: "emprestimos", rotulo: "Meus empréstimos", icone: "box", href: "emprestimos.html" },
+    { id: "emprestimos", rotulo: "Meus empréstimos", icone: "clipboard", href: "emprestimos.html" },
   ];
   const NAV = usuarioFinal ? NAV_USUARIO : NAV_EQUIPE;
 
