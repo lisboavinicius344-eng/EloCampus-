@@ -1,1 +1,21 @@
-(()=>{const $=id=>document.getElementById(id),sessao=obterSessao(),form=$("perfil-form"),erro=$("erro"),ok=$("sucesso"),salvar=$("salvar"),f={nome:$("nome"),email:$("email"),telefone:$("telefone"),instituicao:$("instituicao"),campus:$("campus"),matricula:$("matricula"),setor:$("setor"),perfil:$("perfil"),notificacoes:$("notificacoes")},iniciais=n=>(n||"?").split(" ").slice(0,2).map(x=>x[0]).join("").toUpperCase();let foto="";function preencher(d={}){f.nome.value=d.nome??sessao?.nome??"";f.email.value=d.email??sessao?.email??"";f.telefone.value=d.telefone??sessao?.telefone??"";f.instituicao.value=d.instituicao??sessao?.instituicao??"";f.campus.value=d.campus??sessao?.campus??"";f.matricula.value=d.matricula??sessao?.matricula??"";f.setor.value=d.setor??sessao?.setor??"";f.perfil.value=d.perfil??sessao?.perfil??"";f.notificacoes.checked=Boolean(d.notificacoes);$("profile-avatar").textContent= iniciais(f.nome.value);if(d.foto||sessao?.foto){foto=d.foto||sessao.foto;$("profile-avatar").style.backgroundImage=`url(${foto})`;$("profile-avatar").textContent=""}}function msg(el,t){el.textContent=t;el.hidden=false}preencher();const sairPerfil=$("perfil-sair");if(sairPerfil)sairPerfil.addEventListener("click",()=>{if(confirm("Deseja sair da conta?"))sair();});$("foto-perfil").addEventListener("change",e=>{const file=e.target.files?.[0];if(!file)return;const r=new FileReader();r.onload=()=>{foto=String(r.result);preencher({foto});};r.readAsDataURL(file)});form.addEventListener("submit",async e=>{e.preventDefault();erro.hidden=true;ok.hidden=true;if(!f.nome.value.trim())return msg(erro,"Informe seu nome.");if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(f.email.value))return msg(erro,"Informe um e-mail institucional válido.");if(f.telefone.value.replace(/\D/g,"").length<10)return msg(erro,"Informe um telefone válido.");if(!f.instituicao.value.trim()||!f.campus.value.trim())return msg(erro,"Informe a instituição e o campus.");if(!f.matricula.value.trim())return msg(erro,"Informe a matrícula ou número funcional.");salvar.disabled=true;try{const dados={nome:f.nome.value.trim(),email:f.email.value.trim(),telefone:f.telefone.value.trim(),instituicao:f.instituicao.value.trim(),campus:f.campus.value.trim(),matricula:f.matricula.value.trim(),setor:f.setor.value,notificacoes:f.notificacoes.checked,foto};const retorno=await ELO.salvarPerfil(dados);salvarSessao({...sessao,...dados,...retorno});preencher({...dados,...retorno});msg(ok,"Perfil atualizado com sucesso.")}catch(err){msg(erro,err.message||"Não foi possível salvar o perfil.")}finally{salvar.disabled=false}})})();
+/* Perfil: exibição dos dados devolvidos pela autenticação. Edição depende de rota de API. */
+(() => {
+  "use strict";
+  const $ = (id) => document.getElementById(id);
+  const sessao = typeof obterSessao === "function" ? obterSessao() : null;
+  const usuario = sessao?.usuario || sessao || {};
+  const nome = usuario.nome || sessao?.nome || "";
+  const email = usuario.email || sessao?.email || "";
+  const papel = String(sessao?.perfil || usuario.papel || "").toLowerCase();
+  const nomesPapeis = { administrador: "Administrador", admin: "Administrador", operador: "Operador", aluno: "Aluno", professor: "Professor" };
+  if ($("nome")) $("nome").value = nome;
+  if ($("email")) $("email").value = email;
+  if ($("perfil")) $("perfil").value = nomesPapeis[papel] || papel || "Não informado";
+  if ($("profile-avatar")) {
+    const iniciais = nome.split(/\s+/).filter(Boolean).slice(0, 2).map((parte) => parte[0]).join("").toLocaleUpperCase("pt-BR");
+    $("profile-avatar").textContent = iniciais || "?";
+  }
+  $("perfil-sair")?.addEventListener("click", () => {
+    if (confirm("Deseja sair da conta?")) sair();
+  });
+})();

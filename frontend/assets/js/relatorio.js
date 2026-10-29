@@ -48,20 +48,30 @@
   }
   function render() {
     filtrados = filteredRows();
-    const encerrados = filtrados.filter((l) => l.devolvida);
-    const noPrazo = encerrados.filter((l) => new Date(l.devolvida) <= new Date(l.prevista));
-    $("stat-emprestimos").textContent = filtrados.length;
-    $("nota-emprestimos").textContent = `${encerrados.length} devolvido(s) · ${filtrados.filter((l) => !l.devolvida).length} em aberto`;
+    const porEmprestimo = new Map();
+    filtrados.forEach((item) => {
+      const chave = String(item.emprestimoId ?? item.id);
+      if (!porEmprestimo.has(chave)) porEmprestimo.set(chave, []);
+      porEmprestimo.get(chave).push(item);
+    });
+    const gruposEmprestimo = [...porEmprestimo.values()];
+    const encerrados = gruposEmprestimo.filter((grupo) => grupo.length && grupo.every((item) => Boolean(item.devolvida)));
+    const noPrazo = encerrados.filter((grupo) => grupo.every((item) => new Date(item.devolvida) <= new Date(item.prevista)));
+    const itensDevolvidos = filtrados.filter((l) => l.devolvida).length;
+    const itensAbertos = filtrados.filter((l) => !l.devolvida).length;
+    $("stat-emprestimos").textContent = gruposEmprestimo.length;
+    $("nota-emprestimos").textContent = `${itensDevolvidos} item(ns) devolvido(s) · ${itensAbertos} em aberto`;
     $("stat-prazo").textContent = encerrados.length ? `${Math.round(noPrazo.length / encerrados.length * 100)}%` : "—";
     $("stat-atrasos").textContent = filtrados.filter((l) => !l.devolvida && EloUtil.diasAtraso(l.prevista) > 0).length;
-    $("stat-avarias").textContent = encerrados.filter((l) => l.condicaoDevolucao === "Com avaria").length;
+    $("stat-avarias").textContent = filtrados.filter((l) => l.devolvida && l.condicaoDevolucao === "Com avaria").length;
 
     const byMonth = new Map();
-    filtrados.forEach((l) => {
+    gruposEmprestimo.forEach((grupo) => {
+      const l = grupo[0];
       const d = new Date(l.retirada); const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}`;
       const label = d.toLocaleDateString("pt-BR", {month:"short"}).replace(".", "");
       const item = byMonth.get(key) || { key, label, loans: 0, returns: 0 };
-      item.loans++; if (l.devolvida) item.returns++; byMonth.set(key, item);
+      item.loans++; if (grupo.every((linha) => Boolean(linha.devolvida))) item.returns++; byMonth.set(key, item);
     });
     const months = [...byMonth.values()].sort((a,b) => a.key.localeCompare(b.key)).slice(-7);
     if (!months.length) { empty($("grafico-mensal"), "Sem empréstimos no período selecionado."); $("rotulos-mensais").innerHTML = ""; }

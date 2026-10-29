@@ -1,6 +1,4 @@
-/* Interações das páginas Empréstimos e Devoluções.
- * Todas as gravações neste modo são locais; a integração oficial virá pela camada ELO.
- */
+/* Interações das páginas Empréstimos e Devoluções. As operações são persistidas pela API oficial via ELO. */
 (() => {
   const $ = (id) => document.getElementById(id);
   const esc = (value) => EloUtil.esc(value ?? "");
@@ -102,7 +100,7 @@
         aba.setAttribute("aria-selected", String(chave === filtro));
       });
       if (!filtrados.length) {
-        corpo.innerHTML = `<tr><td colspan="5" class="muted">${registros.length ? "Nenhum item corresponde a este filtro." : usuarioFinal ? 'Você ainda não tem empréstimos. <a href="disponiveis.html">Ver o que pode solicitar</a>.' : "Não há empréstimos disponíveis na fonte de dados local."}</td></tr>`;
+        corpo.innerHTML = `<tr><td colspan="5" class="muted">${registros.length ? "Nenhum item corresponde a este filtro." : usuarioFinal ? 'Você ainda não tem empréstimos. <a href="disponiveis.html">Ver o que pode solicitar</a>.' : "Não há empréstimos registrados no sistema."}</td></tr>`;
         desenharDetalhe(null);
         return;
       }
@@ -158,7 +156,7 @@
       if (salvo === "registrado") {
         const msg = document.createElement("div");
         msg.className = "alert alert-ok"; msg.setAttribute("role", "status");
-        msg.textContent = "Empréstimo registrado na fonte local deste navegador. Não é um registro oficial do servidor.";
+        msg.textContent = "Empréstimo registrado no sistema oficial.";
         document.querySelector(".page-head")?.after(msg);
         history.replaceState(null, "", location.pathname);
       }
@@ -245,7 +243,7 @@
           ? `<td>${esc(l.solicitante.nome)}<small>registrado no seu perfil</small></td>`
           : `<td>${esc(l.solicitante.nome)}<small>recebido por ${esc(l.responsavelDevolucao || "—")}</small></td>`;
         return `<tr><td><strong>${esc(l.equipamento.nome)}</strong><small>${esc(l.equipamento.patrimonio)}</small></td>${pessoa}<td>${dataHora(l.devolvida)}</td><td><span class="pill ${pill}">${esc(cond)}</span></td></tr>`;
-      }).join("") : `<tr><td colspan="4" class="muted">${registros.some((l) => l.devolvida) ? "Nenhuma devolução corresponde ao período ou à pesquisa." : "Nenhuma devolução registrada na fonte local."}</td></tr>`;
+      }).join("") : `<tr><td colspan="4" class="muted">${registros.some((l) => l.devolvida) ? "Nenhuma devolução corresponde ao período ou à pesquisa." : "Nenhuma devolução registrada no sistema."}</td></tr>`;
     }
     function desenharFila() {
       const hoje = new Date();
@@ -255,7 +253,7 @@
       $("aguardando-hoje").textContent = aguardando.length;
       $("com-avaria").textContent = registros.filter((l) => l.devolvida && l.condicaoDevolucao === "Com avaria").length;
     }
-    function desenharItensRetorno(prefill) {
+    function desenharItensRetorno(prefill, selecionarTodos = false) {
       itensContainer.innerHTML = "";
       if (!prefill.length) {
         itensDoGrupo = [];
@@ -267,7 +265,7 @@
       }
       itensDoGrupo = prefill;
       inputPatrimonio.value = prefill.map((l) => l.equipamento.patrimonio).join(", ");
-      itensContainer.innerHTML = `<div class="stack-sm">${prefill.map((l) => `<label class="picked self-return-item" style="cursor:pointer;gap:.75rem"><input type="checkbox" name="itens-devolucao" value="${esc(l.id)}" ${String(l.id) === String(itemInicial) || (!usuarioFinal && !itemInicial && prefill.length === 1) ? "checked" : ""}><span class="item-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16v11H4zM2 20h20M8 16v4m8-4v4"/></svg></span><span class="picked-info"><strong>${esc(l.equipamento.nome)}</strong><small>${esc(l.equipamento.patrimonio)}${usuarioFinal ? ` · Devolver até ${esc(new Date(l.prevista).toLocaleDateString("pt-BR", {day:"2-digit", month:"2-digit", year:"numeric"}))}` : ` · ${esc(l.solicitante.nome)} · retirada ${dataHora(l.retirada)}`}</small></span><span class="pill ${EloUtil.prazo(l.prevista).classe === "late" ? "pill-late" : "pill-ok"}">${esc(l.situacao === "atrasado" ? "Prazo passou" : usuarioFinal ? "Com você" : "Emprestado")}</span></label>`).join("")}</div>`;
+      itensContainer.innerHTML = `<div class="stack-sm">${prefill.map((l) => `<label class="picked self-return-item" style="cursor:pointer;gap:.75rem"><input type="checkbox" name="itens-devolucao" value="${esc(l.id)}" ${selecionarTodos || String(l.id) === String(itemInicial) || (!usuarioFinal && !itemInicial && prefill.length === 1) ? "checked" : ""}><span class="item-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16v11H4zM2 20h20M8 16v4m8-4v4"/></svg></span><span class="picked-info"><strong>${esc(l.equipamento.nome)}</strong><small>${esc(l.equipamento.patrimonio)}${usuarioFinal ? ` · Devolver até ${esc(new Date(l.prevista).toLocaleDateString("pt-BR", {day:"2-digit", month:"2-digit", year:"numeric"}))}` : ` · ${esc(l.solicitante.nome)} · retirada ${dataHora(l.retirada)}`}</small></span><span class="pill ${EloUtil.prazo(l.prevista).classe === "late" ? "pill-late" : "pill-ok"}">${esc(l.situacao === "atrasado" ? "Prazo passou" : usuarioFinal ? "Com você" : "Emprestado")}</span></label>`).join("")}</div>`;
       if (!itemInicial && !usuarioFinal && prefill.length > 1) itensContainer.querySelectorAll('input[name="itens-devolucao"]').forEach((c) => { c.checked = true; });
     }
     function mostrarRevisao(selecionados) {
@@ -303,7 +301,7 @@
       const botao = $("confirmar-devolucao"); botao.disabled = true;
       try {
         const result = await ELO.registrarDevolucao({
-          itens: ids,
+          itens: selecionados.map((l) => ({ emprestimoId: l.emprestimoId, equipamentoId: l.equipamento?.id ?? l.id })),
           condicao: form.querySelector('input[name="condicao"]:checked')?.value || "Perfeito",
           observacoes: $("obs").value,
           acessoriosConferidos: $("acessorios-conferidos").checked,
@@ -312,13 +310,20 @@
         });
         registros = (await ELO.emprestimos()).filter(pertenceAoUsuario);
         desenharRecentes(); desenharFila();
-        aviso(mensagem, `${result.itens} ${result.itens === 1 ? "equipamento devolvido" : "equipamentos devolvidos"}. A devolução foi registrada no servidor.`, "ok");
         history.replaceState(null, "", location.pathname);
         revisar = false;
         form.reset();
-        desenharItensRetorno(usuarioFinal ? registros.filter((l) => !l.devolvida) : []);
         $("confirmar-devolucao").textContent = "Revisar devolução";
         $("revisao-devolucao")?.remove();
+        if (result.falhas?.length) {
+          const chavesPendentes = new Set(result.falhas.map((falha) => `${falha.emprestimoId}:${falha.equipamentoId}`));
+          const pendentes = registros.filter((l) => !l.devolvida && chavesPendentes.has(`${l.emprestimoId}:${l.equipamento?.id ?? l.id}`));
+          desenharItensRetorno(pendentes, true);
+          aviso(mensagem, `${result.itens} item(ns) devolvido(s); ${result.falhas.length} não pôde(puderam) ser registrado(s). Confira os itens ainda pendentes e tente novamente.`, "error");
+          return;
+        }
+        aviso(mensagem, `${result.itens} ${result.itens === 1 ? "equipamento devolvido" : "equipamentos devolvidos"}. A devolução foi registrada no servidor.`, "ok");
+        desenharItensRetorno(usuarioFinal ? registros.filter((l) => !l.devolvida) : []);
       } catch (error) { aviso(mensagem, error.message || "Não foi possível registrar a devolução.", "error"); }
       finally { botao.disabled = false; }
     });

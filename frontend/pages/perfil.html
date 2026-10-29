@@ -26,134 +26,33 @@
             <main class="main">
                 <div class="page-head">
                     <div>
-                        <h1>Meu perfil</h1>
+                        <h1 id="titulo-dados-conta">Meu perfil</h1>
                         <p>Dados de acesso e identificação institucional.</p>
                     </div>
                 </div>
 
-                <div class="alert alert-error" id="erro" hidden></div>
-                <div class="alert alert-ok" id="sucesso" hidden></div>
-
-                <section class="panel profile-panel">
-                    <p class="muted">Os dados desta conta são exibidos somente para leitura. Para alterar a senha, use a opção abaixo.</p><p><a class="btn btn-line" href="trocar-senha.html">Alterar minha senha</a></p><form id="perfil-form" novalidate>
-                        <div class="profile-avatar" id="profile-avatar">?</div>
-
-                        <label class="profile-photo-label" for="foto-perfil">
-                            Imagem do perfil
-                            <input
-                                id="foto-perfil"
-                                type="file"
-                                accept="image/*"
-                            >
-                        </label>
-
-                        <div class="form-grid">
-                            <div class="field">
-                                <label for="nome">Nome completo</label>
-                                <input class="input" id="nome" required>
-                            </div>
-
-                            <div class="field">
-                                <label for="email">E-mail institucional</label>
-                                <input
-                                    class="input"
-                                    id="email"
-                                    type="email"
-                                    placeholder="nome@instituicao.edu.br"
-                                    required
-                                >
-                            </div>
-
-                            <div class="field">
-                                <label for="telefone">Telefone</label>
-                                <input
-                                    class="input"
-                                    id="telefone"
-                                    type="tel"
-                                    placeholder="(00) 00000-0000"
-                                    required
-                                >
-                            </div>
-
-                            <div class="field">
-                                <label for="instituicao">Instituição de ensino</label>
-                                <input
-                                    class="input"
-                                    id="instituicao"
-                                    placeholder="Ex.: Instituto Federal"
-                                    required
-                                >
-                            </div>
-
-                            <div class="field">
-                                <label for="campus">Campus</label>
-                                <input
-                                    class="input"
-                                    id="campus"
-                                    placeholder="Ex.: Campus Lapa"
-                                    required
-                                >
-                            </div>
-
-                            <div class="field">
-                                <label for="matricula">
-                                    Matrícula / número funcional
-                                </label>
-                                <input
-                                    class="input"
-                                    id="matricula"
-                                    placeholder="Ex.: 2024001234 ou SRV-0024"
-                                    required
-                                >
-                            </div>
-
-                            <div class="field">
-                                <label for="setor">Setor / curso</label>
-                                <select class="input" id="setor" required>
-                                    <option value="">Selecione</option>
-                                    <option>Direção</option>
-                                    <option>Coordenação de TI</option>
-                                    <option>Secretaria</option>
-                                    <option>Audiovisual</option>
-                                    <option>Biblioteca</option>
-                                    <option>Docência</option>
-                                    <option>Discente</option>
-                                </select>
-                            </div>
-
-                            <div class="field">
-                                <label for="perfil">Perfil de acesso</label>
-                                <input class="input" id="perfil" readonly>
-                            </div>
+                <section class="panel profile-panel" aria-labelledby="titulo-dados-conta">
+                    <p class="muted">A API atual não disponibiliza a gravação de alterações de perfil. Estes dados são somente para consulta; você pode alterar sua senha nesta tela.</p>
+                    <div class="profile-avatar" id="profile-avatar" aria-hidden="true">?</div>
+                    <div class="form-grid">
+                        <div class="field">
+                            <label for="nome">Nome completo</label>
+                            <input class="input" id="nome" readonly aria-readonly="true">
                         </div>
-
-                        <label class="check-row">
-                            <input id="notificacoes" type="checkbox">
-                            <span>Receber notificações do sistema</span>
-                        </label>
-
-                        <div class="form-actions">
-                            <button
-                                class="btn btn-primary"
-                                id="salvar"
-                                type="submit"
-                            >
-                                Salvar alterações
-                            </button>
-
-                            <a class="btn btn-ghost" href="dashboard.html">
-                                Cancelar
-                            </a>
-
-                            <button
-                                class="btn btn-danger"
-                                id="perfil-sair"
-                                type="button"
-                            >
-                                Sair da conta
-                            </button>
+                        <div class="field">
+                            <label for="email">E-mail institucional</label>
+                            <input class="input" id="email" type="email" readonly aria-readonly="true">
                         </div>
-                    </form>
+                        <div class="field">
+                            <label for="perfil">Perfil de acesso</label>
+                            <input class="input" id="perfil" readonly aria-readonly="true">
+                        </div>
+                    </div>
+                    <div class="form-actions">
+                        <a class="btn btn-line" href="trocar-senha.html">Alterar minha senha</a>
+                        <a class="btn btn-ghost" href="dashboard.html">Voltar ao painel</a>
+                        <button class="btn btn-danger" id="perfil-sair" type="button">Sair da conta</button>
+                    </div>
                 </section>
             </main>
         </div>

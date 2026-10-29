@@ -10,4 +10,4 @@ escape_js() {
 API_URL_ESCAPED=$(escape_js "$API_URL")
 DATA_MODE_ESCAPED=$(escape_js "$DATA_MODE")
 mkdir -p /usr/share/nginx/html/assets/js
-printf 'window.ELO_API_BASE_URL = "%s";\nwindow.ELO_DATA_MODE = "%s";\n' "$API_URL_ESCAPED" "$DATA_MODE_ESCAPED" > /usr/share/nginx/html/assets/js/runtime-config.js
+printf 'window.ELO_API_BASE_URL = "%s";\nwindow.ELO_DATA_MODE = "%s";\nwindow.ELO_FRONTEND_VERSION = "2026.10.29.1";\n' "$API_URL_ESCAPED" "$DATA_MODE_ESCAPED" > /usr/share/nginx/html/assets/js/runtime-config.js

@@ -26,7 +26,7 @@
   function render() {
     const lista = filtrar();
     if (!lista.length) {
-      box.innerHTML = `<p class="estado-vazio">${eventos.length ? "Nenhuma movimentação corresponde aos filtros selecionados." : "Nenhuma movimentação foi encontrada na fonte de dados local."}</p>`;
+      box.innerHTML = `<p class="estado-vazio">${eventos.length ? "Nenhuma movimentação corresponde aos filtros selecionados." : "Nenhuma movimentação foi encontrada no sistema."}</p>`;
       return;
     }
     box.innerHTML = `<p class="muted small" style="margin-bottom:.75rem">Exibindo ${lista.length} de ${eventos.length} movimentações.</p><div class="table-wrap"><table class="table"><thead><tr><th>Data e hora</th><th>Tipo</th><th>Equipamento</th><th>Categoria</th><th>Detalhe</th><th>Responsável</th></tr></thead><tbody>${lista.map((m) => `<tr><td>${EloUtil.dataHora(m.quando)}</td><td><span class="badge badge-${esc(m.classe)}">${esc(m.tipo)}</span></td><td><strong>${esc(m.equipamento?.nome || "—")}</strong><small>${esc(m.equipamento?.patrimonio || "—")}</small></td><td><span class="category-tag">${esc(m.equipamento?.categoria || "Equipamento")}</span></td><td>${esc(m.detalhe || "—")}</td><td>${esc(m.por || "—")}</td></tr>`).join("")}</tbody></table></div>`;
