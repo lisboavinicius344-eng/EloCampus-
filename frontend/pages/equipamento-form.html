@@ -11,9 +11,15 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-  <link rel="stylesheet" href="../assets/css/style.css">
-  <link rel="stylesheet" href="../assets/css/layout.css">
-  <link rel="stylesheet" href="../assets/css/equipamentos.css">
+  <link rel="stylesheet" href="../assets/css/style.css?v=2026.10.28.11">
+  <link rel="stylesheet" href="../assets/css/layout.css?v=2026.10.28.11">
+  <link rel="stylesheet" href="../assets/css/equipamentos.css?v=2026.10.28.11">
+  <style>
+    .cat-row { display: flex; gap: .5rem; align-items: stretch; }
+    .cat-row .input { flex: 1; min-width: 0; }
+    .cat-row .btn { white-space: nowrap; }
+    .nova-categoria { display: grid; gap: .5rem; margin-top: .6rem; padding: .8rem; border: 1px solid var(--border); border-radius: var(--radius-s); }
+  </style>
 </head>
 <body data-pagina="equipamentos">
   <div class="app">
@@ -26,7 +32,7 @@
         <div class="page-head">
           <div>
             <h1 id="titulo">Cadastrar equipamento</h1>
-            <p id="subtitulo">Preencha os dados de identificação. O QR Code é gerado a partir do patrimônio.</p>
+            <p id="subtitulo">Preencha os dados de identificação. O identificador do QR Code usa o patrimônio por padrão, mas pode ser personalizado.</p>
           </div>
           <a class="btn btn-ghost" href="equipamentos.html">Voltar para a lista</a>
         </div>
@@ -44,14 +50,6 @@
                 <span class="field-erro" id="e-nome"></span>
               </div>
 
-              <div class="field col-2">
-                <label for="f-foto">Foto de referência <span class="muted">(não sincronizada)</span></label>
-                <input class="input file-input" id="f-foto" type="file" accept="image/*" aria-describedby="d-foto e-foto">
-                <span class="hint" id="d-foto">A API atual não armazena fotos; a imagem não será mantida após recarregar.</span>
-                <span class="field-erro" id="e-foto"></span>
-                <div class="foto-preview" id="foto-preview" hidden><img id="foto-preview-img" alt="Pré-visualização da foto do equipamento"><button class="btn btn-ghost btn-sm" type="button" id="remover-foto">Remover foto</button></div>
-              </div>
-
               <div class="field">
                 <label for="f-patrimonio">Número de patrimônio</label>
                 <input class="input" id="f-patrimonio" type="text" maxlength="30" autocomplete="off"
@@ -62,9 +60,9 @@
 
               <div class="field">
                 <label for="f-identificador">Identificador no QR Code</label>
-                <input class="input" id="f-identificador" type="text" readonly tabindex="-1"
-                       aria-describedby="d-identificador" value="">
-                <span class="hint" id="d-identificador">Definido a partir do patrimônio.</span>
+                <input class="input" id="f-identificador" type="text" maxlength="80" autocomplete="off"
+                       placeholder="Automático: patrimônio" aria-describedby="d-identificador">
+                <span class="hint" id="d-identificador">Por padrão, usa o patrimônio. Você pode informar outro código impresso na etiqueta.</span>
               </div>
             </div>
 
@@ -72,8 +70,20 @@
             <div class="form-grid">
               <div class="field">
                 <label for="f-categoria">Tipo ou categoria</label>
-                <input class="input" id="f-categoria" type="text" maxlength="80" list="lista-categorias" autocomplete="off" placeholder="Escolha uma sugestão ou digite uma categoria" aria-describedby="e-categoria d-categoria" required><datalist id="lista-categorias"></datalist><span class="hint" id="d-categoria">Se a categoria ainda não existir, ela será criada ao salvar.</span>
+                <div class="cat-row">
+                  <select class="input" id="f-categoria" aria-describedby="d-categoria e-categoria" required>
+                    <option value="">Carregando categorias…</option>
+                  </select>
+                  <button class="btn btn-ghost btn-sm" type="button" id="nova-categoria-btn" aria-expanded="false" aria-controls="nova-categoria">+ Nova categoria</button>
+                </div>
+                <span class="hint" id="d-categoria">Escolha uma categoria cadastrada. Se a lista estiver vazia, crie uma nova categoria.</span>
                 <span class="field-erro" id="e-categoria"></span>
+                <div class="nova-categoria" id="nova-categoria" hidden>
+                  <input class="input" id="nc-nome" type="text" maxlength="80" placeholder="Nome da categoria" aria-label="Nome da nova categoria" autocomplete="off">
+                  <input class="input" id="nc-desc" type="text" maxlength="240" placeholder="Descrição (opcional)" aria-label="Descrição da nova categoria" autocomplete="off">
+                  <button class="btn btn-primary btn-sm" type="button" id="nc-salvar">Criar categoria</button>
+                  <span class="field-erro" id="nc-erro" role="alert"></span>
+                </div>
               </div>
 
               <div class="field">
@@ -84,7 +94,14 @@
                 <span class="field-erro" id="e-setor"></span>
               </div>
 
-              <div class="field"><label for="f-elegibilidade">Quem pode usar</label><select class="input" id="f-elegibilidade"><option value="todos">Todos os perfis</option><option value="somente_funcionarios">Somente professores e funcionários</option></select><span class="hint">Alunos não poderão reservar equipamentos restritos a funcionários.</span></div>
+              <div class="field">
+                <label for="f-elegibilidade">Quem pode usar</label>
+                <select class="input" id="f-elegibilidade" aria-describedby="d-elegibilidade">
+                  <option value="todos" selected>Todos os perfis</option>
+                  <option value="somente_funcionarios">Somente professores e funcionários</option>
+                </select>
+                <span class="hint" id="d-elegibilidade">Alunos não conseguem reservar nem receber emprestado um equipamento restrito a funcionários.</span>
+              </div>
               <div class="field">
                 <label for="f-condicao">Condição física</label>
                 <select class="input" id="f-condicao" aria-describedby="e-condicao" required>
@@ -121,11 +138,11 @@
     </div>
   </div>
 
-  <script src="../assets/js/auth.js"></script>
-  <script src="../assets/js/layout.js"></script>
-  <script src="../assets/js/visuais.js"></script>
-  <script src="../assets/js/runtime-config.js"></script>
-  <script src="../assets/js/api.js"></script>
-  <script src="../assets/js/equipamento-form.js"></script>
+  <script src="../assets/js/auth.js?v=2026.10.28.11"></script>
+  <script src="../assets/js/layout.js?v=2026.10.28.11"></script>
+  <script src="../assets/js/visuais.js?v=2026.10.28.11"></script>
+  <script src="../assets/js/runtime-config.js?v=2026.10.28.11"></script>
+  <script src="../assets/js/api.js?v=2026.10.28.11"></script>
+  <script src="../assets/js/equipamento-form.js?v=2026.10.28.11"></script>
 </body>
 </html>

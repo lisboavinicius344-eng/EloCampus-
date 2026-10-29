@@ -1,2 +1,60 @@
-<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Detalhes do equipamento — ELO Campus</title><link rel="icon" href="../assets/img/logo.png"><link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet"><link rel="stylesheet" href="../assets/css/style.css"><link rel="stylesheet" href="../assets/css/layout.css"><link rel="stylesheet" href="../assets/css/equipamentos.css"></head><body data-pagina="equipamentos"><div class="app"><aside class="sidebar" id="sidebar"></aside><div class="content"><header class="topbar" id="topbar"></header><main class="main"><div class="page-head"><div><h1>Detalhes do equipamento</h1><p>Imagem ou silhueta com a condição aplicada ao próprio visual.</p></div><div class="toolbar"><a class="btn btn-ghost" href="equipamentos.html">Voltar para a lista</a><a class="btn btn-primary" id="editar" href="#">Editar cadastro</a></div></div><div class="alert alert-error" id="erro" role="alert" hidden></div><section class="panel detalhe-panel" id="detalhe"><p class="muted">Carregando informações…</p></section></main></div></div><div class="modal-backdrop" id="modal-exclusao" hidden><div class="confirm-modal" role="dialog" aria-modal="true" aria-labelledby="confirm-title"><h2 id="confirm-title">Retirar equipamento?</h2><p>O equipamento será retirado de uso. Se houver movimentações anteriores, o cadastro será mantido como inativo para preservar o histórico.</p><div class="form-actions"><button class="btn btn-danger" id="confirmar-exclusao">Sim, retirar equipamento</button><button class="btn btn-ghost" id="cancelar-exclusao">Cancelar</button></div></div></div><script src="../assets/js/auth.js"></script><script src="../assets/js/layout.js"></script><script src="../assets/js/visuais.js"></script><script src="../assets/js/runtime-config.js"></script>
-  <script src="../assets/js/api.js"></script><script src="../assets/js/equipamento-detalhe.js"></script></body></html>
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Detalhes do equipamento — ELO Campus</title>
+    <link rel="icon" href="../assets/img/logo.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../assets/css/style.css" />
+    <link rel="stylesheet" href="../assets/css/layout.css" />
+    <link rel="stylesheet" href="../assets/css/equipamentos.css" />
+  </head>
+  <body data-pagina="equipamentos">
+    <div class="app">
+      <aside class="sidebar" id="sidebar"></aside>
+      <div class="content">
+        <header class="topbar" id="topbar"></header>
+        <main class="main">
+          <div class="page-head">
+            <div>
+              <h1>Detalhes do equipamento</h1>
+              <p>Imagem ou silhueta com a condição aplicada ao próprio visual.</p>
+            </div>
+            <div class="toolbar">
+              <a class="btn btn-ghost" href="equipamentos.html">Voltar para a lista</a
+              ><a class="btn btn-primary" id="editar" href="#">Editar cadastro</a>
+            </div>
+          </div>
+          <div class="alert alert-error" id="erro" role="alert" hidden></div>
+          <section class="panel detalhe-panel" id="detalhe">
+            <p class="muted">Carregando informações…</p>
+          </section>
+        </main>
+      </div>
+    </div>
+    <div class="modal-backdrop" id="modal-exclusao" hidden>
+      <div class="confirm-modal" role="dialog" aria-modal="true" aria-labelledby="confirm-title">
+        <h2 id="confirm-title">Retirar equipamento?</h2>
+        <p>
+          O equipamento será retirado de uso. Se houver movimentações anteriores, o cadastro será
+          mantido como inativo para preservar o histórico.
+        </p>
+        <div class="form-actions">
+          <button class="btn btn-danger" id="confirmar-exclusao">Sim, retirar equipamento</button
+          ><button class="btn btn-ghost" id="cancelar-exclusao">Cancelar</button>
+        </div>
+      </div>
+    </div>
+    <script src="../assets/js/auth.js"></script>
+    <script src="../assets/js/layout.js"></script>
+    <script src="../assets/js/visuais.js"></script>
+    <script src="../assets/js/runtime-config.js"></script>
+    <script src="../assets/js/api.js"></script>
+    <script src="../assets/js/equipamento-detalhe.js"></script>
+  </body>
+</html>

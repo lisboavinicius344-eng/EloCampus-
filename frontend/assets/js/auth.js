@@ -107,8 +107,6 @@ function sair() {
   if (cabecalho) cabecalho.textContent = "Entre com seu e-mail institucional e sua senha.";
   const notaLogin = document.querySelector(".login-note");
   if (notaLogin) notaLogin.textContent = "No primeiro acesso, use a senha provisória recebida por e-mail e crie sua senha pessoal.";
-  const seletor = form.querySelector(".access-picker");
-  if (seletor) seletor.hidden = true;
 
   const mostrarMensagem = (texto, tipo = "error") => {
     erro.textContent = texto;
@@ -185,7 +183,20 @@ function sair() {
     botao.textContent = "Verificando…";
     try {
       const sessao = await autenticar(email, senha.value);
-      if (!PERFIS_VALIDOS.has(String(sessao.perfil || "").toLowerCase())) throw new Error("O perfil vinculado à conta não é reconhecido. Procure a equipe responsável.");
+      if (!PERFIS_VALIDOS.has(String(sessao.perfil || "").toLowerCase())) {
+        throw new Error("O perfil vinculado à conta não é reconhecido. Procure a equipe responsável.");
+      }
+
+      const areaEscolhida = form.querySelector('input[name="tipo-acesso"]:checked')?.value || "usuario";
+      const perfil = String(sessao.perfil || "").toLowerCase();
+      const perfilAdministrativo = perfil === "administrador" || perfil === "operador";
+      if (areaEscolhida === "administracao" && !perfilAdministrativo) {
+        throw new Error("Esta conta não possui perfil administrativo. Selecione “Aluno ou professor” para entrar.");
+      }
+      if (areaEscolhida === "usuario" && perfilAdministrativo) {
+        throw new Error("Esta conta pertence à área administrativa. Selecione “Administrador / TI” para continuar.");
+      }
+
       salvarSessao(sessao);
       persistirEmailLembrado();
       senha.value = "";
