@@ -589,3 +589,34 @@ a.nav-item:hover {
 .nav-count[hidden] {
   display: none;
 }
+
+
+/* Identificação explícita do tipo de acesso junto à marca institucional. */
+.side-brand-copy,
+.topbar-brand-copy {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: .28rem;
+}
+.side-brand-name { display: block; }
+.side-brand-role,
+.topbar-brand-copy small {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  max-width: 100%;
+  padding: .2rem .55rem;
+  border: 1px solid rgba(168, 139, 250, .28);
+  border-radius: 999px;
+  background: rgba(139, 92, 246, .12);
+  color: #cfc2ff;
+  font-size: .68rem;
+  font-weight: 600;
+  line-height: 1.35;
+  letter-spacing: .015em;
+  white-space: normal;
+}
+.topbar-brand-copy strong { line-height: 1.1; }
+.topbar-brand-copy small { font-size: .62rem; }
