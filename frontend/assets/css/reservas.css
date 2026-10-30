@@ -26,3 +26,19 @@
 .reservas-page .res-empty { padding: 1.5rem !important; text-align: center; color: var(--muted); }
 .reservas-page.reservas-aluno .res-col-solicitante { display: none; }
 @media(max-width:760px) { .reservas-page .api-grid { grid-template-columns: 1fr; } .reservas-page #res-form > .btn { width: 100%; } .reservas-page .lista-toolbar { align-items: stretch; flex-direction: column; } .reservas-page .lista-toolbar .field, .reservas-page .lista-toolbar > .btn { width: 100%; } }
+
+/* Ajustes finais: filtros e ações não disputam a mesma linha. */
+.reservas-page .lista-toolbar { display:grid; grid-template-columns:minmax(0,1fr) minmax(190px,260px) auto; align-items:end; gap:1rem; }
+.reservas-page .lista-toolbar h2 { align-self:center; }
+.reservas-page .lista-toolbar .field { min-width:0; width:100%; margin:0; }
+.reservas-page #res-status { width:100%; }
+.reservas-page #res-refresh { justify-self:end; min-width:110px; }
+.reservas-page .api-table td:last-child { min-width:190px; }
+.reservas-page .api-actions .btn { min-width:105px; min-height:40px; padding:.55rem .8rem; line-height:1.3; }
+.reservas-page #res-form-wrap .api-grid { align-items:start; }
+@media(max-width:760px) {
+  .reservas-page .lista-toolbar { grid-template-columns:1fr; align-items:stretch; }
+  .reservas-page .lista-toolbar h2 { width:100%; }
+  .reservas-page #res-refresh { width:100%; justify-self:stretch; }
+  .reservas-page .api-actions .btn { flex:1 1 100%; }
+}

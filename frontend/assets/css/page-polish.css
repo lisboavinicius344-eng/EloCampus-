@@ -336,3 +336,66 @@ button.btn, a.btn { min-height: 44px; line-height: 1.25; white-space: normal; }
  #filtros-historico { grid-template-columns:minmax(0,1fr); }
  #limpar-historico { width:100%; }
 }
+
+
+/* Alinhamento consistente dos controles de atualização e filtros. */
+[data-pagina="categorias"] .card > .row {
+  display:flex; align-items:center !important; justify-content:space-between;
+  gap:1rem !important; flex-wrap:wrap;
+}
+[data-pagina="categorias"] #cat-refresh { margin-left:auto; }
+[data-pagina="manutencoes"] .lista-toolbar {
+  display:grid; grid-template-columns:minmax(0,1fr) minmax(190px,260px) auto;
+  align-items:end; gap:1rem;
+}
+[data-pagina="manutencoes"] .lista-toolbar h2 { align-self:center; margin:0; }
+[data-pagina="manutencoes"] .lista-toolbar .field { min-width:0; width:100%; margin:0; }
+[data-pagina="manutencoes"] #man-status { width:100%; }
+[data-pagina="manutencoes"] #man-refresh { justify-self:end; margin:0; }
+[data-pagina="manutencoes"] #man-form > .api-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:1rem; }
+[data-pagina="manutencoes"] #man-form > button { justify-self:start; min-width:190px; }
+[data-pagina="manutencoes"] .api-table td:last-child { min-width:230px; }
+[data-pagina="manutencoes"] .api-table td:last-child .stack-sm { display:grid; gap:.55rem; }
+[data-pagina="manutencoes"] .api-table td:last-child textarea { min-height:72px; }
+[data-pagina="usuarios"] .card > .row,
+[data-pagina="solicitacoes-acesso"] .page-head {
+  display:flex; align-items:center; justify-content:space-between;
+  gap:1rem; flex-wrap:wrap;
+}
+[data-pagina="usuarios"] #api-usuarios-atualizar,
+[data-pagina="solicitacoes-acesso"] #solicitacoes-atualizar,
+[data-pagina="solicitantes"] #solicitantes-atualizar { flex:0 0 auto; min-width:max-content; }
+[data-pagina="usuarios"] .card > .row > div { min-width:0; flex:1 1 300px; }
+[data-pagina="usuarios"] .card > .row > button { margin-left:auto; }
+
+/* Revisão e avanço do cadastro: CTA visível, com área clicável e contraste. */
+form.split .summary { display:flex; flex-direction:column; gap:1rem; min-width:0; }
+form.split .summary .terms { margin-block:.35rem; line-height:1.55; }
+form.split .summary button[type="submit"] {
+  display:flex; align-items:center; justify-content:center;
+  width:100%; min-height:52px; padding:.9rem 1.15rem;
+  border-radius:12px; background:linear-gradient(120deg,#6841c6,#8957dc);
+  color:#fff; border:1px solid rgba(255,255,255,.24);
+  font-weight:750; font-size:1rem; line-height:1.35;
+  white-space:normal; text-align:center; cursor:pointer;
+  box-shadow:0 8px 20px rgba(74,45,145,.22);
+}
+form.split .summary button[type="submit"]:hover { filter:brightness(1.08); transform:translateY(-1px); }
+form.split .summary button[type="submit"]:focus-visible,
+#revisao-emprestimo button:focus-visible { outline:3px solid rgba(103,201,208,.8); outline-offset:3px; }
+#revisao-emprestimo { display:grid; gap:1rem; padding:clamp(1.1rem,2.5vw,1.75rem); }
+#revisao-emprestimo .stack-sm { display:flex; flex-wrap:wrap; gap:.8rem; }
+#revisao-emprestimo .stack-sm .btn { flex:1 1 190px; min-height:48px; white-space:normal; }
+#revisao-emprestimo #confirmar-emprestimo { background:linear-gradient(120deg,#6841c6,#8957dc); color:#fff; border:1px solid rgba(255,255,255,.2); }
+#revisao-emprestimo #voltar-edicao { background:transparent; }
+@media(max-width:760px) {
+  [data-pagina="manutencoes"] .lista-toolbar { grid-template-columns:1fr; align-items:stretch; }
+  [data-pagina="manutencoes"] .lista-toolbar h2 { width:100%; }
+  [data-pagina="manutencoes"] #man-refresh { width:100%; justify-self:stretch; }
+  [data-pagina="manutencoes"] #man-form > .api-grid { grid-template-columns:1fr; }
+  [data-pagina="manutencoes"] #man-form > button { width:100%; }
+  [data-pagina="categorias"] #cat-refresh { width:100%; margin:0; }
+  [data-pagina="usuarios"] .card > .row > button { width:100%; margin:0; }
+  #revisao-emprestimo .stack-sm { flex-direction:column; }
+  #revisao-emprestimo .stack-sm .btn { width:100%; }
+}

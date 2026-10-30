@@ -278,13 +278,11 @@ const ELO = {
       elegibilidade: d.elegibilidade || "todos",
     };
     corpo.categoria_id = Number(d.categoria_id);
-    // Quando há arquivo, envia multipart/form-data para o endpoint de equipamentos.
-    // O navegador define automaticamente o boundary do multipart.
-    let payload = corpo;
-    if (d.foto instanceof File) {
-      payload = new FormData();
-      Object.entries(corpo).forEach(([chave, valor]) => payload.append(chave, valor == null ? "" : String(valor)));
-      payload.append("imagem", d.foto, d.foto.name);
+    // O endpoint de equipamentos recebe JSON. A imagem é enviada como Data URL
+    // no campo "imagem", sem multipart/form-data (que a API rejeita).
+    const payload = { ...corpo };
+    if (typeof d.foto === "string" && d.foto.startsWith("data:image/")) {
+      payload.imagem = d.foto;
     }
     return (await requisitar(id ? `/equipamentos/${encodeURIComponent(id)}` : "/equipamentos", {
       metodo: id ? "PUT" : "POST",

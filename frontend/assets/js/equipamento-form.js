@@ -267,6 +267,15 @@
     }
   }
 
+  function arquivoParaDataUrl(arquivo) {
+    return new Promise((resolve, reject) => {
+      const leitor = new FileReader();
+      leitor.onload = () => resolve(String(leitor.result || ""));
+      leitor.onerror = () => reject(new Error("Não foi possível ler a imagem selecionada."));
+      leitor.readAsDataURL(arquivo);
+    });
+  }
+
   form.addEventListener("submit", async (ev) => {
     ev.preventDefault();
     limparErros();
@@ -279,6 +288,9 @@
     botao.textContent = "Salvando…";
 
     try {
+      if (dados.foto instanceof File) {
+        dados.foto = await arquivoParaDataUrl(dados.foto);
+      }
       await ELO.salvarEquipamento(dados, id);
       window.location.href = `equipamentos.html?salvo=${id ? "editado" : "criado"}`;
     } catch (err) {
