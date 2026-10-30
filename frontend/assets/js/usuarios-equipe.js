@@ -68,6 +68,8 @@
         reenviar.textContent = "Reenviar instruções";
         // A API continua sendo a autoridade para impedir operações não permitidas, como desativar a própria conta.
         reenviar.addEventListener("click", async () => {
+          const confirmado = confirm(`Reenviar as instruções de acesso para ${usuario.nome} (${usuario.email})?\n\nUma nova instrução será enviada ao endereço cadastrado.`);
+          if (!confirmado) return;
           reenviar.disabled = true;
           reenviar.textContent = "Enviando…";
           try {
