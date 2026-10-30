@@ -9,11 +9,8 @@
   const usuarioFinal = ["aluno", "professor", "servidor"].includes(perfilAtual);
   const parametrosIniciais = new URLSearchParams(location.search);
   if (!sessaoAtual) return; // layout.js já redireciona para o login se não houver sessão.
-  if (!parametrosIniciais.get("nome") && ["administrador", "operador"].includes(perfilAtual)) {
-    location.replace("solicitantes.html?origem=novo-emprestimo");
-    return;
-  }
-  if (!parametrosIniciais.get("nome") && !usuarioFinal) return;
+  // Administradores e operadores permanecem no formulário de novo empréstimo;
+  // o solicitante é selecionado dentro do próprio fluxo, sem desvio para a página de cadastro.
   const mensagem = $("emprestimo-mensagem");
   const campoSolicitante = $("solicitante");
   let solicitantesDisponiveis = [];

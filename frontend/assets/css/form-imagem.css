@@ -1,0 +1,6 @@
+/* Campo de imagem no cadastro/edição de equipamentos */
+.photo-field { gap: .55rem; }
+.photo-field input[type="file"] { width: 100%; padding: .7rem; cursor: pointer; }
+.photo-preview { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; margin-top: .35rem; padding: .8rem; border: 1px solid var(--border); border-radius: 14px; background: rgba(255,255,255,.025); }
+.photo-preview img { display: block; width: min(100%, 220px); height: 145px; object-fit: contain; border-radius: 10px; background: rgba(0,0,0,.16); }
+.photo-preview[hidden] { display: none; }
