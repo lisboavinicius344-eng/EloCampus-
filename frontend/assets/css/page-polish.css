@@ -336,35 +336,3 @@ button.btn, a.btn { min-height: 44px; line-height: 1.25; white-space: normal; }
  #filtros-historico { grid-template-columns:minmax(0,1fr); }
  #limpar-historico { width:100%; }
 }
-
-
-/* Respiro consistente entre ações, especialmente nos botões de atualização. */
-.toolbar,
-.lista-toolbar,
-.api-actions,
-.page-head > .toolbar,
-.page-head .toolbar {
-  column-gap: 1rem !important;
-  row-gap: .75rem !important;
-}
-.api-actions {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-}
-.api-actions > .btn + .btn,
-.toolbar > .btn + .btn,
-.lista-toolbar > .btn + .btn {
-  margin-left: .15rem;
-}
-@media (max-width: 640px) {
-  .api-actions,
-  .toolbar,
-  .lista-toolbar {
-    gap: .75rem !important;
-  }
-  .api-actions > .btn,
-  .toolbar > .btn {
-    flex: 1 1 auto;
-  }
-}

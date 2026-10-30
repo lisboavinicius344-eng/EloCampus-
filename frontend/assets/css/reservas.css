@@ -1,176 +1,28 @@
-/* Acabamento da página Reservas: lista clara, controles alinhados e adaptação móvel. */
-.reservas-page .main {
-  max-width: 1440px;
-}
-.reservas-page .page-head {
-  margin-bottom: 1.35rem;
-}
-.reservas-page .page-head p {
-  max-width: 68ch;
-}
-.reservas-page #res-aviso {
-  margin-bottom: 1rem;
-}
-.reservas-page #res-form-wrap,
-.reservas-page .reservas-list-card {
-  padding: clamp(1rem, 2.2vw, 1.6rem);
-  gap: 1.15rem;
-}
-.reservas-page #res-form-wrap h2 {
-  margin: 0;
-  font-size: 1.15rem;
-  line-height: 1.35;
-}
-.reservas-page #res-form {
-  gap: 1.1rem;
-}
-.reservas-page .api-grid {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 1rem;
-}
-.reservas-page #res-equip {
-  min-height: 9rem;
-  border-radius: 14px;
-  padding: 0.65rem 0.8rem;
-}
-.reservas-page #res-equip option {
-  padding: 0.35rem;
-}
-.reservas-page #res-obs {
-  min-height: 6rem;
-  padding: 0.8rem 1rem;
-  border-radius: 14px;
-}
-.reservas-page #res-form .btn {
-  justify-self: start;
-  min-width: 10.5rem;
-}
-.reservas-page .table-wrap {
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  background: rgba(7, 12, 25, 0.18);
-}
-.reservas-page .api-table {
-  min-width: 760px;
-}
-.reservas-page .api-table th {
-  padding: 0.85rem 1rem;
-  color: var(--muted);
-  font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 0.055em;
-  text-transform: uppercase;
-  white-space: nowrap;
-  background: rgba(139, 92, 246, 0.055);
-}
-.reservas-page .api-table td {
-  padding: 0.95rem 1rem;
-  line-height: 1.5;
-}
-.reservas-page .api-table tbody tr:last-child td {
-  border-bottom: 0;
-}
-.reservas-page .api-table tbody tr:hover {
-  background: rgba(103, 201, 208, 0.035);
-}
-.reservas-page .api-code {
-  white-space: nowrap;
-}
-.reservas-page .api-actions {
-  gap: 0.45rem;
-}
-.reservas-page .api-actions .btn {
-  min-height: 36px;
-  padding: 0.5rem 0.75rem;
-  font-size: 0.82rem;
-  white-space: normal;
-}
-.reservas-page .res-status-badge {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0.3rem 0.65rem;
-  border: 1px solid var(--border);
-  border-radius: 999px;
-  font-size: 0.78rem;
-  font-weight: 700;
-  white-space: nowrap;
-}
-.reservas-page .res-status-pendente {
-  color: #fbbf24;
-  background: rgba(251, 191, 36, 0.1);
-  border-color: rgba(251, 191, 36, 0.25);
-}
-.reservas-page .res-status-aprovada,
-.reservas-page .res-status-concluida {
-  color: #6ee7b7;
-  background: rgba(52, 211, 153, 0.1);
-  border-color: rgba(52, 211, 153, 0.25);
-}
-.reservas-page .res-status-rejeitada,
-.reservas-page .res-status-cancelada {
-  color: #fda4af;
-  background: rgba(251, 113, 133, 0.1);
-  border-color: rgba(251, 113, 133, 0.25);
-}
-.reservas-page .res-status-expirada {
-  color: #c4b5fd;
-  background: rgba(139, 92, 246, 0.12);
-  border-color: rgba(139, 92, 246, 0.3);
-}
-.reservas-page .res-status-retirada {
-  color: var(--cyan, #67c9d0);
-  background: rgba(103, 201, 208, 0.1);
-  border-color: rgba(103, 201, 208, 0.25);
-}
-.reservas-page .res-period {
-  min-width: 12rem;
-}
-.reservas-page .res-period span {
-  display: block;
-  color: var(--muted);
-  font-size: 0.82rem;
-  margin-top: 0.2rem;
-}
-.reservas-page .res-empty {
-  padding: 1.5rem !important;
-  text-align: center;
-  color: var(--muted);
-}
-.reservas-page.reservas-aluno .res-col-solicitante {
-  display: none;
-}
-@media (max-width: 760px) {
-  .reservas-page .api-grid {
-    grid-template-columns: minmax(0, 1fr);
-  }
-  .reservas-page #res-form .btn {
-    width: 100%;
-  }
-  .reservas-page .table-wrap {
-    margin-inline: -0.25rem;
-    border-radius: 10px;
-  }
-}
-
-#res-form-wrap {
-  margin-bottom: 0;
-}
-#res-form {
-  gap: 1.15rem;
-}
-#res-form > .field,
-#res-form .api-grid {
-  min-width: 0;
-}
-#res-form .api-grid {
-  gap: 1rem;
-}
-#res-obs {
-  min-height: 6.5rem;
-}
-@media (max-width: 760px) {
-  #res-form .api-grid {
-    grid-template-columns: minmax(0, 1fr);
-  }
-}
+/* Reservas: hierarquia, alinhamento e leitura em telas grandes e pequenas. */
+.reservas-page .main { width: min(100%, 1440px); }
+.reservas-page .page-head { margin-bottom: 1.4rem; }
+.reservas-page #res-form-wrap, .reservas-page main > .card { padding: clamp(1rem, 2vw, 1.5rem); gap: 1.15rem; }
+.reservas-page #res-form-wrap h2, .reservas-page .lista-toolbar h2 { margin: 0; }
+.reservas-page #res-form { display: grid; gap: 1.1rem; }
+.reservas-page .api-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 1rem; }
+.reservas-page .field { min-width: 0; }
+.reservas-page .input { min-height: 44px; }
+.reservas-page #res-equip { min-height: 10rem; padding: .7rem .85rem; border-radius: 12px; }
+.reservas-page #res-obs { min-height: 6.5rem; padding: .8rem 1rem; }
+.reservas-page #res-form > .btn { justify-self: start; min-width: 11rem; }
+.reservas-page .lista-toolbar { display: flex; align-items: end; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+.reservas-page .lista-toolbar .field { min-width: min(100%, 220px); margin: 0; }
+.reservas-page .table-wrap { width: 100%; overflow-x: auto; border: 1px solid var(--border); border-radius: 14px; }
+.reservas-page .api-table { width: 100%; min-width: 820px; border-collapse: separate; border-spacing: 0; }
+.reservas-page .api-table th { padding: .9rem 1rem; color: var(--muted); font-size: .72rem; font-weight: 700; letter-spacing: .055em; text-transform: uppercase; white-space: nowrap; background: rgba(139,92,246,.06); }
+.reservas-page .api-table td { padding: .95rem 1rem; line-height: 1.5; vertical-align: middle; }
+.reservas-page .api-table tbody tr:last-child td { border-bottom: 0; }
+.reservas-page .api-table tbody tr:hover { background: rgba(103,201,208,.035); }
+.reservas-page .api-actions { display: flex; align-items: center; gap: .5rem; flex-wrap: wrap; }
+.reservas-page .api-actions .btn { min-height: 36px; white-space: normal; }
+.reservas-page .res-status-badge { display: inline-flex; align-items: center; justify-content: center; padding: .3rem .65rem; border: 1px solid var(--border); border-radius: 999px; font-size: .78rem; font-weight: 700; white-space: nowrap; }
+.reservas-page .res-period { min-width: 12rem; }
+.reservas-page .res-period span { display: block; margin-top: .2rem; color: var(--muted); font-size: .82rem; }
+.reservas-page .res-empty { padding: 1.5rem !important; text-align: center; color: var(--muted); }
+.reservas-page.reservas-aluno .res-col-solicitante { display: none; }
+@media(max-width:760px) { .reservas-page .api-grid { grid-template-columns: 1fr; } .reservas-page #res-form > .btn { width: 100%; } .reservas-page .lista-toolbar { align-items: stretch; flex-direction: column; } .reservas-page .lista-toolbar .field, .reservas-page .lista-toolbar > .btn { width: 100%; } }

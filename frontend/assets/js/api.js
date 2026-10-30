@@ -102,7 +102,8 @@ async function requisitar(caminho, opcoes = {}) {
   if (!API_BASE_URL) throw new Error("A API do ELO Campus não está configurada. Defina ELO_API_BASE_URL.");
   const sessao = typeof obterSessao === "function" ? obterSessao() : null;
   const headers = { Accept: "application/json" };
-  if (opcoes.corpo !== undefined && opcoes.corpo !== null) headers["Content-Type"] = "application/json";
+  const corpoEhFormData = typeof FormData !== "undefined" && opcoes.corpo instanceof FormData;
+  if (opcoes.corpo !== undefined && opcoes.corpo !== null && !corpoEhFormData) headers["Content-Type"] = "application/json";
   if (!opcoes.semAutenticacao && sessao?.token) headers.Authorization = `Bearer ${sessao.token}`;
 
   let resposta;
@@ -110,7 +111,7 @@ async function requisitar(caminho, opcoes = {}) {
     resposta = await fetch(`${API_BASE_URL}${caminho}`, {
       method: opcoes.metodo || "GET",
       headers,
-      body: opcoes.corpo == null ? undefined : JSON.stringify(opcoes.corpo),
+      body: opcoes.corpo == null ? undefined : (corpoEhFormData ? opcoes.corpo : JSON.stringify(opcoes.corpo)),
       cache: "no-store",
       credentials: "omit",
     });
@@ -276,11 +277,18 @@ const ELO = {
       observacoes: d.observacoes || null,
       elegibilidade: d.elegibilidade || "todos",
     };
-    // A API exige uma categoria já cadastrada; a foto não é guardada pela API e por isso não é enviada.
     corpo.categoria_id = Number(d.categoria_id);
+    // Quando há arquivo, envia multipart/form-data para o endpoint de equipamentos.
+    // O navegador define automaticamente o boundary do multipart.
+    let payload = corpo;
+    if (d.foto instanceof File) {
+      payload = new FormData();
+      Object.entries(corpo).forEach(([chave, valor]) => payload.append(chave, valor == null ? "" : String(valor)));
+      payload.append("imagem", d.foto, d.foto.name);
+    }
     return (await requisitar(id ? `/equipamentos/${encodeURIComponent(id)}` : "/equipamentos", {
       metodo: id ? "PUT" : "POST",
-      corpo,
+      corpo: payload,
     })).equipamento;
   },
   categorias: async () => (await requisitar("/categorias")).categorias,

@@ -1,0 +1,21 @@
+/* Manutenções: formulários e listagem com espaçamento consistente. */
+.manutencoes-page .main { width: min(100%, 1440px); }
+.manutencoes-page .page-head { margin-bottom: 1.35rem; }
+.manutencoes-page main > .card { padding: clamp(1rem, 2vw, 1.5rem); gap: 1.15rem; }
+.manutencoes-page main > .card h2 { margin: 0; }
+.manutencoes-page #man-form { display: grid; gap: 1.1rem; }
+.manutencoes-page .api-grid { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1.4fr); gap: 1rem; }
+.manutencoes-page .field { min-width: 0; }
+.manutencoes-page .input { min-height: 44px; }
+.manutencoes-page #man-desc { width: 100%; }
+.manutencoes-page #man-form > .btn { justify-self: start; min-width: 12rem; }
+.manutencoes-page .lista-toolbar { display: flex; align-items: end; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+.manutencoes-page .lista-toolbar h2 { margin-right: auto; }
+.manutencoes-page .lista-toolbar .field { min-width: min(100%,220px); margin: 0; }
+.manutencoes-page .table-wrap { width: 100%; overflow-x: auto; border: 1px solid var(--border); border-radius: 14px; }
+.manutencoes-page .api-table { width: 100%; min-width: 760px; border-collapse: separate; border-spacing: 0; }
+.manutencoes-page .api-table th { padding: .9rem 1rem; color: var(--muted); font-size: .72rem; letter-spacing: .055em; text-transform: uppercase; white-space: nowrap; background: rgba(139,92,246,.06); }
+.manutencoes-page .api-table td { padding: .95rem 1rem; vertical-align: middle; line-height: 1.5; }
+.manutencoes-page .api-actions { display: flex; align-items: center; gap: .5rem; flex-wrap: wrap; }
+.manutencoes-page .api-actions .btn { min-height: 36px; }
+@media(max-width:760px) { .manutencoes-page .api-grid { grid-template-columns: 1fr; } .manutencoes-page #man-form > .btn { width: 100%; } .manutencoes-page .lista-toolbar { align-items: stretch; flex-direction: column; } .manutencoes-page .lista-toolbar .field, .manutencoes-page .lista-toolbar > .btn { width: 100%; } }

@@ -28,7 +28,34 @@
     observacoes: $("e-obs"),
   };
   const identificador = $("f-identificador");
+  const campoFoto = $("f-foto");
+  const previewWrap = $("foto-preview-wrap");
+  const previewFoto = $("foto-preview");
+  const erroFoto = $("e-foto");
+  let fotoSelecionada = null;
+  let urlPreviewFoto = "";
   let identificadorPersonalizado = false;
+  campoFoto?.addEventListener("change", () => {
+    erroFoto.textContent = "";
+    const arquivo = campoFoto.files?.[0] || null;
+    if (!arquivo) return;
+    if (!/^image\/(jpeg|png|webp|gif)$/.test(arquivo.type)) {
+      campoFoto.value = ""; fotoSelecionada = null; erroFoto.textContent = "Selecione uma imagem JPG, PNG, WEBP ou GIF."; return;
+    }
+    if (arquivo.size > 5 * 1024 * 1024) {
+      campoFoto.value = ""; fotoSelecionada = null; erroFoto.textContent = "A imagem deve ter no máximo 5 MB."; return;
+    }
+    fotoSelecionada = arquivo;
+    if (urlPreviewFoto) URL.revokeObjectURL(urlPreviewFoto);
+    urlPreviewFoto = URL.createObjectURL(arquivo);
+    previewFoto.src = urlPreviewFoto;
+    previewWrap.hidden = false;
+  });
+  $("foto-remover")?.addEventListener("click", () => {
+    campoFoto.value = ""; fotoSelecionada = null; previewWrap.hidden = true;
+    if (urlPreviewFoto) URL.revokeObjectURL(urlPreviewFoto);
+    urlPreviewFoto = ""; previewFoto.removeAttribute("src");
+  });
   let categoriasApi = [];
   const textoCategoria = () => campos.categoria.selectedOptions[0]?.textContent.trim() || "";
 
@@ -60,6 +87,7 @@
       condicao: campos.condicao.value,
       observacoes: campos.observacoes.value.trim(),
       qr_code: identificador.value.trim() || normalizarPatrimonio(campos.patrimonio.value),
+      foto: fotoSelecionada,
     };
   }
 
@@ -206,6 +234,13 @@
     botao.disabled = true;
     try {
       const e = await ELO.equipamento(id);
+      if (e.imagem || e.imagem_url || e.foto) {
+        const imagemAtual = e.imagem || e.imagem_url || e.foto;
+        previewFoto.src = /^https?:\/\//i.test(imagemAtual) ? imagemAtual : `${API_BASE_URL}${imagemAtual}`;
+        previewWrap.hidden = false;
+        const hintFoto = campoFoto?.parentElement?.querySelector(".hint");
+        if (hintFoto) hintFoto.textContent = "Foto atual do equipamento. Selecione outro arquivo para substituí-la.";
+      }
       campos.nome.value = e.nome ?? "";
       campos.patrimonio.value = e.patrimonio ?? "";
       const idCat = e.categoria_id ?? categoriasApi.find((c) => c.nome === e.categoria)?.id ?? "";
