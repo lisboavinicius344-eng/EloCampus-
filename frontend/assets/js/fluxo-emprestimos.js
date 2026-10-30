@@ -9,8 +9,6 @@
   const usuarioFinal = ["aluno", "professor", "servidor"].includes(perfilAtual);
   const parametrosIniciais = new URLSearchParams(location.search);
   if (!sessaoAtual) return; // layout.js já redireciona para o login se não houver sessão.
-  // Administradores e operadores selecionam o solicitante nesta própria página.
-  // O redirecionamento antigo para solicitantes.html impedia abrir o formulário.
   const mensagem = $("emprestimo-mensagem");
   const campoSolicitante = $("solicitante");
   let solicitantesDisponiveis = [];
