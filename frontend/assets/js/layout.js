@@ -158,8 +158,8 @@ const EloUtil = {
   const nome = EloUtil.esc(sessao.nome || "Usuário");
   const iniciais = (sessao.nome || "U").split(" ").slice(0, 2).map((p) => p[0]).join("").toUpperCase();
   const ROTULOS_PERFIL = { administrador: "Administrador · TI", operador: "Equipe operacional", aluno: "Discente", professor: "Docente" };
-  const perfil = ROTULOS_PERFIL[perfilAtual] || (sessao.perfil ? sessao.perfil[0].toUpperCase() + sessao.perfil.slice(1) : "Conta");
-  const subtituloMarca = `<small class="brand-profile">${EloUtil.esc(perfil)}</small>`;
+  const perfil = usuarioFinal ? "Minha conta" : (ROTULOS_PERFIL[perfilAtual] || (sessao.perfil ? sessao.perfil[0].toUpperCase() + sessao.perfil.slice(1) : ""));
+  const subtituloMarca = usuarioFinal ? "" : "<small>Instituição - Campus Lapa</small>";
 
   document.getElementById("sidebar").innerHTML = `
     <a class="side-brand" href="dashboard.html">
@@ -175,7 +175,7 @@ const EloUtil = {
 
   document.getElementById("topbar").innerHTML = `
     <button class="topbar-btn" type="button" id="btn-menu" aria-controls="sidebar" aria-expanded="false" aria-label="Abrir menu">${svg("menu")}</button>
-    <span class="topbar-brand"><img src="../assets/img/logo.png" alt=""><span>ELO Campus<small>${EloUtil.esc(perfil)}</small></span></span>`;
+    <span class="topbar-brand"><img src="../assets/img/logo.png" alt="">ELO Campus</span>`;
 
   if (perfilAtual === "administrador" && typeof ELO !== "undefined" && typeof ELO.solicitacoesAcesso === "function") {
     ELO.solicitacoesAcesso("pendente").then((pendentes) => {
