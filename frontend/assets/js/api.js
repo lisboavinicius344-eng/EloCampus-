@@ -148,6 +148,11 @@ const ELO = {
   resumoDashboard: () => requisitar("/dashboard/resumo"),
   equipamentos: async () => (await requisitar("/equipamentos")).equipamentos.map(normalizarEquipamento),
   equipamento: async (id) => normalizarEquipamento((await requisitar(`/equipamentos/${encodeURIComponent(id)}`)).equipamento),
+  historicoEquipamento: async (id) => {
+    const resposta = await requisitar(`/historico?equipamento_id=${encodeURIComponent(id)}`);
+    if (!Array.isArray(resposta)) throw new Error("A resposta do histórico do equipamento está fora do contrato esperado. A API deve retornar uma lista direta.");
+    return resposta;
+  },
   consultaQr: async (codigo) => {
     const caminho = `/consulta-qr/${encodeURIComponent(String(codigo || "").trim())}`;
     const sessao = typeof obterSessao === "function" ? obterSessao() : null;
@@ -294,6 +299,7 @@ const ELO = {
   criarCategoria: (dados) => requisitar("/categorias", { metodo: "POST", corpo: { nome: String(dados.nome || "").trim(), descricao: String(dados.descricao || "").trim() || null } }),
   editarCategoria: (id, dados) => requisitar(`/categorias/${encodeURIComponent(id)}`, { metodo: "PUT", corpo: { nome: String(dados.nome || "").trim(), descricao: String(dados.descricao || "").trim() || null } }),
   desativarCategoria: (id) => requisitar(`/categorias/${encodeURIComponent(id)}/desativar`, { metodo: "PATCH" }),
+  reativarCategoria: (id) => requisitar(`/categorias/${encodeURIComponent(id)}/reativar`, { metodo: "PATCH" }),
   solicitantes: async () => {
     const resposta = await requisitar("/solicitantes");
     if (!Array.isArray(resposta?.solicitantes)) {
@@ -325,6 +331,7 @@ const ELO = {
     },
   }),
   desativarSolicitante: (id) => requisitar(`/solicitantes/${encodeURIComponent(id)}/desativar`, { metodo: "PATCH" }),
+  reativarSolicitante: (id) => requisitar(`/solicitantes/${encodeURIComponent(id)}/reativar`, { metodo: "PATCH" }),
   salvarSolicitante: (id, dados) => ELO.editarSolicitante(id, dados),
   reservas: async () => (await requisitar("/reservas")).reservas,
   criarReserva: (dados) => requisitar("/reservas", { metodo: "POST", corpo: dados }),
@@ -370,4 +377,5 @@ const ELO = {
   criarUsuario: (dados) => requisitar("/usuarios", { metodo: "POST", corpo: { nome: String(dados.nome || "").trim(), email: String(dados.email || "").trim().toLowerCase(), papel: dados.papel } }),
   reenviarSenha: (id) => requisitar(`/usuarios/${encodeURIComponent(id)}/reenviar-senha`, { metodo: "PATCH" }),
   desativarUsuario: (id) => requisitar(`/usuarios/${encodeURIComponent(id)}/desativar`, { metodo: "PATCH" }),
+  reativarUsuario: (id) => requisitar(`/usuarios/${encodeURIComponent(id)}/reativar`, { metodo: "PATCH" }),
 };

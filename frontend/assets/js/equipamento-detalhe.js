@@ -35,8 +35,55 @@
         <div><dt>Situação</dt><dd>${esc(e.situacao || "Não informada")}</dd></div>
         ${e.observacoes ? `<div class="col-2"><dt>Observações</dt><dd>${esc(e.observacoes)}</dd></div>` : ""}
       </dl>
-      <button class="btn btn-danger" id="retirar">Retirar equipamento</button>
-    </div></div>`;
+      <div class="detalhe-acoes">
+        <button class="btn btn-line" id="ver-historico" type="button">Ver histórico</button>
+        <button class="btn btn-danger" id="retirar" type="button">Retirar equipamento</button>
+      </div>
+    </div></div>
+    <section class="historico-equipamento" id="historico-equipamento" hidden aria-live="polite">
+      <h3>Histórico deste equipamento</h3>
+      <div class="historico-equipamento-lista" id="historico-equipamento-lista"></div>
+    </section>`;
+
+    $("ver-historico").addEventListener("click", async () => {
+      const botao = $("ver-historico");
+      const area = $("historico-equipamento");
+      const lista = $("historico-equipamento-lista");
+      if (!area.hidden) { area.hidden = true; botao.textContent = "Ver histórico"; return; }
+      area.hidden = false;
+      lista.textContent = "Carregando movimentações…";
+      botao.disabled = true;
+      botao.textContent = "Consultando…";
+      try {
+        const movimentos = await ELO.historicoEquipamento(e.id ?? id);
+        lista.replaceChildren();
+        if (!movimentos.length) {
+          lista.textContent = "Nenhuma movimentação registrada para este equipamento.";
+        } else {
+          const tabela = document.createElement("div");
+          tabela.className = "table-wrap";
+          const table = document.createElement("table");
+          table.innerHTML = "<thead><tr><th>Data</th><th>Movimentação</th><th>Descrição</th><th>Responsável</th></tr></thead>";
+          const body = document.createElement("tbody");
+          movimentos.forEach((movimento) => {
+            const tr = document.createElement("tr");
+            const data = movimento.data_movimentacao || movimento.data || movimento.criado_em;
+            const dataFormatada = data ? new Date(data).toLocaleString("pt-BR") : "—";
+            [dataFormatada, movimento.tipo_movimentacao || movimento.tipo || "—", movimento.descricao || movimento.detalhe || "—", movimento.usuario_nome || movimento.usuario || movimento.responsavel || "—"].forEach((valor) => {
+              const td = document.createElement("td");
+              td.textContent = String(valor);
+              tr.appendChild(td);
+            });
+            body.appendChild(tr);
+          });
+          table.appendChild(body); tabela.appendChild(table); lista.appendChild(tabela);
+        }
+        botao.textContent = "Ocultar histórico";
+      } catch (falha) {
+        lista.textContent = falha.message || "Não foi possível carregar o histórico.";
+        botao.textContent = "Tentar novamente";
+      } finally { botao.disabled = false; }
+    });
 
     $("retirar").addEventListener("click", () => { $("modal-exclusao").hidden = false; $("confirmar-exclusao").focus(); });
     $("cancelar-exclusao").addEventListener("click", () => { $("modal-exclusao").hidden = true; });

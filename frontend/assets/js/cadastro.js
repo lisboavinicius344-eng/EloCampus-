@@ -17,7 +17,7 @@
     const dados = { nome: nome.value.trim(), email: email.value.trim().toLowerCase(), tipo: tipo.value, matricula: matricula.value.trim(), mensagem: mensagem.value.trim() };
     if (dados.nome.split(/\s+/).filter(Boolean).length < 2) { mostrar(erro, "Informe seu nome completo.", "error"); nome.focus(); return; }
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(dados.email)) { mostrar(erro, "Informe um endereço de e-mail válido.", "error"); email.focus(); return; }
-    if (!["aluno", "professor"].includes(dados.tipo)) { mostrar(erro, "Selecione Aluno ou Professor.", "error"); tipo.focus(); return; }
+    if (!["aluno", "professor", "servidor"].includes(dados.tipo)) { mostrar(erro, "Selecione Aluno, Professor ou Servidor (TAE).", "error"); tipo.focus(); return; }
     if (typeof ELO === "undefined" || ELO.modo() !== "api") { mostrar(erro, "A solicitação de acesso exige conexão com a API.", "error"); return; }
     botao.disabled = true; botao.textContent = "Enviando solicitação…";
     try {

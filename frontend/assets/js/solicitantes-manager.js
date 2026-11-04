@@ -120,6 +120,7 @@
       const agrupador = elemento("div", undefined, "solicitante-actions");
       agrupador.appendChild(botaoAcao("Editar", "", () => iniciarEdicao(item)));
       if (ativo) agrupador.appendChild(botaoAcao("Desativar", "", () => desativar(item)));
+      else agrupador.appendChild(botaoAcao("Reativar", "btn-primary", () => reativar(item)));
       acoes.appendChild(agrupador);
       linha.appendChild(acoes);
       tbody.appendChild(linha);
@@ -180,6 +181,21 @@
     const reduzirMovimento = Boolean(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
     form.scrollIntoView?.({ block: "start", behavior: reduzirMovimento ? "auto" : "smooth" });
     nome.focus({ preventScroll: true });
+  }
+
+  async function reativar(item) {
+    if (ocupada) return;
+    if (!window.confirm(`Reativar o cadastro de ${item.nome}? O solicitante voltará a poder ser selecionado nos fluxos permitidos.`)) return;
+    ocupada = true;
+    try {
+      const resposta = await ELO.reativarSolicitante(item.id);
+      mostrarAviso(resposta?.mensagem || `Solicitante #${item.id} reativado.`, "ok");
+      await carregar({ silencioso: true });
+    } catch (erro) {
+      mostrarAviso(erro.message || "Não foi possível reativar o solicitante.", "error");
+    } finally {
+      ocupada = false;
+    }
   }
 
   async function desativar(item) {
