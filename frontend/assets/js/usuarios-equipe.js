@@ -33,7 +33,7 @@
     tbody.replaceChildren();
     const carregando = document.createElement("tr");
     const celula = document.createElement("td");
-    celula.colSpan = 5;
+    celula.colSpan = 6;
     celula.textContent = "Carregando contas…";
     carregando.appendChild(celula);
     tbody.appendChild(carregando);
@@ -44,7 +44,7 @@
       if (!usuarios.length) {
         const vazio = document.createElement("tr");
         const mensagem = document.createElement("td");
-        mensagem.colSpan = 5;
+        mensagem.colSpan = 6;
         mensagem.textContent = "Nenhuma conta de equipe encontrada.";
         vazio.appendChild(mensagem);
         tbody.appendChild(vazio);
@@ -61,7 +61,15 @@
         etiqueta.textContent = usuario.deve_trocar_senha ? "Aguardando primeiro acesso" : "Concluído";
         primeiroAcesso.appendChild(etiqueta);
         linha.appendChild(primeiroAcesso);
+        const status = document.createElement("td");
+        const ativo = usuario.ativo !== false;
+        const statusPill = document.createElement("span");
+        statusPill.className = `pill ${ativo ? "pill-ok" : "pill-warn"}`;
+        statusPill.textContent = ativo ? "Ativo" : "Inativo";
+        status.appendChild(statusPill);
+        linha.appendChild(status);
         const acoes = document.createElement("td");
+        if (ativo) {
         const reenviar = document.createElement("button");
         reenviar.type = "button";
         reenviar.className = "btn btn-sm btn-line";
@@ -84,13 +92,30 @@
           }
         });
         acoes.appendChild(reenviar);
-        if (usuario.ativo !== false) {
           const desativar = document.createElement("button"); desativar.type = "button"; desativar.className = "btn btn-sm btn-ghost"; desativar.textContent = "Desativar";
           desativar.addEventListener("click", async () => {
             if (!confirm(`Desativar a conta de ${usuario.nome}?`)) return;
             try { const resultado = await ELO.desativarUsuario(usuario.id); mostrarAviso(resultado?.mensagem || "Conta desativada.", "ok"); await carregar(); }
             catch (erro) { mostrarAviso(erro.message || "Não foi possível desativar a conta.", "error"); }
           }); acoes.appendChild(desativar);
+        } else {
+          const reativar = document.createElement("button");
+          reativar.type = "button";
+          reativar.className = "btn btn-sm btn-primary";
+          reativar.textContent = "Reativar";
+          reativar.addEventListener("click", async () => {
+            if (!confirm(`Reativar a conta de ${usuario.nome}?`)) return;
+            reativar.disabled = true; reativar.textContent = "Reativando…";
+            try {
+              const resultado = await ELO.reativarUsuario(usuario.id);
+              mostrarAviso(resultado?.mensagem || `Conta de ${usuario.nome} reativada.`, "ok");
+              await carregar();
+            } catch (erro) {
+              mostrarAviso(erro.message || "Não foi possível reativar a conta.", "error");
+              reativar.disabled = false; reativar.textContent = "Reativar";
+            }
+          });
+          acoes.appendChild(reativar);
         }
         linha.appendChild(acoes);
         tbody.appendChild(linha);
@@ -99,7 +124,7 @@
       tbody.replaceChildren();
       const linha = document.createElement("tr");
       const celulaErro = document.createElement("td");
-      celulaErro.colSpan = 5;
+      celulaErro.colSpan = 6;
       celulaErro.textContent = "Não foi possível carregar as contas. Tente atualizar a lista.";
       linha.appendChild(celulaErro);
       tbody.appendChild(linha);

@@ -397,5 +397,61 @@ form.split .summary button[type="submit"]:focus-visible,
   [data-pagina="categorias"] #cat-refresh { width:100%; margin:0; }
   [data-pagina="usuarios"] .card > .row > button { width:100%; margin:0; }
   #revisao-emprestimo .stack-sm { flex-direction:column; }
-  #revisao-emprestimo .stack-sm .btn { width:100%; }
+  #revisao-emprestimo .stack-sm .btn { width:100%; flex:0 0 auto; min-height:48px; }
 }
+
+
+/* Histórico contextual do equipamento e hierarquia das ações do detalhe. */
+.detalhe-acoes {
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  gap:.75rem;
+  margin-top:1.1rem;
+}
+.detalhe-acoes .btn { min-height:46px; }
+.historico-equipamento {
+  margin-top:1.5rem;
+  padding-top:1.25rem;
+  border-top:1px solid var(--border, #283247);
+}
+.historico-equipamento h3 { margin:0 0 1rem; }
+.historico-equipamento-lista { min-width:0; }
+.historico-equipamento-lista .table-wrap { margin-top:.5rem; }
+.historico-equipamento-lista table { min-width:620px; }
+.profile-panel .btn-alterar-senha {
+  min-width:190px;
+  min-height:46px;
+  padding:.75rem 1.15rem;
+  font-weight:700;
+  box-shadow:0 7px 18px rgba(104,65,198,.2);
+}
+#revisao-emprestimo .stack-sm {
+  display:flex;
+  align-items:stretch;
+  flex-wrap:wrap;
+  gap:.8rem;
+}
+#revisao-emprestimo .stack-sm > .btn {
+  box-sizing:border-box;
+  flex:1 1 220px;
+  width:auto !important;
+  min-width:0;
+  min-height:50px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  white-space:normal;
+  overflow-wrap:anywhere;
+}
+@media(max-width:760px) {
+  .detalhe-acoes { flex-direction:column; align-items:stretch; }
+  .detalhe-acoes .btn { width:100%; }
+  #revisao-emprestimo .stack-sm { flex-direction:column; }
+  #revisao-emprestimo .stack-sm > .btn { width:100% !important; flex:0 0 auto; }
+}
+
+[data-pagina="usuarios"] #api-usuarios-tbody td:last-child { min-width:190px; }
+[data-pagina="usuarios"] #api-usuarios-tbody td:nth-last-child(2) { white-space:nowrap; }
+[data-pagina="usuarios"] #api-usuarios-tbody td:last-child .btn { margin:.15rem .25rem .15rem 0; }

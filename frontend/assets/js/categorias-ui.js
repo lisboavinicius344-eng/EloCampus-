@@ -51,15 +51,34 @@
           d.textContent = "Desativar";
           d.addEventListener("click", async () => {
             if (!confirm(`Desativar a categoria “${c.nome}”?`)) return;
+            d.disabled = true;
             try {
               const r = await ELO.desativarCategoria(c.id);
               aviso(r?.mensagem || "Categoria desativada.", "ok");
-              carregar();
+              await carregar();
             } catch (e) {
               aviso(e.message, "error");
+              d.disabled = false;
             }
           });
           actions.append(d);
+        } else {
+          const r = document.createElement("button");
+          r.className = "btn btn-primary";
+          r.textContent = "Reativar";
+          r.addEventListener("click", async () => {
+            if (!confirm(`Reativar a categoria “${c.nome}”?`)) return;
+            r.disabled = true;
+            try {
+              const resposta = await ELO.reativarCategoria(c.id);
+              aviso(resposta?.mensagem || "Categoria reativada.", "ok");
+              await carregar();
+            } catch (e) {
+              aviso(e.message || "Não foi possível reativar a categoria.", "error");
+              r.disabled = false;
+            }
+          });
+          actions.append(r);
         }
         tb.append(tr);
       });
