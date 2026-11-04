@@ -385,7 +385,7 @@ form.split .summary button[type="submit"]:focus-visible,
 #revisao-emprestimo button:focus-visible { outline:3px solid rgba(103,201,208,.8); outline-offset:3px; }
 #revisao-emprestimo { display:grid; gap:1rem; padding:clamp(1.1rem,2.5vw,1.75rem); }
 #revisao-emprestimo .stack-sm { display:flex; flex-wrap:wrap; gap:.8rem; }
-#revisao-emprestimo .stack-sm .btn { flex:1 1 190px; min-height:48px; white-space:normal; }
+#revisao-emprestimo .stack-sm .btn { flex:1 1 auto; min-width:min(190px,100%); min-height:48px; white-space:normal; }
 #revisao-emprestimo #confirmar-emprestimo { background:linear-gradient(120deg,#6841c6,#8957dc); color:#fff; border:1px solid rgba(255,255,255,.2); }
 #revisao-emprestimo #voltar-edicao { background:transparent; }
 @media(max-width:760px) {
@@ -397,7 +397,7 @@ form.split .summary button[type="submit"]:focus-visible,
   [data-pagina="categorias"] #cat-refresh { width:100%; margin:0; }
   [data-pagina="usuarios"] .card > .row > button { width:100%; margin:0; }
   #revisao-emprestimo .stack-sm { flex-direction:column; }
-  #revisao-emprestimo .stack-sm .btn { width:100%; flex:0 0 auto; min-height:48px; }
+  #revisao-emprestimo .stack-sm .btn { width:100%; flex:0 0 auto; }
 }
 
 
