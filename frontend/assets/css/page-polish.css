@@ -431,3 +431,45 @@ form.split .summary button[type="submit"]:focus-visible,
     width: 100%;
   }
 }
+
+
+/* Novo empréstimo: revisão com ações separadas, sem comprimir os botões em nenhuma conta. */
+body[data-pagina="emprestimos"] #revisao-emprestimo .stack-sm {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: stretch;
+  gap: 1rem;
+  margin-top: .35rem;
+}
+body[data-pagina="emprestimos"] #revisao-emprestimo .stack-sm > .btn {
+  display: inline-flex;
+  width: 100%;
+  min-width: 0;
+  min-height: 48px;
+  margin: 0;
+  padding: .8rem 1.15rem;
+  justify-content: center;
+  text-align: center;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+body[data-pagina="emprestimos"] #revisao-emprestimo #confirmar-emprestimo {
+  color: #fff;
+  background: linear-gradient(115deg, #4b0ff0, #9639df);
+  border: 1px solid rgba(255,255,255,.2);
+  box-shadow: 0 7px 18px rgba(75,15,240,.2);
+}
+body[data-pagina="emprestimos"] #revisao-emprestimo #voltar-edicao {
+  color: #d9e4ff;
+  background: #222b49;
+  border: 1px solid rgba(148,163,184,.42);
+}
+body[data-pagina="emprestimos"] #revisao-emprestimo .stack-sm > .btn:hover {
+  filter: brightness(1.12);
+}
+@media (max-width: 620px) {
+  body[data-pagina="emprestimos"] #revisao-emprestimo .stack-sm {
+    grid-template-columns: minmax(0, 1fr);
+    gap: .75rem;
+  }
+}
