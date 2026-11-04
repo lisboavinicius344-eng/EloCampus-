@@ -399,3 +399,35 @@ form.split .summary button[type="submit"]:focus-visible,
   #revisao-emprestimo .stack-sm { flex-direction:column; }
   #revisao-emprestimo .stack-sm .btn { width:100%; flex:0 0 auto; }
 }
+
+/* Correção dos CTAs da revisão:
+   evita que flex-grow: 1, combinado ao stack vertical e .btn-block,
+   transforme os botões em grandes painéis que ocupam toda a altura. */
+#revisao-emprestimo[hidden] {
+  display: none !important;
+}
+#revisao-emprestimo .stack-sm {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  flex-wrap: wrap;
+  gap: .8rem;
+}
+#revisao-emprestimo .stack-sm > .btn {
+  flex: 0 1 auto;
+  width: auto;
+  min-width: min(190px, 100%);
+  min-height: 48px;
+  padding: .75rem 1.25rem;
+  line-height: 1.25;
+}
+@media (max-width: 760px) {
+  #revisao-emprestimo .stack-sm {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  #revisao-emprestimo .stack-sm > .btn {
+    flex: 0 0 auto;
+    width: 100%;
+  }
+}
