@@ -397,5 +397,5 @@ form.split .summary button[type="submit"]:focus-visible,
   [data-pagina="categorias"] #cat-refresh { width:100%; margin:0; }
   [data-pagina="usuarios"] .card > .row > button { width:100%; margin:0; }
   #revisao-emprestimo .stack-sm { flex-direction:column; }
-  #revisao-emprestimo .stack-sm .btn { width:100%; }
+  #revisao-emprestimo .stack-sm .btn { width:100%; flex:0 0 auto; min-height:48px; }
 }
