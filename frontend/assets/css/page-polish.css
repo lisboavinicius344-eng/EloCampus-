@@ -473,3 +473,58 @@ body[data-pagina="emprestimos"] #revisao-emprestimo .stack-sm > .btn:hover {
     gap: .75rem;
   }
 }
+
+
+/* Correção definitiva: ações da etapa de revisão do empréstimo.
+   Classe exclusiva para não herdar o layout vertical de .stack-sm/.btn-block. */
+.content > .main #revisao-emprestimo .review-actions {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(180px, 1fr)) !important;
+  align-items: center !important;
+  justify-content: start !important;
+  gap: 1rem !important;
+  width: 100% !important;
+  margin-top: .5rem !important;
+}
+.content > .main #revisao-emprestimo .review-actions > button {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  justify-self: start !important;
+  width: auto !important;
+  min-width: 190px !important;
+  max-width: 280px !important;
+  height: auto !important;
+  min-height: 48px !important;
+  max-height: 52px !important;
+  flex: 0 0 auto !important;
+  padding: .75rem 1.25rem !important;
+  border-radius: 12px !important;
+  line-height: 1.25 !important;
+  white-space: normal !important;
+  text-align: center !important;
+  cursor: pointer;
+}
+.content > .main #revisao-emprestimo #confirmar-emprestimo {
+  color: #fff !important;
+  background: linear-gradient(115deg, #6841c6, #8957dc) !important;
+  border: 1px solid rgba(255,255,255,.2) !important;
+  box-shadow: 0 6px 16px rgba(75,15,240,.2) !important;
+}
+.content > .main #revisao-emprestimo #voltar-edicao {
+  color: #d9e4ff !important;
+  background: #222b49 !important;
+  border: 1px solid rgba(148,163,184,.42) !important;
+  box-shadow: none !important;
+}
+@media (max-width: 620px) {
+  .content > .main #revisao-emprestimo .review-actions {
+    grid-template-columns: minmax(0, 1fr) !important;
+    gap: .75rem !important;
+  }
+  .content > .main #revisao-emprestimo .review-actions > button {
+    justify-self: stretch !important;
+    width: 100% !important;
+    max-width: none !important;
+  }
+}
