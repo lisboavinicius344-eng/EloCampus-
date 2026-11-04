@@ -209,7 +209,31 @@
       finalidade: $("finalidade").value,
       observacoes: $("obs").value.trim(),
     };
-    resumoReview.innerHTML = `<div class="stack-sm">${usuarioFinal ? "" : `<div class="summary-row"><span>Solicitante</span><strong>${esc(dadosParaConfirmar.solicitante)}</strong></div><div class="summary-row"><span>Vínculo</span><strong>${esc(dadosParaConfirmar.vinculo)}</strong></div><div class="summary-row"><span>Retirada</span><strong>No momento da confirmação (horário do servidor)</strong></div>`}<div class="summary-row"><span>Devolução prevista</span><strong>${esc(formatarCampoData($("devolucao").value))}</strong></div><div><strong>Equipamentos</strong><ul>${selecionados.map((e) => `<li>${esc(e.nome)} · ${esc(e.patrimonio)}</li>`).join("")}</ul></div>${dadosParaConfirmar.observacoes ? `<p><strong>Observações:</strong> ${esc(dadosParaConfirmar.observacoes)}</p>` : ""}</div><p class="muted">${usuarioFinal ? "Seu pedido será enviado ao servidor para análise da equipe. O equipamento só estará liberado após aprovação e registro da retirada." : "A confirmação enviará a retirada para registro no sistema oficial."}</p>`;
+    resumoReview.innerHTML = `
+      <div class="review-details">
+        ${usuarioFinal ? "" : `
+          <section class="review-group" aria-label="Dados do solicitante">
+            <h3>Solicitante</h3>
+            <dl class="review-fields">
+              <div><dt>Nome</dt><dd>${esc(dadosParaConfirmar.solicitante || "—")}</dd></div>
+              <div><dt>Vínculo</dt><dd>${esc(dadosParaConfirmar.vinculo || "—")}</dd></div>
+              <div><dt>Retirada</dt><dd>No momento da confirmação (horário do servidor)</dd></div>
+            </dl>
+          </section>`}
+        <section class="review-group" aria-label="Prazo">
+          <h3>Prazo</h3>
+          <dl class="review-fields">
+            <div><dt>${usuarioFinal ? "Retirada" : "Devolução prevista"}</dt><dd>${usuarioFinal ? "Após aprovação da equipe" : esc(formatarCampoData($("devolucao").value))}</dd></div>
+            ${usuarioFinal ? `<div><dt>Devolução prevista</dt><dd>${esc(formatarCampoData($("devolucao").value))}</dd></div>` : ""}
+          </dl>
+        </section>
+        <section class="review-group review-equipment" aria-label="Equipamentos selecionados">
+          <h3>Equipamentos <span class="review-count">${selecionados.length}</span></h3>
+          <ul class="review-equipment-list">${selecionados.map((e) => `<li><span class="review-equipment-name">${esc(e.nome)}</span><span class="review-equipment-code">${esc(e.patrimonio)}</span></li>`).join("")}</ul>
+        </section>
+        ${dadosParaConfirmar.observacoes ? `<section class="review-group"><h3>Observações</h3><p class="review-observations">${esc(dadosParaConfirmar.observacoes)}</p></section>` : ""}
+      </div>
+      <p class="review-notice">${usuarioFinal ? "Seu pedido será enviado ao servidor para análise da equipe. O equipamento só estará liberado após aprovação e registro da retirada." : "A confirmação enviará a retirada para registro no sistema oficial."}</p>`;
     form.hidden = true;
     formReview.hidden = false;
     $("confirmar-emprestimo").focus();

@@ -528,3 +528,64 @@ body[data-pagina="emprestimos"] #revisao-emprestimo .stack-sm > .btn:hover {
     max-width: none !important;
   }
 }
+
+/* Revisão do pedido: informações agrupadas por assunto, sem linhas soltas. */
+#revisao-emprestimo #resumo-revisao { display: grid; gap: 1rem; }
+#revisao-emprestimo .review-details {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: .9rem;
+  align-items: stretch;
+}
+#revisao-emprestimo .review-group {
+  min-width: 0;
+  padding: 1rem 1.1rem;
+  border: 1px solid rgba(148,163,184,.2);
+  border-radius: 14px;
+  background: rgba(10,16,34,.32);
+}
+#revisao-emprestimo .review-group h3 {
+  display: flex;
+  align-items: center;
+  gap: .55rem;
+  margin: 0 0 .8rem;
+  color: #fff;
+  font-size: .98rem;
+  font-weight: 750;
+}
+#revisao-emprestimo .review-fields { display: grid; gap: .65rem; margin: 0; }
+#revisao-emprestimo .review-fields > div {
+  display: grid;
+  grid-template-columns: minmax(95px, .7fr) minmax(0, 1.3fr);
+  gap: .8rem;
+  align-items: start;
+}
+#revisao-emprestimo .review-fields dt { color: #aebbd7; font-size: .88rem; }
+#revisao-emprestimo .review-fields dd { margin: 0; color: #f5f6ff; font-weight: 650; text-align: right; overflow-wrap: anywhere; }
+#revisao-emprestimo .review-equipment { grid-column: 1 / -1; }
+#revisao-emprestimo .review-count {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 1.55rem; height: 1.55rem; padding: 0 .35rem;
+  border-radius: 999px; background: rgba(139,92,246,.2); color: #d9c8ff; font-size: .78rem;
+}
+#revisao-emprestimo .review-equipment-list { display: grid; gap: .55rem; margin: 0; padding: 0; list-style: none; }
+#revisao-emprestimo .review-equipment-list li {
+  display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center;
+  gap: .35rem .8rem; padding: .7rem .8rem; border-radius: 10px;
+  background: rgba(148,163,184,.08);
+}
+#revisao-emprestimo .review-equipment-name { color: #f4f6ff; font-weight: 650; }
+#revisao-emprestimo .review-equipment-code { color: #b9c5df; font-size: .88rem; }
+#revisao-emprestimo .review-observations { margin: 0; color: #dce3f5; white-space: pre-wrap; overflow-wrap: anywhere; }
+#revisao-emprestimo .review-notice {
+  margin: 0; padding: .85rem 1rem; border-left: 3px solid #8b5cf6;
+  border-radius: 0 9px 9px 0; background: rgba(139,92,246,.09); color: #dce3f5;
+}
+#revisao-emprestimo .review-actions { margin-top: .35rem !important; }
+@media (max-width: 700px) {
+  #revisao-emprestimo .review-details { grid-template-columns: minmax(0, 1fr); }
+  #revisao-emprestimo .review-equipment { grid-column: auto; }
+  #revisao-emprestimo .review-fields > div { grid-template-columns: minmax(85px, .65fr) minmax(0, 1.35fr); }
+}
+/* Solicitar acesso: separação visual sem caractere separador entre os links. */
+#cadastro-form ~ .card-foot .privacy-inline-link { margin-left: .9rem; }
