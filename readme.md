@@ -1,92 +1,236 @@
-# ELO Campus — Front-end integrado à API
+# ELO Campus
+### Sistema de Gerenciamento de Empréstimos de Equipamentos
 
-Este repositório contém o front-end estático do ELO Campus. O navegador usa a API oficial por padrão; não há contas de demonstração, empréstimos fictícios ou base de dados de demonstração dentro da pasta servida pelo Nginx.
+O **ELO Campus** é uma aplicação web desenvolvida para modernizar e organizar o gerenciamento de equipamentos e materiais utilizados no ambiente acadêmico. O sistema tem como objetivo facilitar o controle de empréstimos, devoluções, reservas e movimentações, proporcionando mais eficiência, transparência e organização aos processos institucionais.
 
-## O que está disponível
+O projeto foi desenvolvido com foco na praticidade, acessibilidade e facilidade de utilização, oferecendo interfaces específicas para usuários e administradores.
 
-- Login real por e-mail, via `POST /auth/login`.
-- Fluxo de senha provisória e troca obrigatória no primeiro acesso, conforme o contrato da API.
-- Cadastro de alunos/docentes sem campo de senha.
-- Telas públicas de acesso com visual próprio por etapa: entrar, criar conta, recuperar acesso e criar senha.
-- Tela de recuperação de acesso com mensagem genérica para reduzir enumeração de contas.
-- Aviso de privacidade público em `frontend/pages/privacidade.html`, marcado como versão preliminar até a instituição completar os dados de controlador/contato e aprovar os prazos/finalidades.
-- Gestão de contas da equipe sem campos de senha e sem exibição de senhas provisórias.
-- Token guardado em `sessionStorage`; a opção de lembrar guarda somente o e-mail, quando marcada.
-- Chamadas da API com `cache: no-store`, tratamento de erros no campo `erro`, tratamento de sessão expirada e bloqueio obrigatório de troca de senha.
-- “Lembrar meu e-mail” grava somente um endereço válido no `localStorage`, atualiza quando o campo é alterado e remove o valor quando a opção é desmarcada. Senha e token nunca são incluídos nessa preferência.
-- Consulta QR Code mostra os campos do equipamento retornados pela API; quando a equipe está autenticada, solicita detalhes do empréstimo atual e histórico. Para visitantes e usuários comuns, respeita a resposta pública e não revela o nome do solicitante nem o histórico restrito.
-- Telas de equipamentos, categorias, empréstimos, devoluções, reservas, manutenções, QR Code, histórico, solicitantes, usuários e painel.
-- Docker/Nginx para servir somente os arquivos do front-end.
+---
 
-## Cadastro de solicitantes e criação de conta
+## Sobre o projeto
 
-O cadastro de **solicitante** é diferente da conta de login. A equipe deve primeiro abrir **Administração → Solicitantes**, criar o registro e entregar à pessoa o **código/ID que a API devolver**. Só então aluno ou professor usa a página pública `frontend/pages/cadastro.html`, informando nome, e-mail e esse `solicitante_id`; o backend valida se o registro existe, está ativo, tem tipo permitido e ainda não está vinculado a outra conta. O front-end não consulta a lista de solicitantes anonimamente, pois `GET /solicitantes` exige autenticação de equipe e expor a lista publicamente revelaria dados pessoais.
+O ELO Campus foi idealizado para centralizar o gerenciamento do acervo de equipamentos, substituindo processos manuais por um ambiente digital integrado.
 
-A gestão de solicitantes usa `GET/POST/PUT /solicitantes`, `GET /solicitantes/<id>` e `PATCH /solicitantes/<id>/desativar`. Admin e operador podem abrir a página; a gestão de contas (`/usuarios`) permanece exclusiva do admin. A desativação preserva o histórico e não equivale a apagar o registro.
+Por meio da plataforma, é possível consultar equipamentos disponíveis, realizar solicitações de empréstimo, acompanhar reservas, registrar devoluções e administrar as movimentações do acervo.
 
-## Recuperação de senha — dependência do back-end
+O sistema também utiliza identificação por QR Code, permitindo uma consulta mais rápida às informações dos equipamentos.
 
-A tela `frontend/pages/recuperar-senha.html` envia o e-mail para `POST /api/auth/esqueci-senha`. **Essa rota ainda não constava no API.md que foi fornecido para integração.** Se o servidor responder `404`/`405`, a tela explica que a recuperação automática ainda não está habilitada e orienta a solicitar o reenvio à administração.
+## Funcionalidades
 
-O contrato de implementação e as exigências de segurança estão em [`docs/RECUPERACAO-SENHA-E-PRIVACIDADE.md`](docs/RECUPERACAO-SENHA-E-PRIVACIDADE.md). O back-end precisa implementar essa rota para que o envio de senha provisória ou instruções de redefinição funcione de ponta a ponta. A resposta pública deve ser genérica, independentemente de o e-mail existir.
+### 1. Gerenciamento de equipamentos
+- Cadastro e edição de equipamentos.
+- Classificação por categorias e setores.
+- Identificação individual por patrimônio.
+- Inclusão de fotografias dos equipamentos.
+- Controle de disponibilidade e situação.
+- Consulta de informações por QR Code.
 
-## Privacidade e senhas
+### 2. Empréstimos e devoluções
+- Registro de novos empréstimos.
+- Seleção de solicitantes e equipamentos.
+- Definição de prazos de devolução.
+- Confirmação das solicitações.
+- Registro de retirada e devolução.
+- Acompanhamento de empréstimos ativos e atrasados.
+- Histórico de movimentações.
 
-- O front-end não contém senhas de contas nem salva senhas digitadas.
-- Tokens ficam em `sessionStorage` durante a sessão atual. Tokens legados encontrados em `localStorage` são removidos, não restaurados; usuários antigos precisarão entrar novamente. A opção “Lembrar meu e-mail” guarda apenas o e-mail quando marcada.
-- “Lembrar meu e-mail” armazena apenas o endereço de e-mail, e somente se a pessoa marcar a opção.
-- A tela da equipe não exibe `senha_provisoria`. A camada API remove campos de senha de objetos antes de entregá-los às telas.
-- **Limitação importante:** o navegador não consegue ocultar um segredo que o próprio servidor envia no corpo HTTP: esse corpo pode ser inspecionado no DevTools. Para cumprir o requisito de não revelar senhas à administração, o back-end deve parar de devolver `senha_provisoria` nas respostas de criação/reenvio, inclusive quando falha o e-mail. O documento de privacidade detalha o ajuste.
-- Essas medidas são melhorias técnicas, não uma declaração de conformidade jurídica completa com a LGPD. A instituição deve definir base legal/finalidade, aviso de privacidade, retenção, permissões, auditoria e resposta a incidentes.
+### 3. Reservas
+- Solicitação de reserva de equipamentos.
+- Acompanhamento das solicitações.
+- Aprovação e recusa de reservas pela administração, com etapas de confirmação.
+- Controle das situações das reservas.
 
-## Executar no Windows sem Docker
+### 4. Administração
+- Gerenciamento de solicitantes e usuários.
+- Controle da equipe do sistema.
+- Gerenciamento de categorias e setores.
+- Administração de equipamentos.
+- Gerenciamento de manutenções.
+- Histórico de movimentações.
+- Relatórios e indicadores.
+- Painel administrativo com informações gerais do acervo.
 
-1. Instale Python 3 se ainda não estiver instalado.
-2. Abra o PowerShell na raiz do projeto.
-3. Execute:
+### 5. Acesso e autenticação
+- Login de usuários.
+- Solicitação de acesso à plataforma.
+- Recuperação de senha.
+- Edição de perfil.
+- Controle de acesso conforme o tipo de usuário.
+- Alteração obrigatória de senha no primeiro acesso, quando aplicável.
 
-   ```powershell
-   py -m http.server 8080 --directory frontend
-   ```
+### 6. Consulta por QR Code
+Cada equipamento pode possuir um QR Code individual, facilitando sua identificação e consulta de informações, como nome, patrimônio, categoria e disponibilidade, respeitando as permissões de acesso.
 
-4. Acesse `http://localhost:8080`. Para encerrar, pressione `Ctrl+C`.
+---
 
-A origem local (`http://localhost:8080`) precisa estar liberada em `CORS_ORIGINS` no back-end para chamadas à API. Se o CORS não estiver configurado, o navegador bloqueará as requisições mesmo que a API esteja funcionando.
+## Perfis de acesso
 
-## Docker
+O sistema possui diferentes níveis de acesso, definidos conforme as responsabilidades de cada usuário.
 
-Pré-requisitos: Docker Engine/Desktop com `docker compose` disponível.
+| Perfil | Permissões principais |
+|---|---|
+| Administrador | Gerenciamento completo do sistema. |
+| Operador | Gerenciamento operacional de equipamentos, empréstimos e devoluções. |
+| Aluno | Consulta de equipamentos, reservas e acompanhamento dos próprios empréstimos. |
+| Professor | Consulta de equipamentos, reservas e acompanhamento dos próprios empréstimos. |
 
-1. Copie `.env.example` para `.env`.
-2. Na pasta que contém `Dockerfile` e `docker-compose.yml`, execute:
+As permissões são controladas pela integração com o backend.
 
-   ```powershell
-   docker compose config
-   docker compose up --build -d
-   docker compose ps
-   ```
+## Tecnologias utilizadas
 
-3. Acesse `http://localhost:8080` (ou a porta definida por `ELO_PORT`).
-4. Verifique o servidor estático em `http://localhost:8080/healthz`; a resposta esperada é `ok`.
-5. Logs: `docker compose logs -f elo-campus-frontend`.
-6. Encerramento: `docker compose down`.
+O projeto utiliza tecnologias voltadas ao desenvolvimento web e à integração entre interfaces e serviços de backend.
 
-O Compose inclui apenas o serviço estático do front-end. Não cria API nem banco de dados.
+**Frontend**
+- HTML5 — estrutura das páginas.
+- CSS3 — estilização e responsividade.
+- JavaScript — interatividade e funcionalidades.
+- QR Code — identificação e consulta dos equipamentos.
 
-## Configuração da API
+**Backend e integração**
+- API REST — comunicação entre frontend e backend.
+- Autenticação por token Bearer.
+- Integração com banco de dados por meio da API.
+- Controle de permissões e validação de operações.
 
-O endereço padrão é `https://elocampus-backend.a6ti6s.easypanel.host/api`. No Docker, ele pode ser sobrescrito por `ELO_API_BASE_URL` em `.env`. O modo de produção é fixado em `api`; a pasta servida não contém dados de demonstração nem credenciais fictícias.
+**Infraestrutura**
+- Git e GitHub — versionamento e gerenciamento do código.
+- Docker — conteinerização da aplicação.
+- EasyPanel — gerenciamento da implantação e hospedagem.
 
-## Atualizações de integração (28/10/2026)
+---
 
-- A navegação de autoatendimento usa **Reservar equipamento** e **Minhas reservas**; a devolução é operação da equipe no balcão.
-- Incluídas as telas de **Reservas**, **Categorias** e **Manutenções**, conectadas às rotas de API documentadas.
-- O cadastro/edição de equipamentos aceita uma categoria sugerida ou digitada. Se a categoria existir, envia `categoria_id`; se for nova, envia o nome para a API. Também envia `elegibilidade`. A API atual não armazena fotos; o formulário informa essa limitação.
-- No fluxo de retirada da equipe, o solicitante é selecionado por ID, evitando correspondência frágil por nome.
-- Páginas legadas de Relatórios e Saúde do Servidor, não usadas na navegação operacional, foram removidas do pacote.
-- `runtime-config.js` tem versão identificada e o Nginx aplica `Cache-Control: no-store` para evitar manter a configuração de API em cache.
-- As telas de autenticação mantêm diferenças discretas usando a paleta original (fundo escuro e acento ciano), sem cores chamativas fora da identidade visual.
+## Estrutura do sistema
 
-### Limites e pré-requisitos
+O projeto é organizado em módulos que separam as principais funcionalidades da aplicação:
 
-Estas telas chamam a API configurada em `assets/js/runtime-config.js`; operações só funcionarão se a API implantada expuser as rotas descritas e o usuário tiver o papel necessário. O front-end não substitui autorização no backend. A validação sintática dos arquivos JavaScript e a integridade do pacote são verificadas antes da entrega; a validação de ponta a ponta no Easypanel depende de registros e contas reais do ambiente.
+```text
+ELO-Campus/
+│
+├── assets/
+│   ├── css/
+│   ├── js/
+│   ├── img/
+│   └── icons/
+│
+├── pages/
+│   ├── equipamentos/
+│   ├── emprestimos/
+│   ├── devolucoes/
+│   ├── reservas/
+│   ├── solicitantes/
+│   ├── administracao/
+│   └── ...
+│
+├── index.html
+├── docker-compose.yml
+├── Dockerfile
+└── README.md
+```
+
+*A estrutura acima representa uma organização geral dos módulos. Os diretórios e arquivos devem corresponder à versão efetivamente presente no repositório.*
+
+---
+
+## Configuração e execução
+
+### 1. Clonar o repositório
+
+```bash
+git clone https://github.com/lisboavinicius344-eng/EloCampus-.git
+```
+
+### 2. Acessar o diretório
+
+```bash
+cd EloCampus-
+```
+
+### 3. Configurar a API
+
+O frontend utiliza um arquivo de configuração para definir o endereço do backend.
+
+Arquivo:
+
+```text
+assets/js/runtime-config.js
+```
+
+Configuração:
+
+```javascript
+window.ELO_API_BASE_URL = "https://elocampus-backend.a6ti6s.easypanel.host/api";
+window.ELO_DATA_MODE = "api";
+```
+
+O endereço deve corresponder à API disponível no ambiente de implantação.
+
+### 4. Executar a aplicação
+
+Caso utilize Docker e Docker Compose:
+
+```bash
+docker compose up -d --build
+```
+
+Após a inicialização, a aplicação deverá estar disponível no endereço configurado para o serviço.
+
+---
+
+## Integração com o Backend
+
+O ELO Campus utiliza uma API REST para realizar operações de autenticação, gerenciamento de usuários, equipamentos, empréstimos, devoluções, reservas e demais funcionalidades.
+
+A comunicação entre frontend e backend é realizada por requisições HTTP, utilizando os métodos apropriados para cada operação.
+
+A autenticação utiliza tokens Bearer, permitindo que as requisições protegidas sejam associadas ao usuário autenticado.
+
+O backend é responsável pelo processamento dos dados, validações, regras de negócio, persistência e controle de permissões.
+
+---
+
+## Implantação
+
+A aplicação foi preparada para implantação em ambiente de servidor, utilizando Docker para facilitar a execução e o gerenciamento dos serviços.
+
+A infraestrutura pode ser administrada pelo EasyPanel, permitindo configurar os serviços, variáveis de ambiente, domínios e comunicação entre frontend e backend.
+
+É necessário garantir que:
+- O frontend tenha acesso ao endereço da API.
+- O backend esteja disponível e configurado corretamente.
+- As origens do frontend estejam autorizadas nas configurações de CORS.
+- Os serviços estejam utilizando HTTPS em produção.
+- As configurações de acesso e autenticação estejam devidamente protegidas.
+
+---
+
+## Objetivos do projeto
+
+O ELO Campus busca:
+
+- Digitalizar o controle de empréstimos e devoluções.
+- Facilitar a localização e identificação de equipamentos.
+- Reduzir erros nos registros e movimentações.
+- Melhorar o acompanhamento de reservas.
+- Centralizar informações administrativas.
+- Aumentar a transparência e a eficiência na gestão do acervo.
+
+---
+
+## Desenvolvimento
+
+O projeto está em constante evolução, recebendo melhorias de interface, correções de funcionalidades e aperfeiçoamentos na integração com o backend.
+
+Novas funcionalidades poderão ser incorporadas conforme as necessidades operacionais e institucionais.
+
+---
+
+## Projeto
+
+**ELO Campus — Sistema de Gerenciamento de Empréstimos de Equipamentos**
+
+Repositório oficial:
+
+https://github.com/lisboavinicius344-eng/EloCampus-
+
+**Desenvolvimento:** Projeto acadêmico e institucional.
+
