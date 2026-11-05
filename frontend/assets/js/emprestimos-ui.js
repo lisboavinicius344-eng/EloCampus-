@@ -329,6 +329,11 @@
           aviso(mensagem, `${result.itens} item(ns) devolvido(s); ${result.falhas.length} não pôde(puderam) ser registrado(s). Confira os itens ainda pendentes e tente novamente.`, "error");
           return;
         }
+        if (result.encaminhadas && !result.itens) {
+          aviso(mensagem, "Devolução encaminhada para equipe com sucesso.", "ok");
+          desenharItensRetorno(usuarioFinal ? registros.filter((l) => !l.devolvida) : []);
+          return;
+        }
         aviso(mensagem, `${result.itens} ${result.itens === 1 ? "equipamento devolvido" : "equipamentos devolvidos"}. A devolução foi registrada no servidor.`, "ok");
         desenharItensRetorno(usuarioFinal ? registros.filter((l) => !l.devolvida) : []);
       } catch (error) { aviso(mensagem, error.message || "Não foi possível registrar a devolução.", "error"); }
