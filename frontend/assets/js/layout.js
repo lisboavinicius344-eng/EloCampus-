@@ -44,7 +44,7 @@ const EloUtil = {
   const paginaAtual = document.body.dataset.pagina;
   const arquivoAtual = window.location.pathname.split("/").pop();
   const paginasRestritas = ["movimentacoes.html", "usuarios.html", "solicitantes.html", "relatorio.html", "servidor.html", "equipamento-form.html", "manutencoes.html", "categorias.html", "solicitacoes-acesso.html"];
-  const paginasUsuario = ["dashboard.html", "disponiveis.html", "consulta-qr-interno.html", "emprestimos.html", "novo-emprestimo.html", "reservas.html", "perfil.html", "trocar-senha.html"];
+  const paginasUsuario = ["dashboard.html", "disponiveis.html", "consulta-qr-interno.html", "emprestimos.html", "devolucoes.html", "novo-emprestimo.html", "reservas.html", "perfil.html", "trocar-senha.html"];
 
   // O controle de navegação evita acessos acidentais pela URL; segurança real
   // precisa ser aplicada no backend quando a autenticação institucional existir.
