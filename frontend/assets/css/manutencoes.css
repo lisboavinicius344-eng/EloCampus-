@@ -19,3 +19,26 @@
 .manutencoes-page .api-actions { display: flex; align-items: center; gap: .5rem; flex-wrap: wrap; }
 .manutencoes-page .api-actions .btn { min-height: 36px; }
 @media(max-width:760px) { .manutencoes-page .api-grid { grid-template-columns: 1fr; } .manutencoes-page #man-form > .btn { width: 100%; } .manutencoes-page .lista-toolbar { align-items: stretch; flex-direction: column; } .manutencoes-page .lista-toolbar .field, .manutencoes-page .lista-toolbar > .btn { width: 100%; } }
+
+
+/* Cabeçalho e controles de situação/atualização com hierarquia clara. */
+.manutencoes-page .page-head { align-items:flex-start; margin-top:-.25rem; }
+.manutencoes-page .page-head > div { padding-top:.05rem; }
+.manutencoes-page .lista-toolbar {
+  display:grid;
+  grid-template-columns:minmax(0,1fr) minmax(180px,250px) auto;
+  align-items:end;
+  gap:1rem;
+}
+.manutencoes-page .lista-toolbar h2 { align-self:center; margin:0; }
+.manutencoes-page .lista-toolbar .field { width:100%; min-width:0; margin:0; }
+.manutencoes-page #man-status { width:100%; }
+.manutencoes-page #man-refresh { min-width:112px; min-height:44px; }
+.manutencoes-page .maintenance-finish { min-width:190px; display:grid; gap:.5rem; }
+.manutencoes-page .api-actions { align-items:flex-start; }
+.manutencoes-page .api-actions .btn-danger { white-space:normal; max-width:180px; }
+@media(max-width:760px) {
+  .manutencoes-page .lista-toolbar { grid-template-columns:1fr; align-items:stretch; }
+  .manutencoes-page #man-refresh { width:100%; }
+  .manutencoes-page #man-form > .btn { justify-self:stretch; }
+}

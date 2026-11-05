@@ -268,3 +268,23 @@ select.input-block {
   #revisao-emprestimo > .stack-sm { justify-content: stretch; }
   #revisao-emprestimo > .stack-sm .btn { flex: 1 1 100%; }
 }
+
+
+/* Refinamento do fluxo de reserva/empréstimo */
+body[data-pagina="emprestimos"] .main { min-width:0; gap:clamp(1.15rem,2vw,1.8rem); }
+body[data-pagina="emprestimos"] .page-head { margin-bottom:.15rem; }
+body[data-pagina="emprestimos"] .steps { align-items:stretch; gap:.65rem; }
+body[data-pagina="emprestimos"] .step { min-width:0; padding:.65rem 1rem; transition:transform .2s ease, box-shadow .2s ease, background .2s ease; }
+body[data-pagina="emprestimos"] .step.current { transform:translateY(-2px); box-shadow:0 10px 24px rgba(106,28,245,.28); }
+body[data-pagina="emprestimos"] .form-card { min-width:0; gap:clamp(1.25rem,2.4vw,2rem); }
+body[data-pagina="emprestimos"] .form-section { min-width:0; }
+body[data-pagina="emprestimos"] .summary { min-width:0; align-self:stretch; }
+#vinculo-detalhe-wrap { margin-top:.2rem; }
+#vinculo-detalhe-wrap[hidden] { display:none !important; }
+#lista-solicitantes, #lista-setores-vinculo { max-width:100%; }
+@media(max-width:760px) {
+  body[data-pagina="emprestimos"] .steps { display:grid; grid-template-columns:1fr; }
+  body[data-pagina="emprestimos"] .step { width:100%; }
+  body[data-pagina="emprestimos"] .split { gap:1rem; }
+  body[data-pagina="emprestimos"] .summary { padding:1.25rem; }
+}

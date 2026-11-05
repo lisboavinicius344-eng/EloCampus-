@@ -12,7 +12,10 @@
   const mensagem = $("emprestimo-mensagem");
   const campoSolicitante = $("solicitante");
   let solicitantesDisponiveis = [];
+  let solicitanteSelecionado = null;
   const campoVinculo = $("vinculo");
+  const campoVinculoDetalhe = $("vinculo-detalhe");
+  const vinculoDetalheWrap = $("vinculo-detalhe-wrap");
   const campoEquipamento = $("equip");
   const listaEquipamentos = $("lista-equipamentos-selecionados");
   const formReview = $("revisao-emprestimo");
@@ -34,7 +37,19 @@
   };
   const formatarCampoData = (valor) => valor ? EloUtil.dataHora(new Date(valor)) : "—";
   const nomeData = (e) => `${e.nome} — ${e.patrimonio}`;
-  const vinculosPerfil = { aluno: "Aluno", professor: "Professor", servidor: "Servidor" };
+  const vinculosPerfil = { aluno: "aluno", professor: "professor", servidor: "servidor" };
+  const rotulosVinculo = { aluno: "Discente / Aluno", professor: "Docente / Professor", servidor: "Servidor / TAE", grupo_setor: "Grupo ou setor" };
+  const normalizarBusca = (valor) => norm(valor).replace(/\s+/g, " ").trim();
+  function atualizarCampoVinculo() {
+    const grupo = campoVinculo.value === "grupo_setor";
+    if (vinculoDetalheWrap) vinculoDetalheWrap.hidden = !grupo;
+    if (campoVinculoDetalhe) {
+      campoVinculoDetalhe.required = grupo;
+      if (!grupo) campoVinculoDetalhe.value = "";
+    }
+  }
+  campoVinculo.addEventListener("change", atualizarCampoVinculo);
+  atualizarCampoVinculo();
 
   if (!usuarioFinal) {
     // A retirada efetiva é registrada pelo servidor no momento da operação; não aceite uma data local que a API ignora.
@@ -128,15 +143,47 @@
   (async () => {
     try {
       equipamentos = await ELO.equipamentos();
+      if (campoVinculoDetalhe && $("lista-setores-vinculo")) {
+        const setores = [...new Set(equipamentos.map(e => String(e.setor || "").trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"pt-BR"));
+        $("lista-setores-vinculo").replaceChildren(...setores.map(setor => new Option(setor, setor)));
+      }
       if (!usuarioFinal) {
         try {
           solicitantesDisponiveis = (await ELO.solicitantes()).filter(x => x.ativo !== false);
-          campoSolicitante.removeAttribute("readonly"); campoSolicitante.type = "text";
-          const select = document.createElement("select"); select.id = "solicitante-id-select"; select.className = campoSolicitante.className; select.required = true;
-          select.add(new Option("Selecione um solicitante", ""));
-          solicitantesDisponiveis.forEach(x => select.add(new Option(`${x.nome} · ${x.matricula || x.id}`, String(x.id))));
-          campoSolicitante.hidden = true; campoSolicitante.required = false; campoSolicitante.parentElement.insertBefore(select, campoSolicitante);
-          select.addEventListener("change", () => { const x=solicitantesDisponiveis.find(y=>String(y.id)===select.value); campoSolicitante.value=x?.nome||""; $("resumo-solicitante").textContent=x?`${x.nome} · #${x.id}`:"—"; });
+          campoSolicitante.type = "search";
+          campoSolicitante.removeAttribute("readonly");
+          campoSolicitante.setAttribute("list", "lista-solicitantes");
+          campoSolicitante.placeholder = "Pesquise por nome ou matrícula";
+          campoSolicitante.required = true;
+          const lista = $("lista-solicitantes");
+          lista.replaceChildren(...solicitantesDisponiveis.map(x => new Option(`${x.nome} · ${x.matricula || x.id}`, `${x.nome} · ${x.matricula || x.id}`)));
+          const selecionarSolicitante = () => {
+            const termo = normalizarBusca(campoSolicitante.value);
+            solicitanteSelecionado = solicitantesDisponiveis.find(x =>
+              normalizarBusca(x.nome) === termo ||
+              normalizarBusca(`${x.nome} · ${x.matricula || x.id}`) === termo ||
+              normalizarBusca(x.matricula) === termo ||
+              normalizarBusca(String(x.id)) === termo
+            ) || null;
+            if (solicitanteSelecionado) {
+              const tipo = normalizarBusca(solicitanteSelecionado.tipo);
+              campoVinculo.value = tipo.includes("prof") ? "professor" : tipo.includes("serv") || tipo.includes("tecn") ? "servidor" : "aluno";
+              $("resumo-solicitante").textContent = `${solicitanteSelecionado.nome} · #${solicitanteSelecionado.id}`;
+            } else {
+              $("resumo-solicitante").textContent = "Selecione um cadastro válido";
+            }
+            atualizarCampoVinculo();
+          };
+          campoSolicitante.addEventListener("change", selecionarSolicitante);
+          campoSolicitante.addEventListener("blur", selecionarSolicitante);
+          selecionarSolicitante();
+          campoSolicitante.addEventListener("input", () => {
+            const termo = normalizarBusca(campoSolicitante.value);
+            if (!solicitantesDisponiveis.some(x => normalizarBusca(`${x.nome} · ${x.matricula || x.id}`) === termo || normalizarBusca(x.nome) === termo || normalizarBusca(x.matricula) === termo)) {
+              solicitanteSelecionado = null;
+              $("resumo-solicitante").textContent = "Selecione um cadastro válido";
+            }
+          });
         } catch (e) { mostrarMensagem(`Não foi possível carregar solicitantes: ${e.message}`); }
       }
       const disponiveis = equipamentos.filter((e) => e.situacao === "disponivel");
@@ -203,7 +250,7 @@
     event.preventDefault();
     esconderMensagem();
     if (!form.reportValidity()) return;
-    if (!usuarioFinal && !$("solicitante-id-select")?.value) return mostrarMensagem("Selecione um solicitante cadastrado.");
+    if (!usuarioFinal && (!solicitanteSelecionado || String(campoSolicitante.value).trim() === "")) return mostrarMensagem("Pesquise e selecione um solicitante cadastrado pelo nome ou matrícula.");
     if (!selecionados.length) return mostrarMensagem("Adicione pelo menos um equipamento antes de continuar.");
     const retirada = new Date($("retirada").value);
     const devolucao = new Date($("devolucao").value);
@@ -213,16 +260,16 @@
     if (devolucao > limitePeriodo) return mostrarMensagem(usuarioFinal ? "A reserva pode durar no máximo 7 dias." : "O prazo máximo de empréstimo é de 15 dias.");
     dadosParaConfirmar = {
       solicitante: usuarioFinal ? String(sessaoAtual?.nome || "").trim() : campoSolicitante.value.trim(),
-      solicitante_id: usuarioFinal ? undefined : String($("solicitante-id-select")?.value || ""),
+      solicitante_id: usuarioFinal ? undefined : String(solicitanteSelecionado?.id || ""),
       matricula: usuarioFinal ? String(sessaoAtual?.matricula || "") : (parametrosIniciais.get("matricula") || ""),
       vinculo: usuarioFinal ? vinculosPerfil[perfilAtual] : campoVinculo.value,
       equipamentos: selecionados.map((e) => e.id),
       retirada: retirada.toISOString(),
       prevista: devolucao.toISOString(),
       finalidade: $("finalidade").value,
-      observacoes: $("obs").value.trim(),
+      observacoes: [$("obs").value.trim(), (!usuarioFinal && campoVinculo.value === "grupo_setor" ? `Grupo/setor: ${campoVinculoDetalhe.value.trim()}` : "")].filter(Boolean).join(" — "),
     };
-    resumoReview.innerHTML = `<div class="stack-sm">${usuarioFinal ? "" : `<div class="summary-row"><span>Solicitante</span><strong>${esc(dadosParaConfirmar.solicitante)}</strong></div><div class="summary-row"><span>Vínculo</span><strong>${esc(dadosParaConfirmar.vinculo)}</strong></div><div class="summary-row"><span>Retirada</span><strong>No momento da confirmação (horário do servidor)</strong></div>`}<div class="summary-row"><span>Devolução prevista</span><strong>${esc(formatarCampoData($("devolucao").value))}</strong></div><div><strong>Equipamentos</strong><ul>${selecionados.map((e) => `<li>${esc(e.nome)} · ${esc(e.patrimonio)}</li>`).join("")}</ul></div>${dadosParaConfirmar.observacoes ? `<p><strong>Observações:</strong> ${esc(dadosParaConfirmar.observacoes)}</p>` : ""}</div><p class="muted">${usuarioFinal ? "Seu pedido será enviado ao servidor para análise da equipe. O equipamento só estará liberado após aprovação e registro da retirada." : "A confirmação enviará a retirada para registro no sistema oficial."}</p>`;
+    resumoReview.innerHTML = `<div class="stack-sm">${usuarioFinal ? "" : `<div class="summary-row"><span>Solicitante</span><strong>${esc(dadosParaConfirmar.solicitante)}</strong></div><div class="summary-row"><span>Vínculo</span><strong>${esc(rotulosVinculo[dadosParaConfirmar.vinculo] || dadosParaConfirmar.vinculo)}${dadosParaConfirmar.vinculo === "grupo_setor" ? ` · ${esc(campoVinculoDetalhe.value.trim())}` : ""}</strong></div><div class="summary-row"><span>Retirada</span><strong>No momento da confirmação (horário do servidor)</strong></div>`}<div class="summary-row"><span>Devolução prevista</span><strong>${esc(formatarCampoData($("devolucao").value))}</strong></div><div><strong>Equipamentos</strong><ul>${selecionados.map((e) => `<li>${esc(e.nome)} · ${esc(e.patrimonio)}</li>`).join("")}</ul></div>${dadosParaConfirmar.observacoes ? `<p><strong>Observações:</strong> ${esc(dadosParaConfirmar.observacoes)}</p>` : ""}</div><p class="muted">${usuarioFinal ? "Seu pedido será enviado ao servidor para análise da equipe. O equipamento só estará liberado após aprovação e registro da retirada." : "A confirmação enviará a retirada para registro no sistema oficial."}</p>`;
     form.hidden = true;
     formReview.hidden = false;
     $("confirmar-emprestimo").focus();

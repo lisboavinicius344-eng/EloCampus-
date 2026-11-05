@@ -39,7 +39,7 @@
       const titulo = document.querySelector(".page-head h1");
       const descricao = document.querySelector(".page-head p");
       if (titulo) titulo.textContent = "Meus empréstimos";
-      if (descricao) descricao.textContent = "Veja o prazo dos itens que estão com você e acompanhe as devoluções.";
+      if (descricao) descricao.textContent = "A devolução é registrada pela equipe do acervo. Entregue o equipamento presencialmente para conferência e registro.";
       if (busca) busca.placeholder = "Buscar meus equipamentos";
       const acao = document.querySelector('.page-head a[href="novo-emprestimo.html"]');
       if (acao) acao.textContent = "Reservar";
@@ -58,7 +58,7 @@
       const termo = norm(busca?.value.trim());
       return registros.filter((l) => {
         const ativo = !l.devolvida;
-        const atrasado = ativo && EloUtil.diasAtraso(l.prevista) > 0;
+        const atrasado = ativo && EloUtil.vencido(l.prevista);
         const statusOK = filtro === "ativos" ? ativo : filtro === "atrasados" ? atrasado : !ativo;
         const texto = [l.equipamento?.nome, l.equipamento?.patrimonio, l.solicitante?.nome, l.registradoPor, l.finalidade].join(" ");
         return statusOK && (!termo || norm(texto).includes(termo));
@@ -86,15 +86,22 @@
       if (l.observacoesDevolucao) eventos.push(["dot-pink", "Observação da devolução", esc(l.observacoesDevolucao)]);
       timeline.innerHTML = eventos.map(([dot, titulo, detalhe]) => `<li><span class="dot ${dot}"></span><div><strong>${titulo}</strong><div class="muted">${detalhe}</div></div></li>`).join("");
       const link = $("detalhe-devolver");
-      link.href = l.devolvida ? "devolucoes.html" : `devolucoes.html?itemId=${encodeURIComponent(l.id)}&emprestimoId=${encodeURIComponent(l.emprestimoId)}`;
-      link.setAttribute("aria-disabled", String(Boolean(l.devolvida)));
-      link.classList.toggle("is-disabled", Boolean(l.devolvida));
+      if (usuarioFinal) {
+        link.removeAttribute("href");
+        link.textContent = l.devolvida ? "Devolução registrada" : "Entregue à equipe do acervo";
+        link.setAttribute("aria-disabled", "true");
+        link.classList.add("is-disabled");
+      } else {
+        link.href = l.devolvida ? "devolucoes.html" : `devolucoes.html?itemId=${encodeURIComponent(l.id)}&emprestimoId=${encodeURIComponent(l.emprestimoId)}`;
+        link.setAttribute("aria-disabled", String(Boolean(l.devolvida)));
+        link.classList.toggle("is-disabled", Boolean(l.devolvida));
+      }
     }
     function renderizar() {
       const filtrados = filtrar();
       abas.forEach((aba) => {
         const chave = aba.dataset.filtro;
-        const total = registros.filter((l) => chave === "ativos" ? !l.devolvida : chave === "atrasados" ? (!l.devolvida && EloUtil.diasAtraso(l.prevista) > 0) : Boolean(l.devolvida)).length;
+        const total = registros.filter((l) => chave === "ativos" ? !l.devolvida : chave === "atrasados" ? (!l.devolvida && EloUtil.vencido(l.prevista)) : Boolean(l.devolvida)).length;
         const rotulos = usuarioFinal ? { ativos: "Comigo", atrasados: "Atrasados", historico: "Devolvidos" } : { ativos: "Ativos", atrasados: "Atrasados", historico: "Histórico" };
         aba.textContent = `${rotulos[chave] || aba.textContent} · ${total}`;
         aba.setAttribute("aria-selected", String(chave === filtro));
@@ -149,7 +156,7 @@
         const titulo = document.querySelector(".page-head h1");
         const descricao = document.querySelector(".page-head p");
         if (titulo) titulo.textContent = "Meus empréstimos";
-        if (descricao) descricao.textContent = "Consulte a situação e os prazos dos equipamentos vinculados ao seu cadastro.";
+        if (descricao) descricao.textContent = "A devolução é registrada pela equipe do acervo. Entregue o equipamento presencialmente para conferência e registro.";
       }
       renderizar();
       const salvo = new URLSearchParams(location.search).get("salvo");

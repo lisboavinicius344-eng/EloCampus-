@@ -24,8 +24,8 @@
   let ocupada = false;
 
   const tipos = {
-    aluno: "Discente / Aluno",
-    professor: "Docente / Professor",
+    aluno: "Discente / Aluno",
+    professor: "Docente / Professor",
     servidor: "Servidor",
     tecnico: "Técnico",
     externo: "Externo",

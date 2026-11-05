@@ -14,19 +14,26 @@ const EloUtil = {
     return `${EloUtil.data(d)} · ${h}`;
   },
 
-  // Dias de atraso por data de calendário: um empréstimo com devolução
-  // prevista para hoje só passa a atrasado no dia seguinte.
+  // Atraso considera o horário exato do vencimento, não apenas o dia do calendário.
+  vencido(prevista) {
+    const prazo = new Date(prevista);
+    return Number.isFinite(prazo.getTime()) && prazo.getTime() < Date.now();
+  },
+
   diasAtraso(prevista) {
     const a = new Date(prevista);
     const h = new Date();
+    if (!Number.isFinite(a.getTime())) return 0;
     a.setHours(0, 0, 0, 0);
     h.setHours(0, 0, 0, 0);
-    return Math.round((h - a) / 86400000);
+    return Math.max(0, Math.floor((h - a) / 86400000));
   },
 
   prazo(prevista) {
     const d = EloUtil.diasAtraso(prevista);
-    if (d > 0) return { classe: "late", texto: `Atrasado há ${d} ${d === 1 ? "dia" : "dias"}` };
+    if (EloUtil.vencido(prevista)) {
+      return { classe: "late", texto: d === 0 ? "Atrasado desde hoje" : `Atrasado há ${d} ${d === 1 ? "dia" : "dias"}` };
+    }
     if (d === 0) return { classe: "maint", texto: "Vence hoje" };
     return { classe: "ok", texto: "Em dia" };
   },
@@ -145,7 +152,8 @@ const EloUtil = {
     const ativo = i.id === atual;
     const icon = svg(i.icone);
     const badge = i.id === "solicitacoes-acesso" ? '<span class="nav-count" id="solicitacoes-pendentes-count" hidden></span>' : "";
-    return `<li><a class="nav-item${ativo ? " is-active" : ""}" href="${i.href}"${ativo ? ' aria-current="page"' : ""}>${icon}<span>${i.rotulo}</span>${badge}</a></li>`;
+    const tipoFluxo = i.id === "emprestimos" ? "emprestimo" : i.id === "devolucoes" ? "devolucao" : "";
+    return `<li><a class="nav-item${ativo ? " is-active" : ""}${tipoFluxo ? ` nav-item--${tipoFluxo}` : ""}"${tipoFluxo ? ` data-fluxo="${tipoFluxo}"` : ""} href="${i.href}"${ativo ? ' aria-current="page"' : ""}>${icon}<span>${i.rotulo}</span>${badge}</a></li>`;
   };
   const itens = NAV.map((item) => {
     if (!item.grupo) return itemHtml(item);

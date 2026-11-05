@@ -138,8 +138,10 @@
       const dados = await ELO.consultaQr(codigo);
       if (!dados || (typeof dados === "object" && !Object.keys(dados).length)) throw new Error("O servidor não retornou os dados do equipamento.");
       status.className = "qr-status"; status.textContent = ""; mostrarResultado(dados);
-    } catch (e) { msg(e.message || "Não foi possível consultar este equipamento.", "error"); }
-    finally { botao.disabled = false; botao.textContent = "Consultar"; }
+    } catch (e) {
+      status.className = "qr-status is-error";
+      status.textContent = e.message || "Não foi possível consultar este equipamento.";
+    } finally { botao.disabled = false; botao.textContent = "Consultar"; }
   });
   const p = new URLSearchParams(location.search), inicial = (p.get("codigo") || p.get("patrimonio") || p.get("qr") || p.get("id") || "").trim();
   if (inicial) { campo.value = inicial; form.requestSubmit(); }
