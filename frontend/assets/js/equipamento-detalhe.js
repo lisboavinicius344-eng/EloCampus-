@@ -8,7 +8,7 @@
   function visual(e) {
     const tipo = ELO_VISUAIS.categoria(e.categoria);
     const cond = String(e.condicao || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
-    const simboloEstado = cond === "bom" ? '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 4 4L19 6"/></svg>' : cond === "regular" ? '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 8v5M12 17h.01"/><path d="m10.3 3.9-8.5 14a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3l-8.5-14a2 2 0 0 0-3.4 0Z"/></svg>' : '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 6 6 14M8 6l10 10M4 20h6"/></svg>';
+    const simboloEstado = cond === "bom" || cond === "novo" ? '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 4 4L19 6"/></svg>' : cond === "regular" ? '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 8v5M12 17h.01"/><path d="m10.3 3.9-8.5 14a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3l-8.5-14a2 2 0 0 0-3.4 0Z"/></svg>' : '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 6 6 14M8 6l10 10M4 20h6"/></svg>';
     const imagem = e.imagem || e.foto;
     return `<div class="equip-visual visual-${esc(cond)}" data-condicao="${esc(cond)}">
       ${imagem ? `<img src="${esc(imagem)}" alt="Foto de ${esc(e.nome)}">` : `<span class="silhueta" aria-label="Silhueta de ${esc(tipo[1])}">${tipo[0]}</span>`}

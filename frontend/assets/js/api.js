@@ -52,6 +52,8 @@ const normalizarEmprestimo = (emprestimo = {}) => {
       ...emprestimo,
       id: equipamentoId ?? emprestimo.id,
       emprestimoId: emprestimo.id,
+      // O mesmo equipamento aparece em vários empréstimos ao longo do tempo; a chave única é empréstimo + equipamento.
+      chave: `${emprestimo.id ?? ""}:${equipamentoId ?? ""}`,
       equipamento: {
         id: equipamentoId,
         nome: nomeEquipamento,
@@ -379,7 +381,8 @@ const ELO = {
       throw erro;
     }
   },
-  trocarSenha: (dados) => requisitar("/auth/trocar-senha", { metodo: "POST", corpo: { nova_senha: String(dados.nova_senha || ""), ...(dados.senha_atual ? { senha_atual: String(dados.senha_atual) } : {}) } }),
+  // Senha atual incorreta pode voltar como 401: mostra o erro na tela em vez de derrubar a sessão.
+  trocarSenha: (dados) => requisitar("/auth/trocar-senha", { metodo: "POST", naoRedirecionar401: true, corpo: { nova_senha: String(dados.nova_senha || ""), ...(dados.senha_atual ? { senha_atual: String(dados.senha_atual) } : {}) } }),
   usuarios: async () => (await requisitar("/usuarios")).usuarios,
   criarUsuario: (dados) => requisitar("/usuarios", { metodo: "POST", corpo: { nome: String(dados.nome || "").trim(), email: String(dados.email || "").trim().toLowerCase(), papel: dados.papel } }),
   reenviarSenha: (id) => requisitar(`/usuarios/${encodeURIComponent(id)}/reenviar-senha`, { metodo: "PATCH" }),

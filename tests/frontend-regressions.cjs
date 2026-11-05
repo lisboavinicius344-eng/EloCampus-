@@ -70,8 +70,8 @@ vm.runInContext(read('frontend/assets/js/qr.js'), qrContext);
 
   const publicPage = read('frontend/pages/consulta-qr.html');
   const internalPage = read('frontend/pages/consulta-qr-interno.html');
-  assert.match(publicPage, /qr\.js\?v=2026\.11\.05\.6/, 'public QR page must request the new script version');
-  assert.match(internalPage, /qr\.js\?v=2026\.11\.05\.6/, 'internal QR page must request the new script version');
+  assert.match(publicPage, /qr\.js\?v=2026\.11\.05\.7/, 'public QR page must request the new script version');
+  assert.match(internalPage, /qr\.js\?v=2026\.11\.05\.7/, 'internal QR page must request the new script version');
   assert.match(read('frontend/assets/css/qr.css'), /\.qr-status\.is-error/, 'QR error status styling must exist');
 
   // The query-string entry point must submit the same form and show the same 404.

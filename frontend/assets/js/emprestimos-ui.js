@@ -27,14 +27,7 @@
     const abas = [...document.querySelectorAll("[data-filtro]")];
     const sessao = typeof obterSessao === "function" ? obterSessao() : null;
     const usuarioFinal = ["aluno", "professor", "servidor"].includes(String(sessao?.perfil || "").toLowerCase());
-    const chaveNome = (valor) => norm(valor).replace(/\s+/g, " ").trim();
-    const pertenceAoUsuario = (l) => {
-      if (!usuarioFinal) return true;
-      const nomeIgual = chaveNome(l.solicitante?.nome) === chaveNome(sessao?.nome);
-      const matriculaSessao = chaveNome(sessao?.matricula);
-      const matriculaRegistro = chaveNome(l.solicitante?.matricula);
-      return nomeIgual || Boolean(matriculaSessao && matriculaRegistro && matriculaSessao === matriculaRegistro);
-    };
+    const pertenceAoUsuario = (l) => !usuarioFinal || EloUtil.pertenceAoUsuario(l, sessao);
     if (usuarioFinal) {
       const titulo = document.querySelector(".page-head h1");
       const descricao = document.querySelector(".page-head p");
@@ -114,7 +107,7 @@
       corpo.innerHTML = filtrados.map((l) => {
         const status = statusEmprestimo(l);
         if (usuarioFinal) {
-          return `<tr data-item-id="${esc(l.id)}"${status.classe === "pill-late" ? ' class="is-late"' : ""}>
+          return `<tr data-item-id="${esc(l.chave)}"${status.classe === "pill-late" ? ' class="is-late"' : ""}>
             <td><strong>${esc(l.equipamento.nome)}</strong><small>${esc(l.equipamento.patrimonio)}</small></td>
             <td hidden></td>
             <td>${dataHora(l.devolvida || l.prevista)}</td>
@@ -122,15 +115,15 @@
             <td>${l.devolvida ? '<span class="muted small">Devolvido</span>' : '<span class="muted small">Entregue à equipe do acervo</span>'}</td>
           </tr>`;
         }
-        return `<tr data-item-id="${esc(l.id)}"${status.classe === "pill-late" ? ' class="is-late"' : ""}>
+        return `<tr data-item-id="${esc(l.chave)}"${status.classe === "pill-late" ? ' class="is-late"' : ""}>
           <td><strong>${esc(l.equipamento.nome)}</strong><small>${esc(l.equipamento.patrimonio)}${grupoDa(l).length > 1 ? ` · ${grupoDa(l).length} itens no empréstimo` : ""}</small></td>
           <td>${esc(l.solicitante.nome)}<small>por ${esc(l.registradoPor || "—")}</small></td>
           <td>${dataHora(l.devolvida || l.prevista)}</td>
           <td><span class="pill ${status.classe}">${esc(status.texto)}</span></td>
-          <td>${l.devolvida ? '<span class="muted small">Concluído</span>' : `<button class="btn btn-sm" type="button" data-devolver="${esc(l.id)}">Devolver</button>`}</td>
+          <td>${l.devolvida ? '<span class="muted small">Concluído</span>' : `<button class="btn btn-sm" type="button" data-devolver="${esc(l.chave)}">Devolver</button>`}</td>
         </tr>`;
       }).join("");
-      const activeSelection = filtrados.find((l) => String(l.id) === String(selecionado?.id)) || filtrados[0];
+      const activeSelection = filtrados.find((l) => l.chave === selecionado?.chave) || filtrados[0];
       desenharDetalhe(activeSelection);
     }
 
@@ -140,12 +133,12 @@
       const devolver = event.target.closest("[data-devolver]");
       const row = event.target.closest("tr[data-item-id]");
       if (devolver) {
-        const l = registros.find((x) => String(x.id) === String(devolver.dataset.devolver));
+        const l = registros.find((x) => x.chave === devolver.dataset.devolver);
         if (l && !l.devolvida) location.href = `devolucoes.html?itemId=${encodeURIComponent(l.id)}&emprestimoId=${encodeURIComponent(l.emprestimoId)}`;
         return;
       }
       if (row) {
-        const l = registros.find((x) => String(x.id) === String(row.dataset.itemId));
+        const l = registros.find((x) => x.chave === row.dataset.itemId);
         if (l) desenharDetalhe(l);
       }
     });
@@ -191,14 +184,7 @@
     const sessao = typeof obterSessao === "function" ? obterSessao() : null;
     const perfil = String(sessao?.perfil || "").toLowerCase();
     const usuarioFinal = ["aluno", "professor", "servidor"].includes(perfil);
-    const chaveNome = (valor) => norm(valor).replace(/\s+/g, " ").trim();
-    const pertenceAoUsuario = (l) => {
-      if (!usuarioFinal) return true;
-      const nomeIgual = chaveNome(l.solicitante?.nome) === chaveNome(sessao?.nome);
-      const matriculaSessao = chaveNome(sessao?.matricula);
-      const matriculaRegistro = chaveNome(l.solicitante?.matricula);
-      return nomeIgual || Boolean(matriculaSessao && matriculaRegistro && matriculaSessao === matriculaRegistro);
-    };
+    const pertenceAoUsuario = (l) => !usuarioFinal || EloUtil.pertenceAoUsuario(l, sessao);
     let registros = [], periodo = "hoje", itensDoGrupo = [], revisar = false;
 
     if (usuarioFinal) {
@@ -258,7 +244,7 @@
     function desenharFila() {
       const hoje = new Date();
       const aguardando = registros.filter((l) => !l.devolvida && mesmoDia(l.prevista, hoje)).sort((a,b) => new Date(a.prevista) - new Date(b.prevista));
-      fila.innerHTML = aguardando.length ? aguardando.map((l) => `<li><div class="queue-time">${new Date(l.prevista).toLocaleTimeString("pt-BR", {hour:"2-digit",minute:"2-digit"})}</div><div class="queue-info"><strong>${esc(l.equipamento.nome)}</strong><div class="muted small">${esc(l.solicitante.nome)} · ${esc(l.equipamento.patrimonio)}</div></div><button class="btn btn-sm" type="button" data-receber="${esc(l.id)}">${usuarioFinal ? "Registrar" : "Receber"}</button></li>`).join("") : '<li class="muted">Nenhum equipamento com devolução prevista para hoje.</li>';
+      fila.innerHTML = aguardando.length ? aguardando.map((l) => `<li><div class="queue-time">${new Date(l.prevista).toLocaleTimeString("pt-BR", {hour:"2-digit",minute:"2-digit"})}</div><div class="queue-info"><strong>${esc(l.equipamento.nome)}</strong><div class="muted small">${esc(l.solicitante.nome)} · ${esc(l.equipamento.patrimonio)}</div></div><button class="btn btn-sm" type="button" data-receber="${esc(l.chave)}">${usuarioFinal ? "Registrar" : "Receber"}</button></li>`).join("") : '<li class="muted">Nenhum equipamento com devolução prevista para hoje.</li>';
       $("devolvidos-hoje").textContent = registros.filter((l) => l.devolvida && mesmoDia(l.devolvida, hoje)).length;
       $("aguardando-hoje").textContent = aguardando.length;
       $("com-avaria").textContent = registros.filter((l) => l.devolvida && l.condicaoDevolucao === "Danificado").length;
@@ -275,7 +261,7 @@
       }
       itensDoGrupo = prefill;
       inputPatrimonio.value = prefill.map((l) => l.equipamento.patrimonio).join(", ");
-      itensContainer.innerHTML = `<div class="stack-sm">${prefill.map((l) => `<label class="picked self-return-item" style="cursor:pointer;gap:.75rem"><input type="checkbox" name="itens-devolucao" value="${esc(l.id)}" ${selecionarTodos || String(l.id) === String(itemInicial) || (!usuarioFinal && !itemInicial && prefill.length === 1) ? "checked" : ""}><span class="item-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16v11H4zM2 20h20M8 16v4m8-4v4"/></svg></span><span class="picked-info"><strong>${esc(l.equipamento.nome)}</strong><small>${esc(l.equipamento.patrimonio)}${usuarioFinal ? ` · Devolver até ${esc(new Date(l.prevista).toLocaleDateString("pt-BR", {day:"2-digit", month:"2-digit", year:"numeric"}))}` : ` · ${esc(l.solicitante.nome)} · retirada ${dataHora(l.retirada)}`}</small></span><span class="pill ${EloUtil.prazo(l.prevista).classe === "late" ? "pill-late" : "pill-ok"}">${esc(l.situacao === "atrasado" ? "Prazo passou" : usuarioFinal ? "Com você" : "Emprestado")}</span></label>`).join("")}</div>`;
+      itensContainer.innerHTML = `<div class="stack-sm">${prefill.map((l) => `<label class="picked self-return-item" style="cursor:pointer;gap:.75rem"><input type="checkbox" name="itens-devolucao" value="${esc(l.chave)}" ${selecionarTodos || (String(l.id) === String(itemInicial) && (!emprestimoInicial || String(l.emprestimoId) === String(emprestimoInicial))) || (!usuarioFinal && !itemInicial && prefill.length === 1) ? "checked" : ""}><span class="item-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16v11H4zM2 20h20M8 16v4m8-4v4"/></svg></span><span class="picked-info"><strong>${esc(l.equipamento.nome)}</strong><small>${esc(l.equipamento.patrimonio)}${usuarioFinal ? ` · Devolver até ${esc(new Date(l.prevista).toLocaleDateString("pt-BR", {day:"2-digit", month:"2-digit", year:"numeric"}))}` : ` · ${esc(l.solicitante.nome)} · retirada ${dataHora(l.retirada)}`}</small></span><span class="pill ${EloUtil.prazo(l.prevista).classe === "late" ? "pill-late" : "pill-ok"}">${esc(l.situacao === "atrasado" ? "Prazo passou" : usuarioFinal ? "Com você" : "Emprestado")}</span></label>`).join("")}</div>`;
       if (!itemInicial && !usuarioFinal && prefill.length > 1) itensContainer.querySelectorAll('input[name="itens-devolucao"]').forEach((c) => { c.checked = true; });
     }
     function mostrarRevisao(selecionados) {
@@ -289,13 +275,21 @@
       revisar = true; $("confirmar-devolucao").textContent = "Confirmar devolução";
     }
 
+    // Se a seleção/condição mudar depois da revisão, a revisão antiga deixa de valer.
+    form.addEventListener("change", () => {
+      if (!revisar) return;
+      revisar = false;
+      $("revisao-devolucao")?.remove();
+      $("confirmar-devolucao").textContent = "Revisar devolução";
+    });
     abas.forEach((a) => a.addEventListener("click", () => { periodo = a.dataset.periodo; desenharRecentes(); }));
     busca?.addEventListener("input", desenharRecentes);
     fila.addEventListener("click", (event) => {
       const button = event.target.closest("[data-receber]"); if (!button) return;
-      const l = registros.find((x) => String(x.id) === String(button.dataset.receber));
+      const l = registros.find((x) => x.chave === button.dataset.receber);
       if (l) {
         history.replaceState(null, "", `${location.pathname}?itemId=${encodeURIComponent(l.id)}&emprestimoId=${encodeURIComponent(l.emprestimoId)}`);
+        revisar = false; $("revisao-devolucao")?.remove(); $("confirmar-devolucao").textContent = "Revisar devolução";
         itensContainer.innerHTML = ""; desenharItensRetorno([l]); form.scrollIntoView({ behavior: "smooth", block: "start" });
       }
     });
@@ -305,7 +299,7 @@
       mensagem.hidden = true;
       const ids = [...form.querySelectorAll('input[name="itens-devolucao"]:checked')].map((c) => c.value);
       if (!ids.length) return aviso(mensagem, "Selecione os equipamentos que estão sendo devolvidos.", "error");
-      const selecionados = ids.map((id) => itensDoGrupo.find((l) => String(l.id) === String(id))).filter(Boolean);
+      const selecionados = ids.map((id) => itensDoGrupo.find((l) => l.chave === id)).filter(Boolean);
       if (selecionados.length !== ids.length) return aviso(mensagem, "Atualize a página para carregar os dados dos itens selecionados.", "error");
       const conferencias = [
         [$("acessorios-conferidos"), "Confirme que os cabos e acessórios foram conferidos."],
@@ -350,7 +344,7 @@
       desenharRecentes(); desenharFila();
       let prefill = [];
       if (itemInicial) {
-        const item = registros.find((l) => String(l.id) === String(itemInicial) && !l.devolvida);
+        const item = registros.find((l) => String(l.id) === String(itemInicial) && !l.devolvida && (!emprestimoInicial || String(l.emprestimoId) === String(emprestimoInicial)));
         if (item) prefill = registros.filter((l) => String(l.emprestimoId) === String(item.emprestimoId) && !l.devolvida);
       } else if (emprestimoInicial) {
         prefill = registros.filter((l) => String(l.emprestimoId) === String(emprestimoInicial) && !l.devolvida);

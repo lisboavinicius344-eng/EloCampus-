@@ -63,7 +63,7 @@
     $("nota-emprestimos").textContent = `${itensDevolvidos} item(ns) devolvido(s) · ${itensAbertos} em aberto`;
     $("stat-prazo").textContent = encerrados.length ? `${Math.round(noPrazo.length / encerrados.length * 100)}%` : "—";
     $("stat-atrasos").textContent = filtrados.filter((l) => !l.devolvida && EloUtil.vencido(l.prevista)).length;
-    $("stat-avarias").textContent = filtrados.filter((l) => l.devolvida && l.condicaoDevolucao === "Com avaria").length;
+    $("stat-avarias").textContent = filtrados.filter((l) => l.devolvida && l.condicaoDevolucao === "Danificado").length;
 
     const byMonth = new Map();
     gruposEmprestimo.forEach((grupo) => {
