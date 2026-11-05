@@ -112,7 +112,7 @@
             <td hidden></td>
             <td>${dataHora(l.devolvida || l.prevista)}</td>
             <td><span class="pill ${status.classe}">${esc(status.texto)}</span></td>
-            <td>${l.devolvida ? '<span class="muted small">Devolvido</span>' : `<button class="btn btn-sm" type="button" data-devolver="${esc(l.id)}">Devolver</button>`}</td>
+            <td>${l.devolvida ? '<span class="muted small">Devolvido</span>' : '<span class="muted small">Entregue à equipe do acervo</span>'}</td>
           </tr>`;
         }
         return `<tr data-item-id="${esc(l.id)}"${status.classe === "pill-late" ? ' class="is-late"' : ""}>
@@ -168,6 +168,9 @@
   async function paginaDevolucoes() {
     const form = $("form-devolucao");
     if (!form) return;
+    const sessaoInicial = typeof obterSessao === "function" ? obterSessao() : null;
+    const perfilInicial = String(sessaoInicial?.perfil || "").toLowerCase();
+    if (["aluno", "professor"].includes(perfilInicial)) { window.location.replace("dashboard.html"); return; }
     const query = new URLSearchParams(location.search);
     const itemInicial = query.get("itemId");
     const emprestimoInicial = query.get("emprestimoId");
@@ -327,11 +330,6 @@
           const pendentes = registros.filter((l) => !l.devolvida && chavesPendentes.has(`${l.emprestimoId}:${l.equipamento?.id ?? l.id}`));
           desenharItensRetorno(pendentes, true);
           aviso(mensagem, `${result.itens} item(ns) devolvido(s); ${result.falhas.length} não pôde(puderam) ser registrado(s). Confira os itens ainda pendentes e tente novamente.`, "error");
-          return;
-        }
-        if (result.encaminhadas && !result.itens) {
-          aviso(mensagem, "Devolução encaminhada para equipe com sucesso.", "ok");
-          desenharItensRetorno(usuarioFinal ? registros.filter((l) => !l.devolvida) : []);
           return;
         }
         aviso(mensagem, `${result.itens} ${result.itens === 1 ? "equipamento devolvido" : "equipamentos devolvidos"}. A devolução foi registrada no servidor.`, "ok");

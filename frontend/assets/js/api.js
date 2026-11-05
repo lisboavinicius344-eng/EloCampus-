@@ -233,16 +233,12 @@ const ELO = {
     })[condicaoEscolhida] || "bom";
     let feitos = 0;
     const falhas = [];
-    const perfilSessao = String((typeof obterSessao === "function" ? obterSessao() : null)?.perfil || "").toLowerCase();
-    const usuarioFinal = ["aluno", "professor"].includes(perfilSessao);
-    let encaminhadas = 0;
     for (const idEmprestimo of idsEmprestimos) {
       let resposta;
       try {
         resposta = await requisitar(`/emprestimos/${encodeURIComponent(idEmprestimo)}`);
       } catch (erro) {
         const selecionadosDoEmprestimo = selecoes.filter((selecao) => !selecao.emprestimoId || selecao.emprestimoId === String(idEmprestimo));
-        if (usuarioFinal && erro.status === 403) { encaminhadas += selecionadosDoEmprestimo.length; continue; }
         selecionadosDoEmprestimo.forEach((selecao) => falhas.push({ ...selecao, mensagem: erro.message }));
         continue;
       }
@@ -264,12 +260,10 @@ const ELO = {
           });
           feitos += 1;
         } catch (erro) {
-          if (usuarioFinal && erro.status === 403) { encaminhadas += 1; continue; }
           falhas.push({ emprestimoId: String(idEmprestimo), equipamentoId, mensagem: erro.message });
         }
       }
     }
-    if (!feitos && !falhas.length && encaminhadas) return { itens: 0, encaminhadas, falhas: [] };
     if (!feitos && falhas.length) {
       throw new Error(`Nenhum item foi devolvido. ${falhas[0].mensagem || "Confira os dados e tente novamente."}`);
     }
