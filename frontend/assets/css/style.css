@@ -287,12 +287,3 @@ body:not(.qr-page) .main {
     animation: none;
   }
 }
-
-
-/* Em telas estreitas, preserve a escala real do viewport em todas as páginas. */
-@media (max-width: 760px) {
-  :root { --page-zoom: 1; }
-  html { zoom: 1; }
-  body { max-width: 100%; overflow-x: clip; }
-  .app, .content, .main { min-width: 0; max-width: 100%; }
-}

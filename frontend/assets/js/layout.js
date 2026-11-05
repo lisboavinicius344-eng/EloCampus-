@@ -20,26 +20,30 @@ const EloUtil = {
     return Number.isFinite(prazo.getTime()) && prazo.getTime() < Date.now();
   },
 
-  // Diferença entre dias do calendário: positiva para vencimentos passados,
-  // zero para hoje e negativa para datas futuras. Não zere valores negativos.
+  // Diferença entre dias do calendário: positiva = atraso; negativa = dias restantes.
+  // Usa componentes locais + UTC para não falhar em mudanças de horário de verão.
   diasAtraso(prevista) {
-    const vencimento = new Date(prevista);
+    const prazo = new Date(prevista);
+    if (!Number.isFinite(prazo.getTime())) return 0;
     const hoje = new Date();
-    if (!Number.isFinite(vencimento.getTime())) return null;
-    const diaVencimento = Date.UTC(vencimento.getFullYear(), vencimento.getMonth(), vencimento.getDate());
+    const diaPrazo = Date.UTC(prazo.getFullYear(), prazo.getMonth(), prazo.getDate());
     const diaHoje = Date.UTC(hoje.getFullYear(), hoje.getMonth(), hoje.getDate());
-    return Math.round((diaHoje - diaVencimento) / 86400000);
+    return Math.round((diaHoje - diaPrazo) / 86400000);
   },
 
   prazo(prevista) {
+    const data = new Date(prevista);
+    if (!Number.isFinite(data.getTime())) return { classe: "", texto: "Prazo não informado" };
     const d = EloUtil.diasAtraso(prevista);
-    if (d === null) return { classe: "off", texto: "Prazo não informado" };
     if (EloUtil.vencido(prevista)) {
       return { classe: "late", texto: d === 0 ? "Atrasado desde hoje" : `Atrasado há ${d} ${d === 1 ? "dia" : "dias"}` };
     }
     if (d === 0) return { classe: "maint", texto: "Vence hoje" };
-    if (d === -1) return { classe: "ok", texto: "Vence amanhã" };
-    return { classe: "ok", texto: `Vence em ${Math.abs(d)} dias` };
+    if (d < 0) {
+      const restantes = Math.abs(d);
+      return { classe: "ok", texto: `Vence em ${restantes} ${restantes === 1 ? "dia" : "dias"}` };
+    }
+    return { classe: "ok", texto: "Em dia" };
   },
 };
 
@@ -156,8 +160,7 @@ const EloUtil = {
     const ativo = i.id === atual;
     const icon = svg(i.icone);
     const badge = i.id === "solicitacoes-acesso" ? '<span class="nav-count" id="solicitacoes-pendentes-count" hidden></span>' : "";
-    const tipoFluxo = i.id === "emprestimos" ? "emprestimo" : i.id === "devolucoes" ? "devolucao" : "";
-    return `<li><a class="nav-item${ativo ? " is-active" : ""}${tipoFluxo ? ` nav-item--${tipoFluxo}` : ""}"${tipoFluxo ? ` data-fluxo="${tipoFluxo}"` : ""} href="${i.href}"${ativo ? ' aria-current="page"' : ""}>${icon}<span>${i.rotulo}</span>${badge}</a></li>`;
+    return `<li><a class="nav-item${ativo ? " is-active" : ""}" href="${i.href}"${ativo ? ' aria-current="page"' : ""}>${icon}<span>${i.rotulo}</span>${badge}</a></li>`;
   };
   const itens = NAV.map((item) => {
     if (!item.grupo) return itemHtml(item);

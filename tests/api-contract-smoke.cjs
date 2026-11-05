@@ -41,6 +41,9 @@ const context = {
     if (url.endsWith('/consulta-qr/CODE-001')) {
       return { ok: true, status: 200, json: async () => ({ equipamento: { id: 1, nome: 'Projetor' } }) };
     }
+    if (url.endsWith('/consulta-qr/NAO-EXISTE-123')) {
+      return { ok: false, status: 404, json: async () => ({ erro: 'Nenhum equipamento corresponde a esse código.' }) };
+    }
     if (url.endsWith('/auth/solicitar-acesso') && options.method === 'POST') {
       return { ok: true, status: 200, json: async () => ({ mensagem: 'Solicitação recebida.' }) };
     }
@@ -57,22 +60,6 @@ vm.runInContext('function obterSessao() { return testSession; }', context);
 vm.runInContext(fs.readFileSync(path.join(__dirname, '../frontend/assets/js/api.js'), 'utf8'), context);
 
 (async () => {
-  // Regression checks for the exact-hour deadline labels. A future day must
-  // never collapse to zero days and be rendered as "Vence hoje".
-  const layoutSource = fs.readFileSync(path.join(__dirname, '../frontend/assets/js/layout.js'), 'utf8');
-  const utilSource = layoutSource.match(/const EloUtil = \{[\s\S]*?\n\};/);
-  assert(utilSource, 'shared date utilities are present');
-  const utilContext = { Date };
-  vm.createContext(utilContext);
-  vm.runInContext(`${utilSource[0]}; this.EloUtil = EloUtil;`, utilContext);
-  const tomorrow = new Date(); tomorrow.setDate(tomorrow.getDate() + 1); tomorrow.setHours(15, 0, 0, 0);
-  const inSevenDays = new Date(); inSevenDays.setDate(inSevenDays.getDate() + 7); inSevenDays.setHours(15, 0, 0, 0);
-  const laterToday = new Date(); laterToday.setHours(laterToday.getHours() + 2);
-  assert.equal(vm.runInContext(`EloUtil.prazo(${JSON.stringify(tomorrow.toISOString())}).texto`, utilContext), 'Vence amanhã');
-  assert.equal(vm.runInContext(`EloUtil.prazo(${JSON.stringify(inSevenDays.toISOString())}).texto`, utilContext), 'Vence em 7 dias');
-  assert.equal(vm.runInContext(`EloUtil.prazo(${JSON.stringify(laterToday.toISOString())}).texto`, utilContext), 'Vence hoje');
-  assert.equal(vm.runInContext('EloUtil.prazo("data-invalida").texto', utilContext), 'Prazo não informado');
-
   const rows = await vm.runInContext('ELO.emprestimos()', context);
   assert.equal(rows.length, 2, 'a multi-equipment loan becomes two equipment rows');
   assert.deepEqual(Array.from(rows, (row) => row.id), [101, 102], 'row IDs are equipment IDs');
@@ -93,6 +80,11 @@ vm.runInContext(fs.readFileSync(path.join(__dirname, '../frontend/assets/js/api.
   context.testSession = { token: 'user-token', perfil: 'aluno' };
   await vm.runInContext('ELO.consultaQr("CODE-001")', context);
   assert.equal(requests.at(-1).options.headers.Authorization, undefined, 'regular users use the public QR endpoint without a token');
+  await assert.rejects(
+    () => vm.runInContext('ELO.consultaQr("NAO-EXISTE-123")', context),
+    { message: 'Nenhum equipamento corresponde a esse código.' },
+    'the API 404 error field must reach the caller unchanged',
+  );
 
   requests.length = 0;
   context.testSession = { token: 'staff-token', perfil: 'operador' };

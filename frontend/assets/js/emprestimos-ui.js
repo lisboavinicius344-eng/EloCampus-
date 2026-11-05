@@ -11,7 +11,7 @@
   const statusEmprestimo = (l) => {
     if (l.devolvida) return { texto: "Devolvido", classe: "pill-ok" };
     const prazo = EloUtil.prazo(l.prevista);
-    return { texto: prazo.texto, classe: prazo.classe === "late" ? "pill-late" : ["maint", "off"].includes(prazo.classe) ? "pill-warn" : "pill-ok" };
+    return { texto: prazo.texto, classe: prazo.classe === "late" ? "pill-late" : prazo.classe === "maint" ? "pill-warn" : "pill-ok" };
   };
   const aviso = (el, texto, tipo = "info") => {
     if (!el) return;
@@ -177,7 +177,7 @@
     if (!form) return;
     const sessaoInicial = typeof obterSessao === "function" ? obterSessao() : null;
     const perfilInicial = String(sessaoInicial?.perfil || "").toLowerCase();
-    if (["aluno", "professor", "servidor"].includes(perfilInicial)) { window.location.replace("dashboard.html"); return; }
+    if (["aluno", "professor"].includes(perfilInicial)) { window.location.replace("dashboard.html"); return; }
     const query = new URLSearchParams(location.search);
     const itemInicial = query.get("itemId");
     const emprestimoInicial = query.get("emprestimoId");
