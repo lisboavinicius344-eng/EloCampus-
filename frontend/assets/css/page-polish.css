@@ -482,3 +482,52 @@ form.split .summary button[type="submit"]:focus-visible,
 .nav a[data-fluxo="devolucao"].is-active {
   box-shadow:0 9px 22px rgba(4,8,30,.25), inset 0 0 0 1px rgba(255,255,255,.12);
 }
+
+
+/* Ajustes finais de legibilidade para o formulário e a tabela de solicitantes. */
+#vinculo-detalhe-wrap {
+  flex: 0 0 100%;
+  width: 100%;
+  min-width: 0;
+  align-self: stretch;
+}
+#vinculo-detalhe-wrap .input-block {
+  width: 100%;
+  min-width: 0;
+}
+#lista-equipamentos-selecionados .picked {
+  min-width: 0;
+  align-items: flex-start;
+}
+#lista-equipamentos-selecionados .picked-info {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+#lista-equipamentos-selecionados .picked-info small {
+  line-height: 1.45;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+/* Somente o identificador pode quebrar; os demais campos permanecem legíveis
+   e a tabela rola dentro do próprio quadro quando necessário. */
+.solicitantes-table td.solicitante-code {
+  min-width: 4.25rem;
+  max-width: 6.25rem;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: normal;
+  line-height: 1.35;
+}
+.solicitantes-table td:nth-child(n+2) {
+  white-space: nowrap;
+}
+.solicitantes-table td:nth-child(2),
+.solicitantes-table td:nth-child(5) {
+  min-width: 150px;
+}
+.solicitantes-table td:nth-child(3) {
+  min-width: 9.25rem;
+}
+.solicitantes-table td:nth-child(8) {
+  min-width: 170px;
+}

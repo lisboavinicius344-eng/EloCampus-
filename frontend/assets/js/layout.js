@@ -15,47 +15,31 @@ const EloUtil = {
   },
 
   // Atraso considera o horário exato do vencimento, não apenas o dia do calendário.
-  // Verifica se o prazo já venceu, considerando data e horário.
   vencido(prevista) {
-    const dataPrevista = new Date(prevista);
-
-    if (!prevista || Number.isNaN(dataPrevista.getTime())) {
-      return false;
-    }
-
-    return dataPrevista < new Date();
+    const prazo = new Date(prevista);
+    return Number.isFinite(prazo.getTime()) && prazo.getTime() < Date.now();
   },
 
-  // Dias de atraso por data de calendário.
+  // Diferença entre dias do calendário: positiva para vencimentos passados,
+  // zero para hoje e negativa para datas futuras. Não zere valores negativos.
   diasAtraso(prevista) {
-    const a = new Date(prevista);
-    const h = new Date();
-
-    a.setHours(0, 0, 0, 0);
-    h.setHours(0, 0, 0, 0);
-
-    return Math.round((h - a) / 86400000);
+    const vencimento = new Date(prevista);
+    const hoje = new Date();
+    if (!Number.isFinite(vencimento.getTime())) return null;
+    const diaVencimento = Date.UTC(vencimento.getFullYear(), vencimento.getMonth(), vencimento.getDate());
+    const diaHoje = Date.UTC(hoje.getFullYear(), hoje.getMonth(), hoje.getDate());
+    return Math.round((diaHoje - diaVencimento) / 86400000);
   },
 
   prazo(prevista) {
     const d = EloUtil.diasAtraso(prevista);
-
+    if (d === null) return { classe: "off", texto: "Prazo não informado" };
     if (EloUtil.vencido(prevista)) {
-      if (d === 0) {
-        return { classe: "late", texto: "Atrasado desde hoje" };
-      }
-
-      return {
-        classe: "late",
-        texto: `Atrasado há ${d} ${d === 1 ? "dia" : "dias"}`
-      };
+      return { classe: "late", texto: d === 0 ? "Atrasado desde hoje" : `Atrasado há ${d} ${d === 1 ? "dia" : "dias"}` };
     }
-
-    if (d === 0) {
-      return { classe: "maint", texto: "Vence hoje" };
-    }
-
-    return { classe: "ok", texto: "Em dia" };
+    if (d === 0) return { classe: "maint", texto: "Vence hoje" };
+    if (d === -1) return { classe: "ok", texto: "Vence amanhã" };
+    return { classe: "ok", texto: `Vence em ${Math.abs(d)} dias` };
   },
 };
 

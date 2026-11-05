@@ -57,6 +57,22 @@ vm.runInContext('function obterSessao() { return testSession; }', context);
 vm.runInContext(fs.readFileSync(path.join(__dirname, '../frontend/assets/js/api.js'), 'utf8'), context);
 
 (async () => {
+  // Regression checks for the exact-hour deadline labels. A future day must
+  // never collapse to zero days and be rendered as "Vence hoje".
+  const layoutSource = fs.readFileSync(path.join(__dirname, '../frontend/assets/js/layout.js'), 'utf8');
+  const utilSource = layoutSource.match(/const EloUtil = \{[\s\S]*?\n\};/);
+  assert(utilSource, 'shared date utilities are present');
+  const utilContext = { Date };
+  vm.createContext(utilContext);
+  vm.runInContext(`${utilSource[0]}; this.EloUtil = EloUtil;`, utilContext);
+  const tomorrow = new Date(); tomorrow.setDate(tomorrow.getDate() + 1); tomorrow.setHours(15, 0, 0, 0);
+  const inSevenDays = new Date(); inSevenDays.setDate(inSevenDays.getDate() + 7); inSevenDays.setHours(15, 0, 0, 0);
+  const laterToday = new Date(); laterToday.setHours(laterToday.getHours() + 2);
+  assert.equal(vm.runInContext(`EloUtil.prazo(${JSON.stringify(tomorrow.toISOString())}).texto`, utilContext), 'Vence amanhã');
+  assert.equal(vm.runInContext(`EloUtil.prazo(${JSON.stringify(inSevenDays.toISOString())}).texto`, utilContext), 'Vence em 7 dias');
+  assert.equal(vm.runInContext(`EloUtil.prazo(${JSON.stringify(laterToday.toISOString())}).texto`, utilContext), 'Vence hoje');
+  assert.equal(vm.runInContext('EloUtil.prazo("data-invalida").texto', utilContext), 'Prazo não informado');
+
   const rows = await vm.runInContext('ELO.emprestimos()', context);
   assert.equal(rows.length, 2, 'a multi-equipment loan becomes two equipment rows');
   assert.deepEqual(Array.from(rows, (row) => row.id), [101, 102], 'row IDs are equipment IDs');

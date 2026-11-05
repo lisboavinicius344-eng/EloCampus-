@@ -62,7 +62,7 @@
     $("stat-emprestimos").textContent = gruposEmprestimo.length;
     $("nota-emprestimos").textContent = `${itensDevolvidos} item(ns) devolvido(s) · ${itensAbertos} em aberto`;
     $("stat-prazo").textContent = encerrados.length ? `${Math.round(noPrazo.length / encerrados.length * 100)}%` : "—";
-    $("stat-atrasos").textContent = filtrados.filter((l) => !l.devolvida && EloUtil.diasAtraso(l.prevista) > 0).length;
+    $("stat-atrasos").textContent = filtrados.filter((l) => !l.devolvida && EloUtil.vencido(l.prevista)).length;
     $("stat-avarias").textContent = filtrados.filter((l) => l.devolvida && l.condicaoDevolucao === "Com avaria").length;
 
     const byMonth = new Map();
@@ -84,7 +84,7 @@
     const ranking = groupCount(filtrados, (l) => String(l.equipamento?.id ?? l.equipamento?.patrimonio ?? ""));
     const rankRows = ranking.map(([key, count]) => {
       const itens = filtrados.filter((l) => String(l.equipamento?.id ?? l.equipamento?.patrimonio ?? "") === key);
-      const l = itens[0]; const atrasos = itens.filter((x) => (x.devolvida && new Date(x.devolvida) > new Date(x.prevista)) || (!x.devolvida && EloUtil.diasAtraso(x.prevista) > 0)).length;
+      const l = itens[0]; const atrasos = itens.filter((x) => (x.devolvida && new Date(x.devolvida) > new Date(x.prevista)) || (!x.devolvida && EloUtil.vencido(x.prevista))).length;
       return { l, count, atrasos };
     }).sort((a,b) => b.count-a.count).slice(0,8);
     $("ranking-equipamentos").innerHTML = rankRows.length ? rankRows.map(({l,count,atrasos}) => `<tr><td><strong>${esc(l.equipamento.nome)}</strong><small>${esc(l.equipamento.patrimonio)}</small></td><td>${esc(l.equipamento.categoria || "Não informada")}</td><td>${count}</td><td><span class="pill ${atrasos ? "pill-late" : "pill-ok"}">${atrasos}</span></td></tr>`).join("") : '<tr><td colspan="4" class="muted">Nenhum equipamento no período.</td></tr>';
@@ -95,7 +95,7 @@
   }
   function exportCsv() {
     const header = ["Empréstimo", "Solicitante", "Vínculo", "Equipamento", "Patrimônio", "Categoria", "Retirada", "Devolução prevista", "Devolvido em", "Situação", "Responsável"];
-    const rows = filtrados.map((l) => [l.emprestimoId || l.id, l.solicitante?.nome, l.solicitante?.vinculo, l.equipamento?.nome, l.equipamento?.patrimonio, l.equipamento?.categoria, l.retirada ? EloUtil.dataHora(l.retirada) : "", l.prevista ? EloUtil.dataHora(l.prevista) : "", l.devolvida ? EloUtil.dataHora(l.devolvida) : "", l.devolvida ? "Devolvido" : (EloUtil.diasAtraso(l.prevista)>0 ? "Atrasado" : "Emprestado"), l.registradoPor]);
+    const rows = filtrados.map((l) => [l.emprestimoId || l.id, l.solicitante?.nome, l.solicitante?.vinculo, l.equipamento?.nome, l.equipamento?.patrimonio, l.equipamento?.categoria, l.retirada ? EloUtil.dataHora(l.retirada) : "", l.prevista ? EloUtil.dataHora(l.prevista) : "", l.devolvida ? EloUtil.dataHora(l.devolvida) : "", l.devolvida ? "Devolvido" : (EloUtil.vencido(l.prevista) ? "Atrasado" : "Emprestado"), l.registradoPor]);
     const csv = [header, ...rows].map((row) => row.map((v) => `"${String(v ?? "").replaceAll('"','""')}"`).join(";")).join("\r\n");
     const blob = new Blob(["\ufeff", csv], { type: "text/csv;charset=utf-8" });
     const url = URL.createObjectURL(blob); const a = document.createElement("a"); a.href = url; a.download = "relatorio-elocampus.csv"; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
