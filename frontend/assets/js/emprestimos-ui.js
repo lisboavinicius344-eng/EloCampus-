@@ -101,7 +101,7 @@
       const filtrados = filtrar();
       abas.forEach((aba) => {
         const chave = aba.dataset.filtro;
-        const total = registros.filter((l) => chave === "ativos" ? !l.devolvida : chave === "atrasados" ? (!l.devolvida && EloUtil.vencido(l.prevista)) : Boolean(l.devolvida)).length;
+        const total = registros.filter((l) => chave === "atrasados" ? (!l.devolvida && EloUtil.vencido(l.prevista)) : Boolean(l.devolvida)).length;
         const rotulos = usuarioFinal ? { ativos: "Comigo", atrasados: "Atrasados", historico: "Devolvidos" } : { ativos: "Ativos", atrasados: "Atrasados", historico: "Histórico" };
         aba.textContent = `${rotulos[chave] || aba.textContent} · ${total}`;
         aba.setAttribute("aria-selected", String(chave === filtro));

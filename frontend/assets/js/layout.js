@@ -15,26 +15,46 @@ const EloUtil = {
   },
 
   // Atraso considera o horário exato do vencimento, não apenas o dia do calendário.
+  // Verifica se o prazo já venceu, considerando data e horário.
   vencido(prevista) {
-    const prazo = new Date(prevista);
-    return Number.isFinite(prazo.getTime()) && prazo.getTime() < Date.now();
+    const dataPrevista = new Date(prevista);
+
+    if (!prevista || Number.isNaN(dataPrevista.getTime())) {
+      return false;
+    }
+
+    return dataPrevista < new Date();
   },
 
+  // Dias de atraso por data de calendário.
   diasAtraso(prevista) {
     const a = new Date(prevista);
     const h = new Date();
-    if (!Number.isFinite(a.getTime())) return 0;
+
     a.setHours(0, 0, 0, 0);
     h.setHours(0, 0, 0, 0);
-    return Math.max(0, Math.floor((h - a) / 86400000));
+
+    return Math.round((h - a) / 86400000);
   },
 
   prazo(prevista) {
     const d = EloUtil.diasAtraso(prevista);
+
     if (EloUtil.vencido(prevista)) {
-      return { classe: "late", texto: d === 0 ? "Atrasado desde hoje" : `Atrasado há ${d} ${d === 1 ? "dia" : "dias"}` };
+      if (d === 0) {
+        return { classe: "late", texto: "Atrasado desde hoje" };
+      }
+
+      return {
+        classe: "late",
+        texto: `Atrasado há ${d} ${d === 1 ? "dia" : "dias"}`
+      };
     }
-    if (d === 0) return { classe: "maint", texto: "Vence hoje" };
+
+    if (d === 0) {
+      return { classe: "maint", texto: "Vence hoje" };
+    }
+
     return { classe: "ok", texto: "Em dia" };
   },
 };
