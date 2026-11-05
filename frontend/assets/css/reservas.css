@@ -42,3 +42,9 @@
   .reservas-page #res-refresh { width:100%; justify-self:stretch; }
   .reservas-page .api-actions .btn { flex:1 1 100%; }
 }
+
+
+.reserva-row-aprovada td { background:rgba(44,178,119,.055); }
+.reserva-row-aprovada td:first-child { box-shadow:inset 3px 0 0 var(--st-ok, #35b779); }
+.res-equipamentos { min-width:170px; max-width:290px; white-space:normal; overflow-wrap:anywhere; }
+.res-retirada-info { display:block; margin-top:.4rem; max-width:270px; color:var(--st-ok, #35b779); font-weight:600; line-height:1.4; }

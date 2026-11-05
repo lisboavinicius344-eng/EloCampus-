@@ -42,7 +42,7 @@
   });
 
   $("perfil-alterar-senha")?.addEventListener("click", (evento) => {
-    const confirmado = window.confirm("Alterar senha da conta?\n\nVocê será direcionado para a tela segura de alteração de senha, onde deverá confirmar sua senha atual (quando solicitada) e cadastrar uma nova.");
+    const confirmado = window.confirm("Deseja continuar para a página de alteração de senha? Você poderá informar sua senha atual e definir uma nova senha.");
     if (!confirmado) evento.preventDefault();
   });
 

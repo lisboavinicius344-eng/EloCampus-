@@ -92,6 +92,30 @@
     return String(valor || "").toLocaleLowerCase("pt-BR").normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, " ").trim();
   }
 
+  function renderReservasAprovadas(reservas, equipamentos = []) {
+    const area = $("reservas-aprovadas");
+    if (!area) return;
+    const mapaEquipamentos = new Map((Array.isArray(equipamentos) ? equipamentos : []).map((item) => [String(item.id), item]));
+    const aprovadas = (Array.isArray(reservas) ? reservas : [])
+      .filter((reserva) => String(reserva?.status || "").toLowerCase() === "aprovada")
+      .sort((a, b) => new Date(a.data_inicio) - new Date(b.data_inicio));
+    area.hidden = !aprovadas.length;
+    area.innerHTML = aprovadas.map((reserva) => {
+      const itens = (Array.isArray(reserva.itens) ? reserva.itens : Array.isArray(reserva.equipamentos) ? reserva.equipamentos : [])
+        .map((item) => {
+          const equipamento = item?.equipamento && typeof item.equipamento === "object" ? item.equipamento
+            : mapaEquipamentos.get(String(item?.equipamento_id ?? item?.id ?? item?.equipamento ?? ""));
+          return equipamento?.nome || (typeof item?.equipamento === "string" ? item.equipamento : "") || equipamento?.patrimonio;
+        }).filter(Boolean);
+      const inicio = new Date(reserva.data_inicio);
+      inicio.setTime(inicio.getTime() - 2 * 60 * 60 * 1000);
+      const fim = new Date(reserva.data_fim);
+      const formatar = (valor) => Number.isNaN(valor.getTime()) ? "horário a confirmar" : valor.toLocaleString("pt-BR", { dateStyle: "short", timeStyle: "short" });
+      const nomes = itens.length ? itens.join(", ") : "Equipamento reservado";
+      return `<article class="reserva-aprovada"><div class="reserva-aprovada-icon" aria-hidden="true">✓</div><div class="reserva-aprovada-content"><strong>Sua reserva foi aprovada!</strong><p>${esc(nomes)}</p><p>Retire com a equipe de <strong>${esc(formatar(inicio))}</strong> até <strong>${esc(formatar(fim))}</strong>.</p><a href="reservas.html">Ver minha reserva</a></div></article>`;
+    }).join("");
+  }
+
   function renderInicioUsuario(equipamentos, todosEmprestimos, sessao) {
     const nome = String(sessao?.nome || "").trim();
     const primeiroNome = nome.split(/\s+/)[0] || "bem-vindo(a)";
@@ -135,8 +159,11 @@
     const sessao = typeof obterSessao === "function" ? obterSessao() : null;
     const perfilFinal = ["aluno", "professor", "servidor"].includes(String(sessao?.perfil || "").toLowerCase());
     if (perfilFinal) {
-      const [equipamentos, todosEmprestimos] = await Promise.all([ELO.equipamentos(), ELO.emprestimos()]);
+      const [equipamentos, todosEmprestimos, reservas] = await Promise.all([
+        ELO.equipamentos(), ELO.emprestimos(), ELO.reservas().catch(() => []),
+      ]);
       renderInicioUsuario(equipamentos, todosEmprestimos, sessao);
+      renderReservasAprovadas(reservas, equipamentos);
       return;
     }
 

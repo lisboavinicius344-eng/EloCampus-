@@ -705,3 +705,13 @@ a.acao:hover {
     transform: none;
   }
 }
+
+
+/* Avisos prioritários de reservas aprovadas para aluno, professor e servidor. */
+.reservas-aprovadas-list { display:grid; gap:.8rem; margin:0 0 1.15rem; }
+.reserva-aprovada { display:flex; align-items:flex-start; gap:.9rem; padding:1rem 1.1rem; border:1px solid color-mix(in srgb, var(--st-ok, #35b779) 48%, transparent); border-radius:1rem; background:color-mix(in srgb, var(--st-ok, #35b779) 11%, var(--surface, #151b2d)); box-shadow:0 8px 24px rgba(0,0,0,.12); }
+.reserva-aprovada-icon { display:grid; place-items:center; flex:0 0 2rem; width:2rem; height:2rem; border-radius:50%; background:var(--st-ok, #35b779); color:#07150f; font-weight:900; }
+.reserva-aprovada-content { min-width:0; }
+.reserva-aprovada-content > strong { display:block; color:var(--st-ok, #35b779); font-size:1.02rem; }
+.reserva-aprovada-content p { margin:.3rem 0; }
+.reserva-aprovada-content a { display:inline-block; margin-top:.35rem; font-weight:700; color:var(--st-ok, #35b779); text-decoration:underline; text-underline-offset:3px; }

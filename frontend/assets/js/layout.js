@@ -132,7 +132,7 @@ const EloUtil = {
     { id: "painel", rotulo: "Início", icone: "home", href: "dashboard.html" },
     { id: "disponiveis", rotulo: "Ver os equipamentos", icone: "box", href: "disponiveis.html" },
     { id: "consulta-qr", rotulo: "Consultar QR Code", icone: "camera", href: "consulta-qr-interno.html" },
-    { id: "pedir", rotulo: "Reservar equipamento", icone: "bookmark", href: "novo-emprestimo.html" },
+    { id: "pedir", rotulo: "Reservar", icone: "bookmark", href: "novo-emprestimo.html" },
     { id: "reservas", rotulo: "Minhas reservas", icone: "calendar", href: "reservas.html" },
     { id: "emprestimos", rotulo: "Meus empréstimos", icone: "clipboard", href: "emprestimos.html" },
   ];

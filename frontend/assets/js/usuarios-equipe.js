@@ -21,7 +21,7 @@
     return resposta?.mensagem || resposta?.message || `${acao} concluída. Se a conta estiver ativa, as instruções serão enviadas ao e-mail cadastrado.`;
   }
   function perfilLegivel(papel) {
-    return ({ admin: "Administrador", administrador: "Administrador", operador: "Operador", aluno: "Aluno", professor: "Professor", servidor: "Servidor (TAE)", tae: "Servidor (TAE)" })[String(papel || "").trim().toLowerCase()] || "—";
+    return ({ admin: "Administrador", administrador: "Administrador", operador: "Operador", aluno: "Aluno", professor: "Professor", servidor: "Servidor (TAE)", tae: "Servidor (TAE)" })[String(papel || "").toLowerCase()] || "—";
   }
   function adicionarCelula(linha, texto) {
     const celula = document.createElement("td");

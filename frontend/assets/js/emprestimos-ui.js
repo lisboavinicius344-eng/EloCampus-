@@ -42,7 +42,7 @@
       if (descricao) descricao.textContent = "Veja o prazo dos itens que estão com você e acompanhe as devoluções.";
       if (busca) busca.placeholder = "Buscar meus equipamentos";
       const acao = document.querySelector('.page-head a[href="novo-emprestimo.html"]');
-      if (acao) acao.textContent = "Pedir empréstimo";
+      if (acao) acao.textContent = "Reservar";
       const cabecalhos = document.querySelectorAll(".table-wrap thead th");
       if (cabecalhos[1]) cabecalhos[1].hidden = true;
       if (cabecalhos[2]) cabecalhos[2].textContent = "Prazo / devolução";
