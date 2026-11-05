@@ -236,13 +236,14 @@ const ELO = {
     const perfilSessao = String((typeof obterSessao === "function" ? obterSessao() : null)?.perfil || "").toLowerCase();
     const usuarioFinal = ["aluno", "professor"].includes(perfilSessao);
     let encaminhadas = 0;
+    const negadoParaUsuarioFinal = (erro) => usuarioFinal && (erro.status === 403 || /permiss/i.test(String(erro.message || "")));
     for (const idEmprestimo of idsEmprestimos) {
       let resposta;
       try {
         resposta = await requisitar(`/emprestimos/${encodeURIComponent(idEmprestimo)}`);
       } catch (erro) {
         const selecionadosDoEmprestimo = selecoes.filter((selecao) => !selecao.emprestimoId || selecao.emprestimoId === String(idEmprestimo));
-        if (usuarioFinal && erro.status === 403) { encaminhadas += selecionadosDoEmprestimo.length; continue; }
+       if (negadoParaUsuarioFinal(erro)) { encaminhadas += selecionadosDoEmprestimo.length; continue; }
         selecionadosDoEmprestimo.forEach((selecao) => falhas.push({ ...selecao, mensagem: erro.message }));
         continue;
       }
@@ -264,7 +265,7 @@ const ELO = {
           });
           feitos += 1;
         } catch (erro) {
-          if (usuarioFinal && erro.status === 403) { encaminhadas += 1; continue; }
+          if (negadoParaUsuarioFinal(erro)) { encaminhadas += 1; continue; }
           falhas.push({ emprestimoId: String(idEmprestimo), equipamentoId, mensagem: erro.message });
         }
       }
