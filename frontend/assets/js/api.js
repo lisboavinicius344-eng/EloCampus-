@@ -270,7 +270,7 @@ const ELO = {
     if (!feitos) throw new Error("Nenhum dos itens selecionados está pendente de devolução.");
     return { itens: feitos, falhas };
   },
-  removerEquipamento: (id) => requisitar(`/equipamentos/${encodeURIComponent(id)}/inativar`, { metodo: "PATCH" }),
+  removerEquipamento: (id, dados = {}) => requisitar(`/equipamentos/${encodeURIComponent(id)}/inativar`, { metodo: "PATCH", corpo: dados }),
   salvarEquipamento: async (d, id) => {
     const corpo = {
       nome: d.nome,

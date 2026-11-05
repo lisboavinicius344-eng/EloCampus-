@@ -133,9 +133,13 @@
 .solicitantes-table th {
   white-space: nowrap;
 }
-.solicitantes-table td {
-  overflow-wrap: anywhere;
-}
+.solicitantes-table { table-layout:fixed; width:100%; }
+.solicitantes-table th, .solicitantes-table td { padding:.8rem .9rem; vertical-align:middle; }
+.solicitantes-table td { overflow-wrap:normal; word-break:normal; }
+.solicitantes-table td:nth-child(1), .solicitantes-table td:nth-child(4), .solicitantes-table td:nth-child(6), .solicitantes-table td:nth-child(7) { white-space:nowrap; }
+.solicitantes-table td:nth-child(2), .solicitantes-table td:nth-child(5) { min-width:150px; }
+.solicitantes-table td:nth-child(8) { min-width:150px; }
+.solicitantes-table .solicitante-primary, .solicitantes-table .solicitante-secondary { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 .solicitantes-table .solicitante-code {
   font-weight: 700;
   color: #c4b5fd;

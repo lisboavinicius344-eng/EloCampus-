@@ -201,12 +201,12 @@
       const campoPatrimonio = inputPatrimonio.closest(".field");
       if (campoPatrimonio) campoPatrimonio.hidden = true;
       const labelAssinatura = form.querySelector("#assinatura-recebida")?.closest("label");
-      if (labelAssinatura) labelAssinatura.hidden = true;
+      if (labelAssinatura) labelAssinatura.querySelector("span")?.replaceChildren(document.createTextNode("Responsável confirmou o recebimento / conferência"));
       const tituloCondicao = $("cond-label");
       if (tituloCondicao) tituloCondicao.textContent = "Como está o equipamento?";
       const labelsCondicao = { c1: "Tudo certo", c2: "Falta algum acessório", c3: "Há algum problema" };
       Object.entries(labelsCondicao).forEach(([id, texto]) => { const label = document.querySelector(`label[for="${id}"]`); if (label) label.textContent = texto; });
-      const checklist = form.querySelector(".checklist"); if (checklist) checklist.hidden = true;
+      const checklist = form.querySelector(".checklist"); if (checklist) checklist.hidden = false;
       const labelObs = $("obs")?.closest(".field")?.querySelector("label");
       if (labelObs) labelObs.textContent = "Observação (opcional) — informe se falta algo ou se há algum problema";
       const cancel = form.querySelector('a[href="emprestimos.html"]');
@@ -297,6 +297,13 @@
       if (!ids.length) return aviso(mensagem, "Selecione os equipamentos que estão sendo devolvidos.", "error");
       const selecionados = ids.map((id) => itensDoGrupo.find((l) => String(l.id) === String(id))).filter(Boolean);
       if (selecionados.length !== ids.length) return aviso(mensagem, "Atualize a página para carregar os dados dos itens selecionados.", "error");
+      const conferencias = [
+        [$("acessorios-conferidos"), "Confirme que os cabos e acessórios foram conferidos."],
+        [$("equipamento-conferido"), "Confirme a limpeza e a verificação visual do equipamento."],
+        [$("assinatura-recebida"), "Confirme o registro da assinatura / recebimento."],
+      ];
+      const pendente = conferencias.find(([campo]) => campo && !campo.checked);
+      if (pendente) { aviso(mensagem, pendente[1], "error"); pendente[0]?.focus(); return; }
       if (!revisar) { mostrarRevisao(selecionados); return; }
       const botao = $("confirmar-devolucao"); botao.disabled = true;
       try {

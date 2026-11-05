@@ -92,7 +92,9 @@
       botao.disabled = true;
       botao.textContent = "Retirando…";
       try {
-        const resultado = await ELO.removerEquipamento(id);
+        const observacoes = document.getElementById("motivo-exclusao")?.value.trim() || "";
+        if (!observacoes) { erro.textContent = "A observação é obrigatória para retirar o equipamento de uso."; erro.hidden = false; botao.disabled = false; botao.textContent = "Sim, retirar equipamento"; document.getElementById("motivo-exclusao")?.focus(); return; }
+        const resultado = await ELO.removerEquipamento(id, { observacoes });
         location.href = `equipamentos.html?salvo=${resultado?.arquivado ? "arquivado" : "removido"}`;
       } catch (err) {
         $("modal-exclusao").hidden = true;

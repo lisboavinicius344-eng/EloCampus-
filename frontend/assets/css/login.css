@@ -895,3 +895,5 @@ a.link-button:hover {
     gap: 0.75rem 1rem;
   }
 }
+
+.card-foot .privacy-inline { display:inline-block; margin-left:1.1rem; }

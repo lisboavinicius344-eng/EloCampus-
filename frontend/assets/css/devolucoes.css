@@ -213,3 +213,9 @@ textarea.input-block {
 .queue .btn {
   flex: none;
 }
+
+/* Destaque explícito dos itens marcados para devolução. */
+.picked:has(input[type="checkbox"]:checked) { border:1px solid rgba(139,92,246,.75); background:linear-gradient(110deg,rgba(139,92,246,.17),rgba(34,211,238,.08)); box-shadow:0 0 0 2px rgba(139,92,246,.12); }
+.picked:has(input[type="checkbox"]:checked) .item-icon { box-shadow:0 0 0 2px rgba(196,181,253,.35); }
+.self-return-item { border:1px solid var(--border); transition:border-color .15s ease,background .15s ease,box-shadow .15s ease; }
+.self-return-item input { flex:none; width:18px; height:18px; accent-color:#a78bfa; }
