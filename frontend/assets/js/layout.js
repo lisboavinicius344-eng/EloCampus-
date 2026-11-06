@@ -71,7 +71,7 @@ const EloUtil = {
   const usuarioFinal = ["aluno", "professor"].includes(perfilAtual);
   const paginaAtual = document.body.dataset.pagina;
   const arquivoAtual = window.location.pathname.split("/").pop();
-  const paginasRestritas = ["movimentacoes.html", "usuarios.html", "solicitantes.html", "relatorio.html", "servidor.html", "equipamento-form.html", "manutencoes.html", "categorias.html", "solicitacoes-acesso.html"];
+  const paginasRestritas = ["movimentacoes.html", "usuarios.html", "solicitantes.html", "relatorio.html", "servidor.html", "equipamento-form.html", "manutencoes.html", "categorias.html", "solicitacoes-acesso.html", "etiquetas.html"];
   const paginasUsuario = ["dashboard.html", "disponiveis.html", "consulta-qr-interno.html", "emprestimos.html", "novo-emprestimo.html", "reservas.html", "perfil.html", "trocar-senha.html"];
 
   // O controle de navegação evita acessos acidentais pela URL; segurança real

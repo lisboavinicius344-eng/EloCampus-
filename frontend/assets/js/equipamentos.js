@@ -30,6 +30,19 @@
   };
 
   let todos = [];
+  // IDs marcados para impressão de etiquetas; a seleção sobrevive a filtros e buscas.
+  const selecionados = new Set();
+
+  function atualizarBotaoEtiquetas() {
+    const botao = $("imprimir-etiquetas");
+    if (!botao) return;
+    const ids = [...selecionados];
+    botao.href = ids.length ? `etiquetas.html?ids=${ids.map(encodeURIComponent).join(",")}` : "etiquetas.html";
+    botao.textContent = ids.length
+      ? `Imprimir etiquetas (${ids.length} ${ids.length === 1 ? "selecionada" : "selecionadas"})`
+      : "Imprimir etiquetas";
+    botao.title = ids.length ? "Imprime só os equipamentos marcados." : "Imprime todos os equipamentos que não foram baixados.";
+  }
 
   function filtrar() {
     const termo = norm(campos.busca.value.trim());
@@ -56,9 +69,11 @@
       return;
     }
 
+    const todosVisiveisMarcados = lista.every((e) => selecionados.has(String(e.id)));
     $("lista").innerHTML = `
       <table class="table table-eq">
         <thead><tr>
+          <th scope="col" class="col-selecao"><input type="checkbox" data-selecionar-visiveis aria-label="Selecionar todos os equipamentos exibidos para etiquetas"${todosVisiveisMarcados ? " checked" : ""}></th>
           <th scope="col">Equipamento</th><th scope="col">Patrimônio</th><th scope="col">Tipo</th>
           <th scope="col">Setor</th><th scope="col">Condição</th><th scope="col">Situação</th>
           <th scope="col"><span class="sr-only">Ações</span></th>
@@ -70,6 +85,7 @@
             const visual = ELO_VISUAIS.categoria(e.categoria);
             const href = `equipamento-detalhe.html?id=${encodeURIComponent(e.id)}`;
             return `<tr>
+              <td class="col-selecao"><input type="checkbox" data-selecionar="${esc(e.id)}" aria-label="Selecionar ${esc(e.nome)} para etiqueta"${selecionados.has(String(e.id)) ? " checked" : ""}></td>
               <td class="cell-nome"><span class="eq-mini eq-cond-${esc(cond)}" title="${esc(visual[1])}">${visual[0]}</span><a class="link-item" href="${href}">${esc(e.nome)}</a></td>
               <td data-label="Patrimônio">${esc(e.patrimonio)}</td>
               <td data-label="Tipo">${esc(e.categoria)}</td>
@@ -120,6 +136,25 @@
       `<div class="alert alert-${tipo}" id="aviso" role="status" style="margin-bottom:1.25rem">${esc(texto)}</div>`);
   }
 
+  $("lista").addEventListener("change", (ev) => {
+    const item = ev.target.closest("[data-selecionar]");
+    if (item) {
+      if (item.checked) selecionados.add(item.dataset.selecionar); else selecionados.delete(item.dataset.selecionar);
+      const cabecalho = $("lista").querySelector("[data-selecionar-visiveis]");
+      if (cabecalho) cabecalho.checked = [...$("lista").querySelectorAll("[data-selecionar]")].every((c) => c.checked);
+      atualizarBotaoEtiquetas();
+      return;
+    }
+    const todosVisiveis = ev.target.closest("[data-selecionar-visiveis]");
+    if (todosVisiveis) {
+      $("lista").querySelectorAll("[data-selecionar]").forEach((c) => {
+        c.checked = todosVisiveis.checked;
+        if (c.checked) selecionados.add(c.dataset.selecionar); else selecionados.delete(c.dataset.selecionar);
+      });
+      atualizarBotaoEtiquetas();
+    }
+  });
+
   // "Retirar de uso" → ELO.removerEquipamento(id) → PATCH /equipamentos/<id>/inativar
   $("lista").addEventListener("click", async (ev) => {
     const botao = ev.target.closest("[data-retirar]");
@@ -155,5 +190,6 @@
     history.replaceState(null, "", window.location.pathname);
   }
 
+  atualizarBotaoEtiquetas();
   render();
 })();

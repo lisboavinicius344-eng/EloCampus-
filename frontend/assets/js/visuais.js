@@ -4,3 +4,22 @@ const ELO_VISUAIS = (() => {
   function categoria(c) { const n=norm(c); if(n.includes("outro")) return [icon("equipment","Outros"),"Outros"]; if(n.includes("projet")) return [icon("projector","Projetor"),"Projetor"]; if(n.includes("notebook")) return [icon("notebook","Notebook"),"Notebook"]; if(n.includes("informatica")) return [icon("computer","Informática"),"Informática"]; if(n.includes("acessorio")) return [icon("cable","Acessório"),"Acessório"]; if(n.includes("comput")) return [icon("computer","Computador"),"Computador"]; if(n.includes("camera")||n.includes("câmera")||n.includes("foto")) return [icon("camera","Câmera"),"Câmera"]; if(n.includes("microfone")) return [icon("microphone","Microfone"),"Microfone"]; if(n.includes("som")) return [icon("speaker","Caixa de som"),"Caixa de som"]; if(n.includes("audio")||n.includes("áudio")) return [icon("speaker","Áudio"),"Áudio"]; if(n.includes("tablet")) return [icon("tablet","Tablet"),"Tablet"]; if(n.includes("cabo")) return [icon("cable","Cabo"),"Cabo"]; return [icon("equipment","Equipamento"),"Equipamento"]; }
   return {categoria};
 })();
+/* QR Code de equipamentos. A imagem é pública (como a foto), então funciona direto em <img>.
+ * O backend devolve qr_imagem_url relativo à base da API; sem o campo, usa a rota padrão. */
+const ELO_QR = (() => {
+  const base = () => (typeof API_BASE_URL === "string" ? API_BASE_URL : String(window.ELO_API_BASE_URL || "").replace(/\/+$/, ""));
+  function url(equipamento, parametros = {}) {
+    const caminho = equipamento?.qr_imagem_url || `/equipamentos/${encodeURIComponent(equipamento?.id ?? "")}/qrcode`;
+    const absoluta = /^https?:\/\//i.test(caminho) ? caminho : `${base()}${caminho}`;
+    const consulta = new URLSearchParams(Object.entries(parametros).filter(([, v]) => v !== undefined && v !== null && v !== ""));
+    const texto = consulta.toString();
+    return texto ? `${absoluta}${absoluta.includes("?") ? "&" : "?"}${texto}` : absoluta;
+  }
+  return {
+    url,
+    svg: (e) => url(e, { formato: "svg" }),
+    download: (e, formato) => url(e, { formato, baixar: 1 }),
+    // Endereço gravado no QR; só aceita http(s) para exibir como link.
+    destino: (e) => (/^https?:\/\//i.test(String(e?.qr_url || "")) ? String(e.qr_url) : ""),
+  };
+})();

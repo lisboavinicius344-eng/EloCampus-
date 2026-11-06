@@ -1,0 +1,99 @@
+/* ELO Campus — etiquetas com QR Code para folha A4 de adesivo.
+ * Na tela a folha aparece como prévia em papel branco; na impressão só a grade sai. */
+
+.etiquetas-dica { margin: 0 0 1rem; }
+
+.folha-etiquetas {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 12px;
+  padding: 16px;
+  border-radius: var(--radius-m, 16px);
+  background: #fff;
+  color: #111;
+}
+
+.etiqueta {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 10px 8px;
+  border: 1px dashed #c7c7c7; /* guia de corte */
+  border-radius: 6px;
+  background: #fff;
+  color: #111;
+  text-align: center;
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
+
+/* O SVG já vem com 37 mm; o fundo branco garante a margem de silêncio em volta. */
+.etiqueta img {
+  width: 37mm;
+  height: 37mm;
+  min-width: 25mm;
+  min-height: 25mm;
+  padding: 1.5mm;
+  background: #fff;
+  object-fit: contain;
+}
+
+.etiqueta strong {
+  font-size: 11pt;
+  line-height: 1.2;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+
+.etiqueta span {
+  font-size: 10pt;
+  font-family: ui-monospace, "Cascadia Mono", Consolas, monospace;
+  letter-spacing: .02em;
+}
+
+.etiqueta-falha {
+  display: grid;
+  place-items: center;
+  width: 37mm;
+  height: 37mm;
+  border: 1px solid #e11d48;
+  color: #be123c;
+  font-size: 9pt;
+}
+
+.folha-etiquetas .estado-vazio { color: #444; grid-column: 1 / -1; }
+
+@media print {
+  @page { size: A4; margin: 10mm; }
+
+  :root { --page-zoom: 1; }
+  html, body { zoom: 1 !important; background: #fff !important; color: #000 !important; }
+
+  .sidebar, .topbar, .scrim, .no-print { display: none !important; }
+
+  .app, .content, .main {
+    display: block !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    min-height: 0 !important;
+    height: auto !important;
+    background: #fff !important;
+    overflow: visible !important;
+  }
+
+  .folha-etiquetas {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 4mm;
+    padding: 0;
+    border-radius: 0;
+  }
+
+  .etiqueta {
+    min-height: 56mm;
+    padding: 3mm;
+    border-color: #bbb;
+    border-radius: 0;
+  }
+}

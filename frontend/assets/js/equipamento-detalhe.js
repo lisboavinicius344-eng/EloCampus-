@@ -16,6 +16,28 @@
     </div>`;
   }
 
+  // QR Code de identificação (página só da equipe: aluno/professor são redirecionados pelo layout).
+  function qrMarkup(e) {
+    const destino = ELO_QR.destino(e);
+    const idEquip = e.id ?? id;
+    return `<section class="qr-equipamento" aria-labelledby="qr-equipamento-titulo">
+      <div class="qr-equipamento-imagem">
+        <img id="qr-equipamento-img" src="${esc(ELO_QR.svg(e))}" alt="QR Code de ${esc(e.nome)}" width="148" height="148">
+        <p class="qr-equipamento-falha" id="qr-equipamento-falha" hidden>Não foi possível carregar o QR Code. Confira se a API está no ar.</p>
+      </div>
+      <div class="qr-equipamento-info">
+        <h3 id="qr-equipamento-titulo">QR Code de identificação</h3>
+        <p class="muted">Cole a etiqueta no equipamento. A leitura pela câmera abre a consulta pública deste item.</p>
+        ${destino ? `<p class="qr-equipamento-destino">Endereço gravado: <a href="${esc(destino)}" target="_blank" rel="noopener">${esc(destino)}</a></p>` : ""}
+        <div class="qr-equipamento-acoes">
+          <a class="btn btn-line" href="${esc(ELO_QR.download(e, "png"))}">Baixar PNG</a>
+          <a class="btn btn-line" href="${esc(ELO_QR.download(e, "svg"))}">Baixar SVG</a>
+          <a class="btn btn-primary" href="etiquetas.html?ids=${encodeURIComponent(idEquip)}&amp;imprimir=1" target="_blank" rel="noopener">Imprimir etiqueta</a>
+        </div>
+      </div>
+    </section>`;
+  }
+
   if (!id) {
     erro.textContent = "Não foi informado qual equipamento deve ser exibido.";
     erro.hidden = false;
@@ -40,10 +62,16 @@
         <button class="btn btn-danger" id="retirar" type="button">Retirar equipamento</button>
       </div>
     </div></div>
+    ${qrMarkup(e)}
     <section class="historico-equipamento" id="historico-equipamento" hidden aria-live="polite">
       <h3>Histórico deste equipamento</h3>
       <div class="historico-equipamento-lista" id="historico-equipamento-lista"></div>
     </section>`;
+
+    $("qr-equipamento-img")?.addEventListener("error", () => {
+      $("qr-equipamento-img").hidden = true;
+      $("qr-equipamento-falha").hidden = false;
+    }, { once: true });
 
     $("ver-historico").addEventListener("click", async () => {
       const botao = $("ver-historico");

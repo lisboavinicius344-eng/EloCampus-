@@ -514,3 +514,31 @@ textarea.input {
   padding: 0.45rem;
   border-radius: 12px;
 }
+
+/* QR Code no detalhe do equipamento */
+.qr-equipamento {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1.25rem;
+  margin-top: 1.5rem;
+  padding: 1.25rem;
+  border: 1px solid var(--border, #29344d);
+  border-radius: var(--radius-m, 16px);
+}
+.qr-equipamento-imagem {
+  flex: 0 0 auto;
+  padding: 10px;
+  border-radius: var(--radius-s, 10px);
+  background: #fff; /* margem branca para a leitura da câmera */
+}
+.qr-equipamento-imagem img { display: block; width: 148px; height: 148px; }
+.qr-equipamento-falha { max-width: 148px; margin: 0; color: #be123c; font-size: .85rem; }
+.qr-equipamento-info { flex: 1 1 260px; min-width: 0; }
+.qr-equipamento-info h3 { margin: 0 0 .35rem; }
+.qr-equipamento-destino { overflow-wrap: anywhere; font-size: .9rem; }
+.qr-equipamento-acoes { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: .75rem; }
+
+/* Seleção de equipamentos para etiquetas */
+.table-eq .col-selecao { width: 2.5rem; text-align: center; }
+.table-eq .col-selecao input { width: 1.05rem; height: 1.05rem; cursor: pointer; accent-color: var(--purple, #8b5cf6); }
