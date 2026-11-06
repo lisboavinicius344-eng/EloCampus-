@@ -2,7 +2,7 @@
 (() => {
   "use strict";
   const $ = (id) => document.getElementById(id);
-  const nomesPapeis = { admin: "Administrador", operador: "Operador", aluno: "Aluno", professor: "Professor" };
+  const nomesPapeis = { admin: "Administrador", administrador: "Administrador", operador: "Operador", aluno: "Aluno", professor: "Professor" };
   const msg = $("perfil-mensagem");
   const avisar = (texto, ok) => { msg.textContent = texto; msg.className = `alert ${ok ? "alert-ok" : "alert-error"}`; msg.hidden = false; };
   const iniciais = (nome) => nome.split(/\s+/).filter(Boolean).slice(0, 2).map((p) => p[0]).join("").toLocaleUpperCase("pt-BR") || "?";

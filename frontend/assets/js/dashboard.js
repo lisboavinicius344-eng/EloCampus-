@@ -88,10 +88,6 @@
       </li>`).join("")}</ul>`;
   }
 
-  function nomeNormalizado(valor) {
-    return String(valor || "").toLocaleLowerCase("pt-BR").normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, " ").trim();
-  }
-
   function renderReservasAprovadas(reservas, equipamentos = []) {
     const area = $("reservas-aprovadas");
     if (!area) return;
@@ -134,12 +130,7 @@
 
     const area = $("inicio-usuario");
     area.hidden = false;
-    const matriculaSessao = nomeNormalizado(sessao?.matricula);
-    const meus = (Array.isArray(todosEmprestimos) ? todosEmprestimos : []).filter((l) => {
-      const porNome = nomeNormalizado(l.solicitante?.nome) === nomeNormalizado(nome);
-      const matriculaRegistro = nomeNormalizado(l.solicitante?.matricula);
-      return porNome || Boolean(matriculaSessao && matriculaRegistro && matriculaSessao === matriculaRegistro);
-    });
+    const meus = (Array.isArray(todosEmprestimos) ? todosEmprestimos : []).filter((l) => EloUtil.pertenceAoUsuario(l, sessao));
     const ativos = meus.filter((l) => !l.devolvida).sort((a, b) => new Date(a.prevista) - new Date(b.prevista));
     const disponiveis = (Array.isArray(equipamentos) ? equipamentos : []).filter((e) => e.situacao === "disponivel");
     $("quantidade-disponivel").textContent = disponiveis.length;
@@ -168,7 +159,8 @@
     }
 
     const [resumo, todosEmprestimos, todasMovimentacoes] = await Promise.all([
-      ELO.resumoDashboard(), ELO.emprestimos(), ELO.movimentacoes(),
+      // O histórico pode ser restrito por perfil; sem ele o painel continua funcionando.
+      ELO.resumoDashboard(), ELO.emprestimos(), ELO.movimentacoes().catch(() => []),
     ]);
     renderKpis(resumo);
     renderDistribuicao(resumo);

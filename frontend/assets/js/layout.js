@@ -45,6 +45,19 @@ const EloUtil = {
     }
     return { classe: "ok", texto: "Em dia" };
   },
+
+  // Identifica se um empréstimo normalizado pertence à sessão. Usa o ID do solicitante
+  // quando ambos existem; nome/matrícula ficam só como fallback (homônimos colidem).
+  pertenceAoUsuario(l, sessao) {
+    const chave = (v) => String(v ?? "").toLocaleLowerCase("pt-BR").normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, " ").trim();
+    const idSessao = String(sessao?.solicitante_id ?? "").trim();
+    const idRegistro = String(l?.solicitante?.id ?? "").trim();
+    if (idSessao && idRegistro) return idSessao === idRegistro;
+    const matriculaSessao = chave(sessao?.matricula);
+    const matriculaRegistro = chave(l?.solicitante?.matricula);
+    if (matriculaSessao && matriculaRegistro) return matriculaSessao === matriculaRegistro;
+    return Boolean(chave(sessao?.nome)) && chave(l?.solicitante?.nome) === chave(sessao?.nome);
+  },
 };
 
 (function () {
@@ -134,7 +147,7 @@ const EloUtil = {
     { grupo: "Administração", itens: [
       { id: "solicitantes", rotulo: "Solicitantes", icone: "usercheck", href: "solicitantes.html" },
       { id: "solicitacoes-acesso", rotulo: "Solicitações de acesso", icone: "shieldcheck", href: "solicitacoes-acesso.html", admin: true },
-      { id: "movimentacoes", rotulo: "Histórico de movimentações", icone: "swap", href: "movimentacoes.html", admin: true },
+      { id: "movimentacoes", rotulo: "Histórico de movimentações", icone: "swap", href: "movimentacoes.html" },
       { id: "usuarios", rotulo: "Equipe do sistema", icone: "server", href: "usuarios.html", admin: true }
     ]},
     { id: "perfil", rotulo: "Configuração do perfil", icone: "gear", href: "perfil.html" },
@@ -154,7 +167,8 @@ const EloUtil = {
   const NAV = usuarioFinal ? NAV_USUARIO : NAV_EQUIPE;
 
   const atual = usuarioFinal && arquivoAtual === "novo-emprestimo.html" ? "pedir" : document.body.dataset.pagina;
-  const itemPermitido = (i) => !i.admin || equipe;
+  // Itens "admin" só aparecem para administrador (as próprias páginas redirecionam operadores).
+  const itemPermitido = (i) => !i.admin || perfilAtual === "administrador";
   const itemHtml = (i) => {
     if (!itemPermitido(i)) return "";
     const ativo = i.id === atual;
@@ -193,7 +207,9 @@ const EloUtil = {
     <button class="topbar-btn" type="button" id="btn-menu" aria-controls="sidebar" aria-expanded="false" aria-label="Abrir menu">${svg("menu")}</button>
     <span class="topbar-brand"><img src="../assets/img/logo.png" alt="">ELO Campus</span>`;
 
-  if (perfilAtual === "administrador" && typeof ELO !== "undefined" && typeof ELO.solicitacoesAcesso === "function") {
+  // Na maioria das páginas layout.js carrega antes de api.js; espera o DOM para o ELO existir.
+  const carregarContadorPendentes = () => {
+    if (perfilAtual !== "administrador" || typeof ELO === "undefined" || typeof ELO.solicitacoesAcesso !== "function") return;
     ELO.solicitacoesAcesso("pendente").then((pendentes) => {
       const contador = document.getElementById("solicitacoes-pendentes-count");
       if (!contador) return;
@@ -202,7 +218,9 @@ const EloUtil = {
       contador.hidden = total === 0;
       contador.setAttribute("aria-label", `${total} solicitações pendentes`);
     }).catch(() => { /* menu permanece utilizável se a rota não estiver disponível */ });
-  }
+  };
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", carregarContadorPendentes, { once: true });
+  else carregarContadorPendentes();
 
   if (usuarioFinal) {
     document.querySelectorAll('a[href="equipamento-form.html"], a[href="movimentacoes.html"], a[href="relatorio.html"], a[href="usuarios.html"], a[href="solicitantes.html"], a[href="servidor.html"]').forEach((el) => { el.hidden = true; el.style.display = "none"; });

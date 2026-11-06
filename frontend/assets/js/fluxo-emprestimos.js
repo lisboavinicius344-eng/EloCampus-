@@ -282,7 +282,10 @@
     try {
       const emprestimosAtuais = await ELO.emprestimos();
       const idSolicitanteSelecionado = usuarioFinal ? String(sessaoAtual?.solicitante_id ?? "") : String(dadosParaConfirmar.solicitante_id ?? "");
-      const temAtraso = emprestimosAtuais.some((item) => item.situacao === "atrasado" && (!idSolicitanteSelecionado || String(item.solicitante?.id ?? "") === idSolicitanteSelecionado));
+      // Sem ID do solicitante, só se compara com os empréstimos da própria pessoa; nunca bloqueia por atraso de terceiros.
+      const temAtraso = emprestimosAtuais.some((item) => item.situacao === "atrasado" && (idSolicitanteSelecionado
+        ? String(item.solicitante?.id ?? "") === idSolicitanteSelecionado
+        : usuarioFinal && EloUtil.pertenceAoUsuario(item, sessaoAtual)));
       if (temAtraso) throw new Error("Há equipamento em atraso vinculado a este solicitante. Regularize a devolução antes de reservar ou retirar outro equipamento.");
       if (usuarioFinal) {
         await ELO.criarReserva({ equipamentos: dadosParaConfirmar.equipamentos.map(Number), data_inicio: dadosParaConfirmar.retirada, data_fim: dadosParaConfirmar.prevista, observacoes: [dadosParaConfirmar.finalidade, dadosParaConfirmar.observacoes].filter(Boolean).join(" — ") || null });
