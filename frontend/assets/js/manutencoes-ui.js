@@ -99,7 +99,7 @@
     const submit = $("man-form").querySelector('[type="submit"]');
     submit.disabled = true;
     try {
-      const r = await ELO.abrirManutencao({ equipamento_id: String(equipamento.id), descricao_problema: descricao });
+      const r = await ELO.abrirManutencao({ equipamento_id: Number(equipamento.id), descricao_problema: descricao })
       if (inativar) {
         try {
           await ELO.removerEquipamento(String(equipamento.id), { observacoes: motivoInativacao });
