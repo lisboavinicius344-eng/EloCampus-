@@ -288,3 +288,50 @@ body[data-pagina="emprestimos"] .summary { min-width:0; align-self:stretch; }
   body[data-pagina="emprestimos"] .split { gap:1rem; }
   body[data-pagina="emprestimos"] .summary { padding:1.25rem; }
 }
+
+
+/* Revisão estrutural da tela Reservar equipamento — mantém os componentes originais. */
+.novo-emprestimo-page .main { width: min(100%, 1440px); }
+.novo-emprestimo-page .page-head { margin-bottom: .25rem; }
+.novo-emprestimo-page .steps { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: .75rem; width: 100%; }
+.novo-emprestimo-page .step { min-width: 0; justify-content: flex-start; padding: .65rem .9rem; gap: .65rem; }
+.novo-emprestimo-page .step-label { min-width: 0; white-space: normal; line-height: 1.2; }
+.novo-emprestimo-page form.split {
+  display: grid;
+  grid-template-columns: minmax(0, 1.65fr) minmax(280px, .85fr);
+  align-items: start;
+  gap: 1.25rem;
+}
+.novo-emprestimo-page form.split > * { min-width: 0; width: 100%; }
+.novo-emprestimo-page .form-card { gap: 1.6rem; }
+.novo-emprestimo-page .form-section { min-width: 0; gap: 1rem; }
+.novo-emprestimo-page .form-row { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 1rem; }
+.novo-emprestimo-page .form-row .field { min-width: 0; width: 100%; }
+.novo-emprestimo-page .add-row { display: grid; grid-template-columns: minmax(0,1fr) auto; align-items: end; gap: .8rem; }
+.novo-emprestimo-page .add-row .field { min-width: 0; width: 100%; }
+.novo-emprestimo-page #adicionar-equip { min-height: 48px; white-space: nowrap; padding-inline: 1.15rem; }
+.novo-emprestimo-page .picked { min-width: 0; }
+.novo-emprestimo-page .picked-info { overflow-wrap: anywhere; }
+.novo-emprestimo-page .summary { position: sticky; top: 1.25rem; min-width: 0; gap: 1.1rem; }
+.novo-emprestimo-page .summary .stack-sm { gap: .75rem; }
+.novo-emprestimo-page .summary-row { align-items: flex-start; }
+.novo-emprestimo-page .summary-row strong { max-width: 58%; overflow-wrap: anywhere; }
+.novo-emprestimo-page .summary button[type="submit"] { min-height: 50px; padding: .8rem 1rem; white-space: normal; line-height: 1.25; }
+.novo-emprestimo-page .summary .cancel { display: block; margin-top: -.25rem; padding: .45rem; }
+.novo-emprestimo-page #revisao-emprestimo { width: 100%; min-width: 0; }
+.novo-emprestimo-page #revisao-emprestimo .stack-sm { justify-content: flex-start; gap: .8rem; }
+.novo-emprestimo-page #revisao-emprestimo .stack-sm .btn { min-width: 190px; }
+@media (max-width: 980px) {
+  .novo-emprestimo-page form.split { grid-template-columns: minmax(0,1fr); }
+  .novo-emprestimo-page .summary { position: static; }
+}
+@media (max-width: 650px) {
+  .novo-emprestimo-page .steps { grid-template-columns: minmax(0,1fr); }
+  .novo-emprestimo-page .step { width: 100%; }
+  .novo-emprestimo-page .form-row { grid-template-columns: minmax(0,1fr); }
+  .novo-emprestimo-page .add-row { grid-template-columns: minmax(0,1fr); }
+  .novo-emprestimo-page #adicionar-equip { width: 100%; }
+  .novo-emprestimo-page .summary { padding: 1.25rem; }
+  .novo-emprestimo-page #revisao-emprestimo .stack-sm { flex-direction: column; }
+  .novo-emprestimo-page #revisao-emprestimo .stack-sm .btn { width: 100%; min-width: 0; }
+}

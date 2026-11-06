@@ -66,6 +66,11 @@
     }
     function desenharDetalhe(l) {
       selecionado = l;
+      corpo.querySelectorAll("tr[data-item-id]").forEach((row) => {
+        const ativo = Boolean(l && String(row.dataset.itemId) === String(l.id));
+        row.classList.toggle("is-selected", ativo);
+        row.setAttribute("aria-selected", String(ativo));
+      });
       $("detalhe-nome").textContent = l ? l.equipamento.nome : "Selecione um empréstimo";
       $("detalhe-sub").textContent = l ? `${l.equipamento.patrimonio} · ${l.solicitante.nome}` : "Os detalhes aparecerão aqui.";
       const estado = l ? statusEmprestimo(l) : { texto: "—", classe: "pill-ok" };

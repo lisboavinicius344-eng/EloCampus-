@@ -68,3 +68,21 @@
   .reservas-page #res-new-link { width:100%; }
   .reservas-page .api-table { min-width:760px; }
 }
+
+
+/* Espaçamento consistente entre filtro e Atualizar (aluno e administração). */
+.reservas-page .lista-toolbar {
+  column-gap: 1.5rem;
+  row-gap: 1rem;
+}
+.reservas-page #res-refresh {
+  margin-left: .25rem;
+  padding-inline: 1.15rem;
+}
+.reservas-page .lista-toolbar .field {
+  margin-right: .15rem;
+}
+@media (max-width:760px) {
+  .reservas-page .lista-toolbar { gap: .9rem; }
+  .reservas-page #res-refresh { margin: 0; }
+}

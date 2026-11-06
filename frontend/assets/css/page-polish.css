@@ -447,3 +447,84 @@ form.split .summary button[type="submit"]:focus-visible,
   white-space: nowrap;
 }
 .solicitantes-table td:nth-child(3) * { white-space: nowrap; }
+
+/* Navegação: estados de foco/seleção mais perceptíveis, sem alterar a identidade. */
+.nav a {
+  position: relative;
+  transition: transform .2s ease, background .22s ease, box-shadow .22s ease, color .22s ease;
+  transform: translateY(0);
+}
+.nav a:hover {
+  transform: translateY(-2px);
+  background: linear-gradient(110deg, rgba(75,15,240,.22), rgba(210,59,224,.13));
+  box-shadow: 0 8px 20px rgba(4,8,30,.2);
+}
+.nav a[aria-current="page"] {
+  transform: translateY(-2px);
+  background: linear-gradient(120deg, #4b0ff0 0%, #8c2cf5 58%, #d23be0 100%);
+  box-shadow: 0 10px 24px rgba(106,28,245,.38), inset 0 1px 0 rgba(255,255,255,.16);
+}
+.nav a:active { transform: translateY(0) scale(.985); }
+
+@media (prefers-reduced-motion: reduce) {
+  .nav a { transition: none; }
+}
+
+.nav a[data-fluxo="emprestimo"]:hover,
+.nav a[data-fluxo="emprestimo"].is-active {
+  background:linear-gradient(115deg,rgba(75,15,240,.28),rgba(139,44,245,.2));
+}
+.nav a[data-fluxo="devolucao"]:hover,
+.nav a[data-fluxo="devolucao"].is-active {
+  background:linear-gradient(115deg,rgba(47,107,255,.27),rgba(0,209,255,.17));
+}
+.nav a[data-fluxo="emprestimo"].is-active,
+.nav a[data-fluxo="devolucao"].is-active {
+  box-shadow:0 9px 22px rgba(4,8,30,.25), inset 0 0 0 1px rgba(255,255,255,.12);
+}
+
+
+/* ID de solicitante: um pouco mais de largura antes de permitir quebra. */
+.solicitantes-table th:first-child,
+.solicitantes-table td:first-child {
+  width: 7.25rem;
+  min-width: 7.25rem;
+}
+.solicitantes-table .solicitante-code {
+  min-width: 5.5rem;
+  max-width: 7rem;
+  overflow-wrap: anywhere;
+  word-break: normal;
+  white-space: normal;
+}
+
+/* Espaçamento final do Atualizar nas reservas: sem encostar no filtro. */
+.reservas-page .lista-toolbar {
+  column-gap: 1.5rem !important;
+  row-gap: 1rem !important;
+}
+.reservas-page #res-refresh { margin-left: .35rem; }
+@media (max-width:760px) {
+  .reservas-page #res-refresh { margin-left: 0; }
+}
+
+/* Acabamento do formulário de reserva após os estilos globais. */
+.novo-emprestimo-page form.split { display:grid; grid-template-columns:minmax(0,1.65fr) minmax(280px,.85fr); gap:1.25rem; align-items:start; }
+.novo-emprestimo-page form.split > * { min-width:0; width:100%; }
+.novo-emprestimo-page .summary { position:sticky; top:1.25rem; }
+.novo-emprestimo-page form.split .summary button[type="submit"] {
+  width:100%; min-height:50px; padding:.8rem 1rem; white-space:normal;
+  border-radius:12px; line-height:1.25; text-align:center;
+}
+.novo-emprestimo-page .add-row { display:grid; grid-template-columns:minmax(0,1fr) auto; align-items:end; gap:.85rem; }
+.novo-emprestimo-page #adicionar-equip { min-height:48px; white-space:nowrap; }
+.novo-emprestimo-page .form-row { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:1rem; }
+@media(max-width:980px) {
+  .novo-emprestimo-page form.split { grid-template-columns:minmax(0,1fr); }
+  .novo-emprestimo-page .summary { position:static; }
+}
+@media(max-width:650px) {
+  .novo-emprestimo-page .form-row,
+  .novo-emprestimo-page .add-row { grid-template-columns:minmax(0,1fr); }
+  .novo-emprestimo-page #adicionar-equip { width:100%; }
+}

@@ -51,9 +51,9 @@
 }
 
 .kpi-alerta {
-  border-color: rgba(251, 113, 133, 0.55);
-  background: linear-gradient(135deg, rgba(251, 113, 133, 0.12), var(--surface) 60%);
-  box-shadow: 0 0 32px -12px rgba(251, 113, 133, 0.55);
+  border-color: rgba(139, 92, 246, 0.48);
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.14), var(--surface) 60%);
+  box-shadow: 0 0 32px -12px rgba(139, 92, 246, 0.48);
 }
 .kpi-alerta .kpi-valor {
   color: var(--st-late);
@@ -715,3 +715,32 @@ a.acao:hover {
 .reserva-aprovada-content > strong { display:block; color:var(--st-ok, #35b779); font-size:1.02rem; }
 .reserva-aprovada-content p { margin:.3rem 0; }
 .reserva-aprovada-content a { display:inline-block; margin-top:.35rem; font-weight:700; color:var(--st-ok, #35b779); text-decoration:underline; text-underline-offset:3px; }
+
+/* Identidade visual do painel: acento roxo consistente com a seleção do sistema. */
+.kpi { --c: var(--purple); }
+.kpi-alerta {
+  border-color: rgba(139, 92, 246, .48);
+  background: linear-gradient(135deg, rgba(139, 92, 246, .14), var(--surface) 62%);
+  box-shadow: 0 0 30px -14px rgba(139, 92, 246, .5);
+}
+.kpi-alerta .kpi-valor { color: #b69aff; }
+
+/* Área inicial: todos os atalhos seguem o destaque roxo original do ELO. */
+.self-action-browse,
+.self-action-request,
+.self-action-return,
+.self-action-qr {
+  --action-glow: rgba(139, 92, 246, .2);
+  background: linear-gradient(145deg, rgba(139, 92, 246, .16), rgba(17, 24, 43, .97) 68%);
+}
+.self-action-icon {
+  background: linear-gradient(145deg, rgba(139, 92, 246, .3), rgba(109, 40, 217, .14));
+}
+.self-action-arrow { color: #b69aff; }
+.mov-devolucao { --c: #a78bfa; }
+.mov-manutencao { --c: #8b5cf6; }
+.dist-legenda .badge-ok { --c: #9b7cf7; }
+.dist-legenda .badge-loan { --c: #8b5cf6; }
+.dist-legenda .badge-late { --c: #b69aff; }
+.dist-legenda .badge-maint { --c: #7652d6; }
+.dist-legenda .badge-off { --c: #6550b8; }

@@ -21,7 +21,7 @@ const EloUtil = {
   },
 
   // Diferença entre dias do calendário: positiva = atraso; negativa = dias restantes.
-  // Usa componentes locais + UTC para não falhar em mudanças de horário de verão.
+  // UTC evita diferenças incorretas em mudanças de horário de verão.
   diasAtraso(prevista) {
     const prazo = new Date(prevista);
     if (!Number.isFinite(prazo.getTime())) return 0;
@@ -160,7 +160,8 @@ const EloUtil = {
     const ativo = i.id === atual;
     const icon = svg(i.icone);
     const badge = i.id === "solicitacoes-acesso" ? '<span class="nav-count" id="solicitacoes-pendentes-count" hidden></span>' : "";
-    return `<li><a class="nav-item${ativo ? " is-active" : ""}" href="${i.href}"${ativo ? ' aria-current="page"' : ""}>${icon}<span>${i.rotulo}</span>${badge}</a></li>`;
+    const tipoFluxo = i.id === "emprestimos" ? "emprestimo" : i.id === "devolucoes" ? "devolucao" : "";
+    return `<li><a class="nav-item${ativo ? " is-active" : ""}${tipoFluxo ? ` nav-item--${tipoFluxo}` : ""}"${tipoFluxo ? ` data-fluxo="${tipoFluxo}"` : ""} href="${i.href}"${ativo ? ' aria-current="page"' : ""}>${icon}<span>${i.rotulo}</span>${badge}</a></li>`;
   };
   const itens = NAV.map((item) => {
     if (!item.grupo) return itemHtml(item);

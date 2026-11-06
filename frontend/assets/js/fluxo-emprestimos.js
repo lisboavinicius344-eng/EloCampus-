@@ -63,7 +63,7 @@
     const nomeSessao = String(sessaoAtual?.nome || "").trim();
     campoSolicitante.value = nomeSessao;
     campoSolicitante.readOnly = true;
-    campoVinculo.value = vinculosPerfil[perfilAtual] || "Servidor";
+    campoVinculo.value = vinculosPerfil[perfilAtual] || "servidor";
     campoVinculo.disabled = true;
 
     // Modo de autoatendimento: o usuário informa apenas o que precisa, não dados

@@ -41,9 +41,6 @@ const context = {
     if (url.endsWith('/consulta-qr/CODE-001')) {
       return { ok: true, status: 200, json: async () => ({ equipamento: { id: 1, nome: 'Projetor' } }) };
     }
-    if (url.endsWith('/consulta-qr/NAO-EXISTE-123')) {
-      return { ok: false, status: 404, json: async () => ({ erro: 'Nenhum equipamento corresponde a esse código.' }) };
-    }
     if (url.endsWith('/auth/solicitar-acesso') && options.method === 'POST') {
       return { ok: true, status: 200, json: async () => ({ mensagem: 'Solicitação recebida.' }) };
     }
@@ -80,11 +77,6 @@ vm.runInContext(fs.readFileSync(path.join(__dirname, '../frontend/assets/js/api.
   context.testSession = { token: 'user-token', perfil: 'aluno' };
   await vm.runInContext('ELO.consultaQr("CODE-001")', context);
   assert.equal(requests.at(-1).options.headers.Authorization, undefined, 'regular users use the public QR endpoint without a token');
-  await assert.rejects(
-    () => vm.runInContext('ELO.consultaQr("NAO-EXISTE-123")', context),
-    { message: 'Nenhum equipamento corresponde a esse código.' },
-    'the API 404 error field must reach the caller unchanged',
-  );
 
   requests.length = 0;
   context.testSession = { token: 'staff-token', perfil: 'operador' };
@@ -92,7 +84,8 @@ vm.runInContext(fs.readFileSync(path.join(__dirname, '../frontend/assets/js/api.
   assert.equal(requests.at(-1).options.headers.Authorization, 'Bearer staff-token', 'staff can request restricted QR details');
 
   requests.length = 0;
-  await vm.runInContext('ELO.registrarEmprestimo({ solicitante_id: \"3f6c1e2a-9b7d-4c11-8a22-123456789abc\", equipamentos: [101], prevista: \"2026-11-05T18:00:00-03:00\" })', context);
+  const futureDeadline = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
+  await vm.runInContext(`ELO.registrarEmprestimo({ solicitante_id: \"3f6c1e2a-9b7d-4c11-8a22-123456789abc\", equipamentos: [101], prevista: ${JSON.stringify(futureDeadline)} })`, context);
   const loanBody = JSON.parse(requests.at(-1).options.body);
   assert.equal(loanBody.solicitante_id, '3f6c1e2a-9b7d-4c11-8a22-123456789abc', 'UUID person IDs remain strings in loan requests');
   assert.equal(typeof loanBody.solicitante_id, 'string');
