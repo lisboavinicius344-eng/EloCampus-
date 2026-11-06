@@ -740,7 +740,7 @@ a.acao:hover {
 .mov-devolucao { --c: #a78bfa; }
 .mov-manutencao { --c: #8b5cf6; }
 .dist-legenda .badge-ok { --c: #9b7cf7; }
-.dist-legenda .badge-loan { --c: var(--st-loan); }
+.dist-legenda .badge-loan { --c: #8b5cf6; }
 .dist-legenda .badge-late { --c: #b69aff; }
 .dist-legenda .badge-maint { --c: #7652d6; }
 .dist-legenda .badge-off { --c: #6550b8; }

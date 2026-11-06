@@ -76,7 +76,7 @@
         reenviar.textContent = "Reenviar instruções";
         // A API continua sendo a autoridade para impedir operações não permitidas, como desativar a própria conta.
         reenviar.addEventListener("click", async () => {
-          const confirmado = await EloUtil.confirm(`Reenviar as instruções de acesso para ${usuario.nome} (${usuario.email})?\n\nUma nova instrução será enviada ao endereço cadastrado.`);
+          const confirmado = confirm(`Reenviar as instruções de acesso para ${usuario.nome} (${usuario.email})?\n\nUma nova instrução será enviada ao endereço cadastrado.`);
           if (!confirmado) return;
           reenviar.disabled = true;
           reenviar.textContent = "Enviando…";
@@ -94,7 +94,7 @@
         acoes.appendChild(reenviar);
           const desativar = document.createElement("button"); desativar.type = "button"; desativar.className = "btn btn-sm btn-ghost"; desativar.textContent = "Desativar";
           desativar.addEventListener("click", async () => {
-            if (!(await EloUtil.confirm(`Desativar a conta de ${usuario.nome}?`))) return;
+            if (!confirm(`Desativar a conta de ${usuario.nome}?`)) return;
             try { const resultado = await ELO.desativarUsuario(usuario.id); mostrarAviso(resultado?.mensagem || "Conta desativada.", "ok"); await carregar(); }
             catch (erro) { mostrarAviso(erro.message || "Não foi possível desativar a conta.", "error"); }
           }); acoes.appendChild(desativar);
@@ -104,7 +104,7 @@
           reativar.className = "btn btn-sm btn-primary";
           reativar.textContent = "Reativar";
           reativar.addEventListener("click", async () => {
-            if (!(await EloUtil.confirm(`Reativar a conta de ${usuario.nome}?`))) return;
+            if (!confirm(`Reativar a conta de ${usuario.nome}?`)) return;
             reativar.disabled = true; reativar.textContent = "Reativando…";
             try {
               const resultado = await ELO.reativarUsuario(usuario.id);

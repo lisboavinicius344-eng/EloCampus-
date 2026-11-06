@@ -58,66 +58,6 @@ const EloUtil = {
     if (matriculaSessao && matriculaRegistro) return matriculaSessao === matriculaRegistro;
     return Boolean(chave(sessao?.nome)) && chave(l?.solicitante?.nome) === chave(sessao?.nome);
   },
-
-  // Confirmações e perguntas fazem parte da interface, sem diálogos nativos do navegador.
-  async confirm(mensagem, titulo = "Confirmar ação") {
-    return new Promise((resolve) => {
-      const modal = document.createElement("div");
-      modal.className = "elo-dialog-backdrop";
-      modal.innerHTML = `<div class="elo-dialog" role="dialog" aria-modal="true" aria-labelledby="elo-dialog-title">
-        <div class="elo-dialog-icon" aria-hidden="true">?</div>
-        <h2 id="elo-dialog-title">${EloUtil.esc(titulo)}</h2>
-        <p>${EloUtil.esc(mensagem).replace(/\n/g, "<br>")}</p>
-        <div class="elo-dialog-actions">
-          <button type="button" class="btn btn-line elo-dialog-cancel">Cancelar</button>
-          <button type="button" class="btn btn-primary elo-dialog-ok">Confirmar</button>
-        </div>
-      </div>`;
-      document.body.append(modal);
-      const cancelar = modal.querySelector(".elo-dialog-cancel");
-      const ok = modal.querySelector(".elo-dialog-ok");
-      const fechar = (resultado) => { modal.remove(); resolve(resultado); };
-      cancelar.addEventListener("click", () => fechar(false));
-      ok.addEventListener("click", () => fechar(true));
-      modal.addEventListener("click", (event) => { if (event.target === modal) fechar(false); });
-      const tecla = (event) => {
-        if (event.key === "Escape") { document.removeEventListener("keydown", tecla); fechar(false); }
-        if (event.key === "Enter") { document.removeEventListener("keydown", tecla); fechar(true); }
-      };
-      document.addEventListener("keydown", tecla);
-      ok.focus();
-    });
-  },
-
-  async prompt(titulo = "Informe um valor", placeholder = "") {
-    return new Promise((resolve) => {
-      const modal = document.createElement("div");
-      modal.className = "elo-dialog-backdrop";
-      modal.innerHTML = `<div class="elo-dialog" role="dialog" aria-modal="true">
-        <div class="elo-dialog-icon elo-dialog-icon-input" aria-hidden="true">✎</div>
-        <h2>${EloUtil.esc(titulo)}</h2>
-        <p>${EloUtil.esc(placeholder)}</p>
-        <textarea class="input input-block elo-dialog-input" rows="3" placeholder="${EloUtil.esc(placeholder)}"></textarea>
-        <div class="elo-dialog-actions">
-          <button type="button" class="btn btn-line elo-dialog-cancel">Cancelar</button>
-          <button type="button" class="btn btn-primary elo-dialog-ok">Continuar</button>
-        </div>
-      </div>`;
-      document.body.append(modal);
-      const input = modal.querySelector(".elo-dialog-input");
-      const cancelar = modal.querySelector(".elo-dialog-cancel");
-      const ok = modal.querySelector(".elo-dialog-ok");
-      const fechar = (resultado) => { modal.remove(); resolve(resultado); };
-      cancelar.addEventListener("click", () => fechar(null));
-      ok.addEventListener("click", () => fechar(input.value));
-      modal.addEventListener("click", (event) => { if (event.target === modal) fechar(null); });
-      input.addEventListener("keydown", (event) => {
-        if ((event.ctrlKey || event.metaKey) && event.key === "Enter") ok.click();
-        if (event.key === "Escape") cancelar.click();
-      });
-      input.focus();
-    });
-  },
 };
 
 (function () {
@@ -131,7 +71,7 @@ const EloUtil = {
   const usuarioFinal = ["aluno", "professor"].includes(perfilAtual);
   const paginaAtual = document.body.dataset.pagina;
   const arquivoAtual = window.location.pathname.split("/").pop();
-  const paginasRestritas = ["movimentacoes.html", "usuarios.html", "solicitantes.html", "relatorio.html", "servidor.html", "equipamento-form.html", "manutencoes.html", "categorias.html", "solicitacoes-acesso.html", "selecionar-solicitante.html"];
+  const paginasRestritas = ["movimentacoes.html", "usuarios.html", "solicitantes.html", "relatorio.html", "servidor.html", "equipamento-form.html", "manutencoes.html", "categorias.html", "solicitacoes-acesso.html"];
   const paginasUsuario = ["dashboard.html", "disponiveis.html", "consulta-qr-interno.html", "emprestimos.html", "novo-emprestimo.html", "reservas.html", "perfil.html", "trocar-senha.html"];
 
   // O controle de navegação evita acessos acidentais pela URL; segurança real

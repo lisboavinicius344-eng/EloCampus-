@@ -5,17 +5,6 @@
   const $ = (id) => document.getElementById(id);
   const esc = EloUtil.esc;
   const norm = (s) => String(s ?? "").toLocaleLowerCase("pt-BR").normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-  const ROTULOS_TIPO = {
-    manutencao_cancelada: "Manutenção cancelada",
-    manutencao_concluida: "Manutenção concluída",
-    devolucao: "Devolução",
-    retirada: "Retirada",
-    manutencao: "Manutenção",
-    baixa: "Baixa",
-    reserva: "Reserva",
-  };
-  const rotuloTipo = (valor) => ROTULOS_TIPO[String(valor ?? "").toLowerCase()] || String(valor ?? "Movimentação");
-
   const controls = [$("historico-busca"), $("historico-tipo"), $("historico-de"), $("historico-ate")];
   let eventos = [];
   function lerData(valor, fim = false) {
@@ -30,7 +19,7 @@
     const ate = lerData($("historico-ate")?.value, true);
     return eventos.filter((m) => {
       const data = new Date(m.quando);
-      const texto = [rotuloTipo(m.tipo), m.tipo, m.equipamento?.nome, m.equipamento?.patrimonio, m.equipamento?.categoria, m.detalhe, m.por].join(" ");
+      const texto = [m.tipo, m.equipamento?.nome, m.equipamento?.patrimonio, m.equipamento?.categoria, m.detalhe, m.por].join(" ");
       return (!q || norm(texto).includes(q)) && (!tipo || m.classe === tipo) && (!de || data >= de) && (!ate || data <= ate);
     });
   }
@@ -40,12 +29,7 @@
       box.innerHTML = `<p class="estado-vazio">${eventos.length ? "Nenhuma movimentação corresponde aos filtros selecionados." : "Nenhuma movimentação foi encontrada no sistema."}</p>`;
       return;
     }
-    box.innerHTML = `<p class="muted small" style="margin-bottom:.75rem">Exibindo ${lista.length} de ${eventos.length} movimentações.</p><div class="table-wrap"><table class="table"><thead><tr><th>Data e hora</th><th>Tipo</th><th>Equipamento</th><th>Categoria</th><th>Detalhe</th><th>Responsável</th></tr></thead><tbody>${lista.map((m) => {
-      const nomeEquipamento = m.equipamento?.nome || m.equipamento?.patrimonio || "—";
-      const patrimonio = m.equipamento?.nome && m.equipamento?.patrimonio ? m.equipamento.patrimonio : "";
-      const categoria = m.equipamento?.categoria || "";
-      return `<tr><td>${EloUtil.dataHora(m.quando)}</td><td><span class="badge badge-${esc(m.classe)}">${esc(rotuloTipo(m.tipo))}</span></td><td><strong>${esc(nomeEquipamento)}</strong>${patrimonio ? `<small>${esc(patrimonio)}</small>` : ""}</td><td>${categoria ? `<span class="category-tag">${esc(categoria)}</span>` : "—"}</td><td>${esc(m.detalhe || "—")}</td><td>${esc(m.por || "—")}</td></tr>`;
-    }).join("")}</tbody></table></div>`;
+    box.innerHTML = `<p class="muted small" style="margin-bottom:.75rem">Exibindo ${lista.length} de ${eventos.length} movimentações.</p><div class="table-wrap"><table class="table"><thead><tr><th>Data e hora</th><th>Tipo</th><th>Equipamento</th><th>Categoria</th><th>Detalhe</th><th>Responsável</th></tr></thead><tbody>${lista.map((m) => `<tr><td>${EloUtil.dataHora(m.quando)}</td><td><span class="badge badge-${esc(m.classe)}">${esc(m.tipo)}</span></td><td><strong>${esc(m.equipamento?.nome || "—")}</strong><small>${esc(m.equipamento?.patrimonio || "—")}</small></td><td><span class="category-tag">${esc(m.equipamento?.categoria || "Equipamento")}</span></td><td>${esc(m.detalhe || "—")}</td><td>${esc(m.por || "—")}</td></tr>`).join("")}</tbody></table></div>`;
   }
   try {
     eventos = await ELO.movimentacoes();

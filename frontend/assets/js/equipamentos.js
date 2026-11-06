@@ -126,10 +126,10 @@
     if (!botao) return;
     const eq = todos.find((e) => String(e.id) === botao.dataset.retirar);
     if (!eq) return;
-    const observacoes = await EloUtil.prompt("Motivo obrigatório para retirar o equipamento de uso", `Explique por que “${eq.nome}” não deve mais integrar o acervo.`);
+    const observacoes = window.prompt(`Informe o motivo obrigatório para retirar “${eq.nome}” de uso:`);
     if (observacoes === null) return;
     if (!observacoes.trim()) { avisar("A observação é obrigatória para retirar o equipamento de uso.", "error"); return; }
-    if (!(await EloUtil.confirm(`Confirma a retirada de “${eq.nome}” de uso? O histórico será preservado.`))) return;
+    if (!confirm(`Confirma a retirada de “${eq.nome}” de uso? O histórico será preservado.`)) return;
     botao.disabled = true;
     try {
       await ELO.removerEquipamento(eq.id, { observacoes: observacoes.trim() });

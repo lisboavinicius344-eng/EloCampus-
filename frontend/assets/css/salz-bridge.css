@@ -7,13 +7,13 @@
   --line: #29344d;
   --text: #f3f4f6;
   --text-2: #a7b0c5;
-  --purple: #2563eb;
+  --purple: #6d28d9;
   --violet: #a855f7;
   --magenta: #a855f7;
   --pink: #ff29b8;
   --blue: #3b82f6;
   --cyan: #22d3ee;
-  --grad-main: linear-gradient(90deg, #1d4ed8, #ec4899);
+  --grad-main: linear-gradient(90deg, #6d28d9, #a855f7);
   --grad-cool: linear-gradient(90deg, #3b82f6, #22d3ee);
   --grad-warm: linear-gradient(135deg, #6d28d9, #ff29b8);
   --ok-bg: rgba(52, 211, 153, 0.13);
@@ -111,8 +111,8 @@ tr.is-late td {
   --font: "Outfit", system-ui, -apple-system, "Segoe UI", sans-serif;
   --border: #29344d;
   --muted: #a7b0c5;
-  --purple-deep: #1d4ed8;
-  --purple-light: #ec4899;
+  --purple-deep: #6d28d9;
+  --purple-light: #a855f7;
   --radius-l: 28px;
 }
 

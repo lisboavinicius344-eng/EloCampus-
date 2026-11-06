@@ -41,10 +41,10 @@
     finally { botao.disabled = false; botao.textContent = "Salvar alterações"; }
   });
 
-  $("perfil-alterar-senha")?.addEventListener("click", async (evento) => {
-    const confirmado = await EloUtil.confirm("Deseja continuar para a página de alteração de senha? Você poderá informar sua senha atual e definir uma nova senha.");
+  $("perfil-alterar-senha")?.addEventListener("click", (evento) => {
+    const confirmado = window.confirm("Deseja continuar para a página de alteração de senha? Você poderá informar sua senha atual e definir uma nova senha.");
     if (!confirmado) evento.preventDefault();
   });
 
-  $("perfil-sair")?.addEventListener("click", async () => { if (await EloUtil.confirm("Deseja sair da conta?")) sair(); });
+  $("perfil-sair")?.addEventListener("click", () => { if (confirm("Deseja sair da conta?")) sair(); });
 })();

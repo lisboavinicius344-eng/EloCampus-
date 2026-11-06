@@ -37,7 +37,7 @@
       </dl>
       <div class="detalhe-acoes">
         <button class="btn btn-line" id="ver-historico" type="button">Ver histórico</button>
-        ${["baixado", "inativo"].includes(String(e.status || e.situacao || "").toLowerCase()) || ["inativo", "em_manutencao", "manutencao"].includes(String(e.situacao || "").toLowerCase()) ? "" : '<button class="btn btn-danger" id="retirar" type="button">Retirar equipamento</button>'}
+        <button class="btn btn-danger" id="retirar" type="button">Retirar equipamento</button>
       </div>
     </div></div>
     <section class="historico-equipamento" id="historico-equipamento" hidden aria-live="polite">

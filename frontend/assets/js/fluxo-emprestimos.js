@@ -9,11 +9,6 @@
   const usuarioFinal = ["aluno", "professor", "servidor"].includes(perfilAtual);
   const parametrosIniciais = new URLSearchParams(location.search);
   if (!sessaoAtual) return; // layout.js já redireciona para o login se não houver sessão.
-  if (!usuarioFinal && !parametrosIniciais.get("solicitanteId")) {
-    window.location.replace("selecionar-solicitante.html");
-    return;
-  }
-  const solicitanteIdInicial = parametrosIniciais.get("solicitanteId");
   const mensagem = $("emprestimo-mensagem");
   const campoSolicitante = $("solicitante");
   let solicitantesDisponiveis = [];
@@ -165,7 +160,6 @@
           const selecionarSolicitante = () => {
             const termo = normalizarBusca(campoSolicitante.value);
             solicitanteSelecionado = solicitantesDisponiveis.find(x =>
-              (solicitanteIdInicial && String(x.id) === String(solicitanteIdInicial)) ||
               normalizarBusca(x.nome) === termo ||
               normalizarBusca(`${x.nome} · ${x.matricula || x.id}`) === termo ||
               normalizarBusca(x.matricula) === termo ||
@@ -174,30 +168,22 @@
             if (solicitanteSelecionado) {
               const tipo = normalizarBusca(solicitanteSelecionado.tipo);
               campoVinculo.value = tipo.includes("prof") ? "professor" : tipo.includes("serv") || tipo.includes("tecn") ? "servidor" : "aluno";
-              campoSolicitante.value = `${solicitanteSelecionado.nome} · ${solicitanteSelecionado.matricula || solicitanteSelecionado.id}`;
-              campoSolicitante.readOnly = true;
-              campoSolicitante.removeAttribute("list");
-              campoSolicitante.placeholder = "Solicitante selecionado";
               $("resumo-solicitante").textContent = `${solicitanteSelecionado.nome} · #${solicitanteSelecionado.id}`;
-              const hint = document.querySelector("#solicitante")?.closest(".field")?.querySelector(".hint");
-              if (hint) hint.innerHTML = `<a href="selecionar-solicitante.html">Trocar solicitante</a>`;
             } else {
-              $("resumo-solicitante").textContent = "Solicitante não encontrado";
+              $("resumo-solicitante").textContent = "Selecione um cadastro válido";
             }
             atualizarCampoVinculo();
           };
           campoSolicitante.addEventListener("change", selecionarSolicitante);
           campoSolicitante.addEventListener("blur", selecionarSolicitante);
           selecionarSolicitante();
-          if (!solicitanteIdInicial) {
-            campoSolicitante.addEventListener("input", () => {
-              const termo = normalizarBusca(campoSolicitante.value);
-              if (!solicitantesDisponiveis.some(x => normalizarBusca(`${x.nome} · ${x.matricula || x.id}`) === termo || normalizarBusca(x.nome) === termo || normalizarBusca(x.matricula) === termo)) {
-                solicitanteSelecionado = null;
-                $("resumo-solicitante").textContent = "Selecione um cadastro válido";
-              }
-            });
-          }
+          campoSolicitante.addEventListener("input", () => {
+            const termo = normalizarBusca(campoSolicitante.value);
+            if (!solicitantesDisponiveis.some(x => normalizarBusca(`${x.nome} · ${x.matricula || x.id}`) === termo || normalizarBusca(x.nome) === termo || normalizarBusca(x.matricula) === termo)) {
+              solicitanteSelecionado = null;
+              $("resumo-solicitante").textContent = "Selecione um cadastro válido";
+            }
+          });
         } catch (e) { mostrarMensagem(`Não foi possível carregar solicitantes: ${e.message}`); }
       }
       const disponiveis = equipamentos.filter((e) => e.situacao === "disponivel");

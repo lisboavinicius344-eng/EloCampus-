@@ -46,31 +46,6 @@
           <td>${esc(m.status || "—")}</td><td><div class="api-actions"></div></td>`;
         const actions = tr.querySelector(".api-actions");
 
-        const estadoStatus = String(equipamento?.status || "").toLowerCase();
-        const estadoSituacao = String(equipamento?.situacao || "").toLowerCase();
-        if (equipamentoId && !["baixado", "inativo"].includes(estadoStatus) && !["baixado", "inativo"].includes(estadoSituacao)) {
-          const inativarBtn = document.createElement("button");
-          inativarBtn.className = "btn btn-danger";
-          inativarBtn.type = "button";
-          inativarBtn.textContent = "Inativar equipamento";
-          inativarBtn.addEventListener("click", async () => {
-            const motivo = await EloUtil.prompt("Motivo da inativação (obrigatório)", "Explique por que este equipamento não deve mais integrar o acervo.");
-            if (motivo === null) return;
-            if (!motivo.trim()) { aviso("Informe o motivo da inativação.", "error"); return; }
-            if (!(await EloUtil.confirm(`Inativar “${equipamento?.nome || nomeEquipamento || "este equipamento"}”? O histórico será preservado.`))) return;
-            inativarBtn.disabled = true;
-            try {
-              await ELO.removerEquipamento(String(equipamentoId), { observacoes: motivo.trim() });
-              aviso("Equipamento inativado. O histórico da manutenção foi preservado.", "ok");
-              await carregar();
-            } catch (erro) {
-              aviso(erro.message || "Não foi possível inativar o equipamento.", "error");
-              inativarBtn.disabled = false;
-            }
-          });
-          actions.append(inativarBtn);
-        }
-
         if (["aberta", "em_andamento"].includes(m.status)) {
           const wrap = document.createElement("div");
           wrap.className = "stack-sm maintenance-finish";
@@ -107,21 +82,47 @@
     const equipamento = equipamentosAtuais.find(e => String(e.id) === String($("man-equip").value));
     const descricao = $("man-desc").value.trim();
     if (!equipamento || !descricao) return aviso("Selecione o equipamento e descreva o problema.", "error");
-    if (!(await EloUtil.confirm(`Enviar ${equipamento.nome} para manutenção?\n\nProblema: ${descricao}`))) return;
-    if (!(await EloUtil.confirm("Confirmação final: registrar a manutenção deste equipamento?"))) return;
-
+    const inativar = $("man-inativar")?.checked === true;
+    const motivoInativacao = $("man-motivo-inativacao")?.value.trim() || "Inativado durante abertura de manutenção.";
+    if (inativar && !$("man-motivo-inativacao")?.value.trim()) {
+      aviso("Informe o motivo da inativação ou desmarque essa opção.", "error");
+      $("man-motivo-inativacao")?.focus();
+      return;
+    }
+    const resumoInativacao = inativar
+      ? `\n\nATENÇÃO: além de abrir a manutenção, o equipamento será INATIVADO e deixará de integrar o acervo disponível.\nMotivo: ${motivoInativacao}`
+      : "\n\nO equipamento ficará indisponível enquanto estiver em manutenção, mas continuará ativo no acervo.";
+    if (!window.confirm(`Enviar ${equipamento.nome} para manutenção?\n\nProblema: ${descricao}${resumoInativacao}`)) return;
+    if (!window.confirm(inativar
+      ? "Confirmação final: registrar a manutenção E inativar permanentemente este equipamento?"
+      : "Confirmação final: registrar a manutenção deste equipamento?")) return;
     const submit = $("man-form").querySelector('[type="submit"]');
     submit.disabled = true;
     try {
-      const r = await ELO.abrirManutencao({ equipamento_id: Number(equipamento.id), descricao_problema: descricao });
-      aviso(r?.mensagem || "Equipamento enviado para manutenção.", "ok");
+      const r = await ELO.abrirManutencao({ equipamento_id: Number(equipamento.id), descricao_problema: descricao })
+      if (inativar) {
+        try {
+          await ELO.removerEquipamento(String(equipamento.id), { observacoes: motivoInativacao });
+          aviso("Manutenção aberta e equipamento inativado.", "ok");
+        } catch (erroInativacao) {
+          aviso(`A manutenção foi aberta, mas não foi possível inativar o equipamento: ${erroInativacao.message || "erro na API"}. Faça a inativação pela tela de Equipamentos.`, "error");
+        }
+      } else {
+        aviso(r?.mensagem || "Equipamento enviado para manutenção.", "ok");
+      }
       $("man-desc").value = "";
+      if ($("man-inativar")) $("man-inativar").checked = false;
+      if ($("man-motivo-inativacao")) $("man-motivo-inativacao").value = "";
+      if ($("man-inativacao-wrap")) $("man-inativacao-wrap").hidden = true;
       await carregar();
-    } catch (e) {
-      aviso(e.message || "Não foi possível enviar o equipamento para manutenção.", "error");
-    } finally {
-      submit.disabled = false;
-    }
+    } catch (e) { aviso(e.message || "Não foi possível enviar o equipamento para manutenção.", "error"); }
+    finally { submit.disabled = false; }
+  });
+  $("man-inativar")?.addEventListener("change", () => {
+    const wrap = $("man-inativacao-wrap");
+    const motivo = $("man-motivo-inativacao");
+    if (wrap) wrap.hidden = !$("man-inativar").checked;
+    if (motivo) motivo.required = $("man-inativar").checked;
   });
   $("man-status").addEventListener("change", carregar);
   $("man-refresh").addEventListener("click", carregar);
