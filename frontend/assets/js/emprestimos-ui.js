@@ -34,8 +34,8 @@
       if (titulo) titulo.textContent = "Meus empréstimos";
       if (descricao) descricao.textContent = "A devolução é registrada pela equipe do acervo. Entregue o equipamento presencialmente para conferência e registro.";
       if (busca) busca.placeholder = "Buscar meus equipamentos";
-      const acao = document.querySelector('.page-head a[href="novo-emprestimo.html"]');
-      if (acao) acao.textContent = "Reservar";
+      const acao = document.querySelector(".page-head a");
+      if (acao) { acao.href = "novo-emprestimo.html"; acao.textContent = "Reservar"; }
       const cabecalhos = document.querySelectorAll(".table-wrap thead th");
       if (cabecalhos[1]) cabecalhos[1].hidden = true;
       if (cabecalhos[2]) cabecalhos[2].textContent = "Prazo / devolução";

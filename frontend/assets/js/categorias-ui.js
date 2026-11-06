@@ -50,7 +50,7 @@
           d.className = "btn btn-ghost";
           d.textContent = "Desativar";
           d.addEventListener("click", async () => {
-            if (!confirm(`Desativar a categoria “${c.nome}”?`)) return;
+            if (!(await EloUtil.confirm(`Desativar a categoria “${c.nome}”?`))) return;
             d.disabled = true;
             try {
               const r = await ELO.desativarCategoria(c.id);
@@ -67,7 +67,7 @@
           r.className = "btn btn-primary";
           r.textContent = "Reativar";
           r.addEventListener("click", async () => {
-            if (!confirm(`Reativar a categoria “${c.nome}”?`)) return;
+            if (!(await EloUtil.confirm(`Reativar a categoria “${c.nome}”?`))) return;
             r.disabled = true;
             try {
               const resposta = await ELO.reativarCategoria(c.id);

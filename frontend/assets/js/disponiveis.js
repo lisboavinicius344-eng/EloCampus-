@@ -26,11 +26,19 @@
     }
     grade.innerHTML = resultado.map((item) => {
       const visual = ELO_VISUAIS.categoria(item.categoria);
+      const imagem = item.imagem || item.foto;
+      const visualImagem = imagem
+        ? `<div class="available-photo"><img src="${esc(imagem)}" alt="Foto de ${esc(item.nome)}" loading="lazy"></div>`
+        : `<div class="available-photo available-photo-placeholder" aria-hidden="true"><span class="available-icon">${visual[0]}</span></div>`;
       return `<article class="available-card">
-        <div class="available-card-top"><span class="available-icon" aria-hidden="true">${visual[0]}</span><span class="available-status">Disponível</span></div>
+        ${visualImagem}
+        <div class="available-card-top"><div class="available-status">Disponível</div></div>
         <h2>${esc(item.nome)}</h2>
-        <p class="available-kind">${esc(item.categoria || "Outros")}</p>
-        <p class="available-code">Código do item: ${esc(item.patrimonio)}</p>
+        <div class="available-meta">
+          <span>${esc(item.categoria || "Outros")}</span>
+          <span>Patrimônio: ${esc(item.patrimonio || "—")}</span>
+          <span>Setor: ${esc(item.setor || "—")}</span>
+        </div>
         <a class="btn btn-primary" href="novo-emprestimo.html?equipamentoId=${encodeURIComponent(item.id)}">Reservar <span aria-hidden="true">→</span></a>
       </article>`;
     }).join("");

@@ -19,9 +19,9 @@ html {
   --muted: #a7b0c5;
 
   /* Marca */
-  --purple: #8b5cf6;
-  --purple-deep: #6d28d9;
-  --purple-light: #a855f7;
+  --purple: #2563eb;       /* azul principal da marca */
+  --purple-deep: #1d4ed8;  /* azul escuro da marca */
+  --purple-light: #ec4899; /* rosa principal da marca */
   --blue: #3b82f6;
   --cyan: #22d3ee;
 
@@ -286,4 +286,12 @@ body:not(.qr-page) .main {
   body:not(.qr-page) .main {
     animation: none;
   }
+}
+
+
+/* Em telas móveis, não use o zoom global do desktop: evita que o body
+   fique maior que o viewport (ex.: 433px de layout em uma tela de 390px). */
+@media (max-width: 899px) {
+  html { zoom: 1; }
+  body { min-height: 100vh; }
 }

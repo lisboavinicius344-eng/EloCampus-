@@ -185,7 +185,7 @@
 
   async function reativar(item) {
     if (ocupada) return;
-    if (!window.confirm(`Reativar o cadastro de ${item.nome}? O solicitante voltará a poder ser selecionado nos fluxos permitidos.`)) return;
+    if (!(await EloUtil.confirm(`Reativar o cadastro de ${item.nome}? O solicitante voltará a poder ser selecionado nos fluxos permitidos.`))) return;
     ocupada = true;
     try {
       const resposta = await ELO.reativarSolicitante(item.id);
@@ -200,7 +200,7 @@
 
   async function desativar(item) {
     if (ocupada) return;
-    const confirmar = window.confirm(`Desativar o cadastro de ${item.nome}? O histórico será preservado, mas o cadastro não poderá ser usado em novos fluxos.`);
+    const confirmar = await EloUtil.confirm(`Desativar o cadastro de ${item.nome}? O histórico será preservado, mas o cadastro não poderá ser usado em novos fluxos.`);
     if (!confirmar) return;
     ocupada = true;
     try {

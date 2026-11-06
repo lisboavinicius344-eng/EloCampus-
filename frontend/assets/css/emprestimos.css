@@ -25,16 +25,16 @@ html {
   --text-2: #a9b0e0;
 
   /* marca (da logo) */
-  --purple: #4b0ff0;
-  --violet: #9b2cf5;
-  --magenta: #d23be0;
-  --pink: #ff4fd0;
-  --blue: #2f6bff;
-  --cyan: #00d1ff;
+  --purple: #2563eb;
+  --violet: #3b82f6;
+  --magenta: #ec4899;
+  --pink: #f472b6;
+  --blue: #2563eb;
+  --cyan: #22d3ee;
 
-  --grad-main: linear-gradient(135deg, #4b0ff0, #9b2cf5 60%, #d23be0);
-  --grad-cool: linear-gradient(135deg, #2f6bff, #00d1ff);
-  --grad-warm: linear-gradient(135deg, #c02ef0, #ff4fd0);
+  --grad-main: linear-gradient(135deg, #1d4ed8, #2563eb 55%, #ec4899);
+  --grad-cool: linear-gradient(135deg, #2563eb, #22d3ee);
+  --grad-warm: linear-gradient(135deg, #db2777, #f472b6);
 
   /* status */
   --ok-bg: #0f3b36;
@@ -526,4 +526,9 @@ td small {
 @media (prefers-reduced-motion: reduce) {
   #lista-emprestimos tr[data-item-id],
   #lista-emprestimos tr[data-item-id]:hover td { animation: none; transition: none; }
+}
+
+@media (max-width: 899px) {
+  html { zoom: 1; }
+  .app { min-height: 100vh; }
 }

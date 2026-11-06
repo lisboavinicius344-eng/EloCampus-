@@ -52,20 +52,17 @@
             const result = await ELO.aprovarSolicitacaoAcesso(pedido.id, payload);
             card.replaceChildren(); const done = document.createElement("div"); done.className = "access-card";
             const text = document.createElement("p"); text.textContent = result?.mensagem || "Solicitação aprovada."; done.append(text);
-            if (result?.email_enviado === false && result?.senha_provisoria) {
-              const warning = document.createElement("div"); warning.className = "access-password";
-              const label = document.createElement("p"); label.textContent = "O e-mail não foi enviado. Esta senha provisória será exibida somente nesta tela, uma única vez. Repasse-a ao usuário por um canal seguro.";
-              const code = document.createElement("code"); code.textContent = String(result.senha_provisoria);
-              const copy = document.createElement("button"); copy.type = "button"; copy.className = "btn btn-line"; copy.textContent = "Copiar senha provisória"; copy.addEventListener("click", () => { if (navigator.clipboard?.writeText) navigator.clipboard.writeText(code.textContent).then(() => informar("Senha copiada. Feche esta mensagem após repassá-la.", "ok")).catch(() => informar("Não foi possível copiar automaticamente. Selecione a senha e copie manualmente.", "info")); else informar("Selecione a senha e copie manualmente.", "info"); });
-              const dismiss = document.createElement("button"); dismiss.type = "button"; dismiss.className = "btn btn-primary"; dismiss.textContent = "Senha repassada / ocultar"; dismiss.addEventListener("click", () => { code.textContent = ""; warning.replaceChildren(); warning.textContent = "Senha provisória ocultada. Ela não pode ser recuperada por esta tela."; });
-              warning.append(label, code, copy, dismiss); done.append(warning);
-            } else if (result?.email_enviado === false) { const note = document.createElement("p"); note.textContent = "O e-mail não foi enviado. A API não retornou senha provisória para repasse; verifique o fluxo de entrega com a equipe técnica."; done.append(note); }
+            if (result?.email_enviado === false) {
+              const note = document.createElement("p");
+              note.textContent = "O e-mail não foi enviado. Use “Reenviar instruções” para tentar novamente.";
+              done.append(note);
+            }
             card.append(done); informar("Solicitação aprovada.", "ok"); await atualizarContador();
           } catch (e) { informar(e.message || "Não foi possível aprovar a solicitação.", "error"); approve.disabled = false; }
           finally { ocupada = false; }
         });
         const reject = document.createElement("button"); reject.type = "button"; reject.className = "btn btn-ghost"; reject.textContent = "Recusar";
-        reject.addEventListener("click", async () => { if (ocupada) return; const motivo = window.prompt("Motivo da recusa (opcional):", ""); if (motivo === null) return; if (!window.confirm(`Recusar a solicitação de ${pedido.nome || pedido.email}?`)) return; ocupada = true; reject.disabled = true; try { const r = await ELO.recusarSolicitacaoAcesso(pedido.id, motivo); informar(r?.mensagem || "Solicitação recusada.", "ok"); await atualizarContador(); await carregar(); } catch (e) { informar(e.message || "Não foi possível recusar a solicitação.", "error"); reject.disabled = false; } finally { ocupada = false; } });
+        reject.addEventListener("click", async () => { if (ocupada) return; const motivo = await EloUtil.prompt("Motivo da recusa (opcional)", "Você pode explicar brevemente por que a solicitação foi recusada."); if (motivo === null) return; if (!(await EloUtil.confirm(`Recusar a solicitação de ${pedido.nome || pedido.email}?`))) return; ocupada = true; reject.disabled = true; try { const r = await ELO.recusarSolicitacaoAcesso(pedido.id, motivo); informar(r?.mensagem || "Solicitação recusada.", "ok"); await atualizarContador(); await carregar(); } catch (e) { informar(e.message || "Não foi possível recusar a solicitação.", "error"); reject.disabled = false; } finally { ocupada = false; } });
         actions.append(approve, reject); card.append(actions); lista.append(card);
       });
       aviso.hidden = true;

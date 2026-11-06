@@ -44,18 +44,16 @@
 }
 
 
-.manutencoes-page .man-inativar-option {
-  display: flex;
-  align-items: flex-start;
-  gap: .8rem;
-  padding: .9rem 1rem;
-  border: 1px solid rgba(139, 92, 246, .34);
-  border-radius: 14px;
-  background: rgba(139, 92, 246, .07);
-  cursor: pointer;
+
+/* Seletores administrativos compactos e sem destaque excessivo. */
+.manutencoes-page select.input,
+.manutencoes-page select.input-block {
+  min-height: 44px;
+  height: 44px;
+  border-radius: 12px;
+  box-shadow: none;
 }
-.manutencoes-page .man-inativar-option input { flex: 0 0 auto; width: 18px; height: 18px; margin-top: .2rem; accent-color: var(--purple); }
-.manutencoes-page .man-inativar-option span { display: grid; gap: .2rem; }
-.manutencoes-page .man-inativar-option small { color: var(--muted); line-height: 1.45; }
-.manutencoes-page .man-inativacao-wrap { max-width: 720px; }
-.manutencoes-page .man-inativacao-wrap[hidden] { display: none !important; }
+.manutencoes-page select.input:hover,
+.manutencoes-page select.input-block:hover {
+  border-color: var(--border);
+}
