@@ -67,6 +67,8 @@
 
 @media print {
   @page { size: A4; margin: 10mm; }
+  html, body { background: #fff !important; }
+  html::before, html::after, body::before, body::after, .app::before, .app::after { display: none !important; }
 
   :root { --page-zoom: 1; }
   html, body { zoom: 1 !important; background: #fff !important; color: #000 !important; }

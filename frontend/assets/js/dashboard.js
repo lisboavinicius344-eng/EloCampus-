@@ -19,7 +19,7 @@
     const itens = [
       { rot: "Total de equipamentos", v: r.total, nota: "Itens cadastrados", cor: "var(--purple)" },
       { rot: "Disponíveis", v: r.disponiveis, nota: `${pct(r.disponiveis)}% do acervo, prontos para empréstimo`, cor: "var(--purple)" },
-      { rot: "Emprestados", v: r.emprestados, nota: "Em circulação, dentro do prazo", cor: "#9b7cf7" },
+      { rot: "Emprestados", v: r.emprestados, nota: "Em circulação", cor: "#9b7cf7" },
       { rot: "Em atraso", v: r.atrasados, cor: "#b18af8", alerta: r.atrasados > 0,
         nota: r.atrasados > 0 ? "Prazo vencido e ainda não devolvidos" : "Nenhum prazo vencido" },
     ];
@@ -81,8 +81,8 @@
       <li class="mov mov-${esc(m.classe)}">
         <span class="mov-ponto" aria-hidden="true"></span>
         <div>
-          <strong>${esc(m.tipo)}</strong>
-          <span>${esc(m.equipamento.nome)} · ${esc(m.equipamento.patrimonio)}</span>
+          <strong>${esc(EloUtil.tipoMovimentacao(m.tipo))}</strong>
+          <span>${esc(m.equipamento.nome)}${m.equipamento.patrimonio ? ` · ${esc(m.equipamento.patrimonio)}` : ""}</span>
           <small>${m.detalhe ? esc(m.detalhe) + " · " : ""}${dataHora(m.quando)} · por ${esc(m.por)}</small>
         </div>
       </li>`).join("")}</ul>`;

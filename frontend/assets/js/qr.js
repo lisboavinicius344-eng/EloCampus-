@@ -20,6 +20,7 @@
   const situacaoTexto = (valorBruto) => ({
     disponivel: "Disponível", emprestado: "Emprestado", atrasado: "Em atraso", manutencao: "Em manutenção",
     inativo: "Inativo", baixado: "Inativo", cancelado: "Cancelado", concluido: "Concluído", em_andamento: "Em andamento",
+    emprestimo: "Empréstimo", devolucao: "Devolução", baixa: "Baixa", manutencao_concluida: "Manutenção concluída", manutencao_cancelada: "Manutenção cancelada",
   }[String(valorBruto || "").toLowerCase()] || (valorBruto ? String(valorBruto).replace(/[_-]+/g, " ").replace(/^\p{L}/u, x => x.toLocaleUpperCase("pt-BR")) : "Não informado"));
   const formatarData = (v) => {
     if (!v) return "Não informado";
@@ -97,7 +98,7 @@
         container.innerHTML = '<p class="qr-muted-note">Nenhuma movimentação consta no histórico da API para este equipamento.</p>';
         return;
       }
-      container.innerHTML = `<ol class="qr-history-list">${movimentos.map(m => `<li><span class="qr-history-dot" aria-hidden="true"></span><div><strong>${esc(situacaoTexto(m.tipo || m.tipo_movimentacao))}</strong><p>${esc(m.detalhe || m.descricao || "Movimentação registrada")}</p><small>${esc(formatarData(m.quando || m.data_movimentacao))}${m.por || m.usuario_nome ? ` · ${esc(m.por || m.usuario_nome)}` : ""}</small></div></li>`).join("")}</ol>`;
+      container.innerHTML = `<ol class="qr-history-list">${movimentos.map(m => `<li><span class="qr-history-dot" aria-hidden="true"></span><div><strong>${esc(typeof EloUtil !== "undefined" && EloUtil.tipoMovimentacao ? EloUtil.tipoMovimentacao(m.tipo || m.tipo_movimentacao) : situacaoTexto(m.tipo || m.tipo_movimentacao))}</strong><p>${esc(m.detalhe || m.descricao || "Movimentação registrada")}</p><small>${esc(formatarData(m.quando || m.data_movimentacao))}${m.por || m.usuario_nome ? ` · ${esc(m.por || m.usuario_nome)}` : ""}</small></div></li>`).join("")}</ol>`;
     } catch {
       const container = section.querySelector("[data-qr-history]");
       if (container) container.innerHTML = '<p class="qr-muted-note">Não foi possível carregar o histórico agora. Os dados atuais do equipamento continuam disponíveis.</p>';

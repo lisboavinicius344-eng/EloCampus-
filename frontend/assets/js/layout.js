@@ -46,6 +46,19 @@ const EloUtil = {
     return { classe: "ok", texto: "Em dia" };
   },
 
+  // Rótulo em português para o tipo de movimentação vindo da API (GET /historico).
+  tipoMovimentacao(tipo) {
+    const chave = String(tipo ?? "").trim().toLowerCase();
+    const rotulos = {
+      emprestimo: "Empréstimo", retirada: "Empréstimo", devolucao: "Devolução",
+      manutencao: "Manutenção aberta", manutencao_concluida: "Manutenção concluída", manutencao_cancelada: "Manutenção cancelada",
+      baixa: "Baixa", cadastro: "Cadastro", reativacao: "Reativação",
+    };
+    if (rotulos[chave]) return rotulos[chave];
+    const texto = chave.replace(/[_-]+/g, " ").trim();
+    return texto ? texto[0].toLocaleUpperCase("pt-BR") + texto.slice(1) : "Movimentação";
+  },
+
   // Identifica se um empréstimo normalizado pertence à sessão. Usa o ID do solicitante
   // quando ambos existem; nome/matrícula ficam só como fallback (homônimos colidem).
   pertenceAoUsuario(l, sessao) {

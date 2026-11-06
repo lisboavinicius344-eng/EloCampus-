@@ -5,6 +5,11 @@
 html {
   zoom: var(--page-zoom);
 }
+/* Em celulares, sem zoom: senão o body passa a ter largura/0,9 (ex.: 390 px viram 433 px). */
+@media (max-width: 899px) {
+  :root { --page-zoom: 1; }
+  html { zoom: 1; }
+}
 
 /* ELO Campus — estilos globais
    Tokens e componentes compartilhados por todas as páginas. */
