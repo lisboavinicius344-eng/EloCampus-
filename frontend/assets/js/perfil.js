@@ -20,7 +20,12 @@
   }
 
   let atual = null;
-  ELO.perfil().then((p) => { atual = p; preencher(p); })
+  ELO.perfil().then((p) => {
+    atual = p;
+    preencher(p);
+    const sessao = obterSessao();
+    if (sessao && sessao.master !== (p.master === true)) salvarSessao({ ...sessao, master: p.master === true });
+  })
     .catch((e) => avisar(e.message || "Não foi possível carregar o perfil.", false));
 
   $("perfil-salvar")?.addEventListener("click", async () => {
@@ -35,7 +40,7 @@
     try {
       atual = await ELO.salvarPerfil(dados);
       preencher(atual);
-      salvarSessao({ ...obterSessao(), nome: atual.nome });  // menu lateral com o nome novo
+      salvarSessao({ ...obterSessao(), nome: atual.nome, master: atual.master === true });  // mantém nome e permissão atualizados
       avisar("Perfil atualizado com sucesso.", true);
     } catch (e) { avisar(e.message || "Não foi possível salvar.", false); }
     finally { botao.disabled = false; botao.textContent = "Salvar alterações"; }

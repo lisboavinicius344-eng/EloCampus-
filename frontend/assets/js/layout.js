@@ -72,9 +72,9 @@ const EloUtil = {
     return Boolean(chave(sessao?.nome)) && chave(l?.solicitante?.nome) === chave(sessao?.nome);
   },
 
+  // IDs de pessoas são informação restrita: somente a flag explícita da API libera a exibição.
   podeVerIdsInternos() {
-    const perfil = String(obterSessao()?.perfil || "").toLowerCase().replace(/[-\s]+/g, "_");
-    return ["master", "administrador_geral", "administrador_master"].includes(perfil);
+    return obterSessao()?.master === true;
   },
 };
 

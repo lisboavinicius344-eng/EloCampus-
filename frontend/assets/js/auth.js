@@ -53,6 +53,7 @@ async function autenticar(email, senha) {
     token: corpo.token,
     nome: usuario.nome,
     solicitante_id: usuario.solicitante_id,
+    master: usuario.master === true || corpo.master === true,
     deve_trocar_senha: Boolean(usuario.deve_trocar_senha),
   };
 }

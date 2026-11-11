@@ -6,6 +6,7 @@
   const esc = (value) => EloUtil.esc(value ?? "");
   const sessaoAtual = typeof obterSessao === "function" ? obterSessao() : null;
   const perfilAtual = String(sessaoAtual?.perfil || "").toLowerCase();
+  const mostrarIdsPessoas = sessaoAtual?.master === true;
   const usuarioFinal = ["aluno", "professor", "servidor"].includes(perfilAtual);
   const parametrosIniciais = new URLSearchParams(location.search);
   if (!sessaoAtual) return; // layout.js já redireciona para o login se não houver sessão.
@@ -155,22 +156,28 @@
           campoSolicitante.type = "search";
           campoSolicitante.removeAttribute("readonly");
           campoSolicitante.setAttribute("list", "lista-solicitantes");
-          campoSolicitante.placeholder = "Pesquise por nome ou matrícula";
+          campoSolicitante.placeholder = mostrarIdsPessoas ? "Pesquise por nome, matrícula ou ID" : "Pesquise por nome, matrícula ou e-mail";
           campoSolicitante.required = true;
           const lista = $("lista-solicitantes");
-              lista.replaceChildren(...solicitantesDisponiveis.map(x => new Option(`${x.nome} · ${x.matricula || "cadastro sem matrícula"}`, `${x.nome} · ${x.matricula || "cadastro sem matrícula"}`)));
+          const identificadorVisivel = (pessoa) => pessoa.matricula || (mostrarIdsPessoas ? pessoa.id : pessoa.email) || (mostrarIdsPessoas ? "cadastro sem matrícula" : "sem e-mail");
+          const rotuloSolicitante = (pessoa) => `${pessoa.nome} · ${identificadorVisivel(pessoa)}`;
+          lista.replaceChildren(...solicitantesDisponiveis.map(x => new Option(rotuloSolicitante(x), rotuloSolicitante(x))));
           const selecionarSolicitante = () => {
             const termo = normalizarBusca(campoSolicitante.value);
             solicitanteSelecionado = solicitantesDisponiveis.find(x =>
               normalizarBusca(x.nome) === termo ||
-              normalizarBusca(`${x.nome} · ${x.matricula || x.id}`) === termo ||
+              normalizarBusca(rotuloSolicitante(x)) === termo ||
               normalizarBusca(x.matricula) === termo ||
+              normalizarBusca(x.email) === termo ||
               normalizarBusca(String(x.id)) === termo
             ) || null;
             if (solicitanteSelecionado) {
               const tipo = normalizarBusca(solicitanteSelecionado.tipo);
               campoVinculo.value = tipo.includes("prof") ? "professor" : tipo.includes("serv") || tipo.includes("tecn") ? "servidor" : "aluno";
-              $("resumo-solicitante").textContent = `${solicitanteSelecionado.nome}${solicitanteSelecionado.matricula ? ` · ${solicitanteSelecionado.matricula}` : ""}`;
+              const identificadorResumo = mostrarIdsPessoas
+                ? [solicitanteSelecionado.matricula, `#${solicitanteSelecionado.id}`].filter(Boolean).join(" · ")
+                : (solicitanteSelecionado.matricula || solicitanteSelecionado.email);
+              $("resumo-solicitante").textContent = `${solicitanteSelecionado.nome}${identificadorResumo ? ` · ${identificadorResumo}` : ""}`;
             } else {
               $("resumo-solicitante").textContent = "Selecione um cadastro válido";
             }
@@ -181,7 +188,7 @@
           selecionarSolicitante();
           campoSolicitante.addEventListener("input", () => {
             const termo = normalizarBusca(campoSolicitante.value);
-            if (!solicitantesDisponiveis.some(x => normalizarBusca(`${x.nome} · ${x.matricula || x.id}`) === termo || normalizarBusca(x.nome) === termo || normalizarBusca(x.matricula) === termo)) {
+            if (!solicitantesDisponiveis.some(x => normalizarBusca(rotuloSolicitante(x)) === termo || normalizarBusca(x.nome) === termo || normalizarBusca(x.matricula) === termo || normalizarBusca(x.email) === termo || normalizarBusca(String(x.id)) === termo)) {
               solicitanteSelecionado = null;
               $("resumo-solicitante").textContent = "Selecione um cadastro válido";
             }
@@ -272,7 +279,12 @@
       finalidade: $("finalidade").value,
       observacoes: [$("obs").value.trim(), (!usuarioFinal && campoVinculo.value === "grupo_setor" ? `Grupo/setor: ${campoVinculoDetalhe.value.trim()}` : ""), (!usuarioFinal && campoVinculo.value === "outro" ? `Vínculo: ${campoVinculoDetalhe.value.trim()}` : "")].filter(Boolean).join(" — "),
     };
-    resumoReview.innerHTML = `<div class="stack-sm">${usuarioFinal ? "" : `<div class="summary-row"><span>Solicitante</span><strong>${esc(dadosParaConfirmar.solicitante)}</strong></div><div class="summary-row"><span>Vínculo</span><strong>${esc(rotulosVinculo[dadosParaConfirmar.vinculo] || dadosParaConfirmar.vinculo)}${dadosParaConfirmar.vinculo === "grupo_setor" ? ` · ${esc(campoVinculoDetalhe.value.trim())}` : ""}</strong></div><div class="summary-row"><span>Retirada</span><strong>No momento da confirmação (horário do servidor)</strong></div>`}<div class="summary-row"><span>Devolução prevista</span><strong>${esc(formatarCampoData($("devolucao").value))}</strong></div><div><strong>Equipamentos</strong><ul>${selecionados.map((e) => `<li>${esc(e.nome)} · ${esc(e.patrimonio)}</li>`).join("")}</ul></div>${dadosParaConfirmar.observacoes ? `<p><strong>Observações:</strong> ${esc(dadosParaConfirmar.observacoes)}</p>` : ""}</div><p class="muted">${usuarioFinal ? "Seu pedido será enviado ao servidor para análise da equipe. O equipamento só estará liberado após aprovação e registro da retirada." : "A confirmação enviará a retirada para registro no sistema oficial."}</p>`;
+    const identificadorConfirmacao = !usuarioFinal && solicitanteSelecionado
+      ? (mostrarIdsPessoas
+        ? [solicitanteSelecionado.matricula, `#${solicitanteSelecionado.id}`].filter(Boolean).join(" · ")
+        : (solicitanteSelecionado.matricula || solicitanteSelecionado.email))
+      : "";
+    resumoReview.innerHTML = `<div class="stack-sm">${usuarioFinal ? "" : `<div class="summary-row"><span>Solicitante</span><strong>${esc(dadosParaConfirmar.solicitante)}${identificadorConfirmacao ? ` · ${esc(identificadorConfirmacao)}` : ""}</strong></div><div class="summary-row"><span>Vínculo</span><strong>${esc(rotulosVinculo[dadosParaConfirmar.vinculo] || dadosParaConfirmar.vinculo)}${dadosParaConfirmar.vinculo === "grupo_setor" ? ` · ${esc(campoVinculoDetalhe.value.trim())}` : ""}</strong></div><div class="summary-row"><span>Retirada</span><strong>No momento da confirmação (horário do servidor)</strong></div>`}<div class="summary-row"><span>Devolução prevista</span><strong>${esc(formatarCampoData($("devolucao").value))}</strong></div><div><strong>Equipamentos</strong><ul>${selecionados.map((e) => `<li>${esc(e.nome)} · ${esc(e.patrimonio)}</li>`).join("")}</ul></div>${dadosParaConfirmar.observacoes ? `<p><strong>Observações:</strong> ${esc(dadosParaConfirmar.observacoes)}</p>` : ""}</div><p class="muted">${usuarioFinal ? "Seu pedido será enviado ao servidor para análise da equipe. O equipamento só estará liberado após aprovação e registro da retirada." : "A confirmação enviará a retirada para registro no sistema oficial."}</p>`;
     form.hidden = true;
     formReview.hidden = false;
     $("confirmar-emprestimo").focus();

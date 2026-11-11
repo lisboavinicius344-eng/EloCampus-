@@ -177,7 +177,7 @@
     email.value = item.email || "";
     $("solicitante-matricula").value = item.matricula || "";
     telefone.value = item.telefone || "";
-    $("solicitante-form-titulo").textContent = `Editar solicitante #${item.id}`;
+    $("solicitante-form-titulo").textContent = mostrarIds ? `Editar solicitante #${item.id}` : "Editar solicitante";
     submit.textContent = "Salvar alterações";
     cancel.hidden = false;
     const reduzirMovimento = Boolean(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
@@ -191,7 +191,7 @@
     ocupada = true;
     try {
       const resposta = await ELO.reativarSolicitante(item.id);
-      mostrarAviso(resposta?.mensagem || `Solicitante #${item.id} reativado.`, "ok");
+      mostrarAviso(resposta?.mensagem || (mostrarIds ? `Solicitante #${item.id} reativado.` : `Solicitante ${item.nome} reativado.`), "ok");
       await carregar({ silencioso: true });
     } catch (erro) {
       mostrarAviso(erro.message || "Não foi possível reativar o solicitante.", "error");
@@ -207,7 +207,7 @@
     ocupada = true;
     try {
       await ELO.desativarSolicitante(item.id);
-      mostrarAviso(`Solicitante #${item.id} desativado. O registro histórico foi preservado.`, "ok");
+      mostrarAviso(mostrarIds ? `Solicitante #${item.id} desativado. O registro histórico foi preservado.` : `Solicitante ${item.nome} desativado. O registro histórico foi preservado.`, "ok");
       await carregar({ silencioso: true });
     } catch (erro) {
       mostrarAviso(erro.message || "Não foi possível desativar o solicitante.", "error");
@@ -249,7 +249,7 @@
       const resposta = id ? await ELO.salvarSolicitante(id, dados) : await ELO.criarSolicitante(dados);
       const registro = resposta?.solicitante || resposta?.data?.solicitante || null;
       if (id) {
-        mostrarAviso(resposta?.mensagem || `Cadastro do solicitante #${id} atualizado.`, "ok");
+        mostrarAviso(resposta?.mensagem || (mostrarIds ? `Cadastro do solicitante #${id} atualizado.` : `Cadastro de ${dados.nome} atualizado.`), "ok");
       } else {
         mostrarAviso(resposta?.mensagem || "Solicitante cadastrado.", "ok");
       }
