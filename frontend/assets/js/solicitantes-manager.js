@@ -20,6 +20,8 @@
   const filtroStatus = $("solicitante-status");
   const filtroTipo = $("solicitante-filtro-tipo");
   const contagem = $("solicitante-contagem");
+  const mostrarIds = EloUtil.podeVerIdsInternos();
+  document.querySelectorAll("[data-id-column]").forEach((el) => { el.hidden = !mostrarIds; });
   let solicitantes = [];
   let ocupada = false;
 
@@ -84,7 +86,7 @@
     if (!filtrados.length) {
       const linha = document.createElement("tr");
       const mensagem = elemento("td", solicitantes.length ? "Nenhum solicitante corresponde aos filtros." : "Nenhum solicitante cadastrado na API.", "estado-vazio");
-      mensagem.colSpan = 8;
+      mensagem.colSpan = mostrarIds ? 8 : 7;
       linha.appendChild(mensagem);
       tbody.appendChild(linha);
       return;
@@ -92,7 +94,7 @@
 
     filtrados.forEach((item) => {
       const linha = document.createElement("tr");
-      celula(linha, String(item.id ?? "—"), "solicitante-code");
+      if (EloUtil.podeVerIdsInternos()) celula(linha, String(item.id ?? "—"), "solicitante-code");
 
       const pessoa = document.createElement("td");
       pessoa.appendChild(elemento("span", item.nome || "Nome não informado", "solicitante-primary"));
@@ -133,7 +135,7 @@
     tbody.replaceChildren();
     const carregando = document.createElement("tr");
     const celulaCarregando = elemento("td", "Consultando solicitantes na API…", "estado-vazio");
-    celulaCarregando.colSpan = 8;
+    celulaCarregando.colSpan = mostrarIds ? 8 : 7;
     carregando.appendChild(celulaCarregando);
     tbody.appendChild(carregando);
     try {
@@ -146,7 +148,7 @@
       tbody.replaceChildren();
       const linha = document.createElement("tr");
       const mensagem = elemento("td", "Não foi possível carregar os solicitantes. Confirme a sessão e se a API disponibiliza GET /solicitantes para este perfil.", "estado-vazio");
-      mensagem.colSpan = 8;
+      mensagem.colSpan = mostrarIds ? 8 : 7;
       linha.appendChild(mensagem);
       tbody.appendChild(linha);
       contagem.textContent = "—";

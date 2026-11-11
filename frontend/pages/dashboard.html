@@ -11,10 +11,10 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-  <link rel="stylesheet" href="../assets/css/style.css?v=2026.11.06.4">
-  <link rel="stylesheet" href="../assets/css/layout.css?v=2026.11.06.4">
-  <link rel="stylesheet" href="../assets/css/dashboard.css?v=2026.11.06.4">
-  <link rel="stylesheet" href="../assets/css/page-polish.css?v=2026.11.06.4">
+  <link rel="stylesheet" href="../assets/css/style.css?v=2026.11.11.1">
+  <link rel="stylesheet" href="../assets/css/layout.css?v=2026.11.11.1">
+  <link rel="stylesheet" href="../assets/css/dashboard.css?v=2026.11.11.1">
+  <link rel="stylesheet" href="../assets/css/page-polish.css?v=2026.11.11.1">
 </head>
 <body data-pagina="painel">
   <div class="app">
@@ -33,6 +33,7 @@
           <a class="btn btn-primary" href="equipamento-form.html">+ Cadastrar equipamento</a>
         </div>
         <div class="alert alert-error dashboard-api-alert" id="erro" role="alert" hidden></div>
+        <div class="dashboard-overdue-alert" id="alerta-atrasos" role="alert" aria-live="polite" hidden></div>
 
         <section id="inicio-usuario" class="self-home" hidden aria-label="Seu espaço">
           <div id="reservas-aprovadas" class="reservas-aprovadas-list" role="status" aria-live="polite" hidden></div>
@@ -94,11 +95,11 @@
             <section class="panel" aria-labelledby="t-acoes">
               <h2 class="panel-title" id="t-acoes">Ações rápidas</h2><p class="muted acao-hint">Escolha uma operação para continuar.</p>
               <ul class="acoes">
-                <li><a class="acao" href="novo-emprestimo.html">+ Nova solicitação</a></li>
-                <li><a class="acao" href="reservas.html">Minhas reservas</a></li>
-                <li><a class="acao" href="consulta-qr-interno.html">Consultar QR Code</a></li>
+                <li><a class="acao" href="novo-emprestimo.html">+ Novo empréstimo</a></li>
+                <li><a class="acao" href="devolucoes.html">Registrar devolução</a></li>
                 <li><a class="acao" href="equipamentos.html">Consultar equipamentos</a></li>
-                <li><a class="acao" href="emprestimos.html">Acompanhar empréstimos</a></li>
+                <li><a class="acao" href="reservas.html">Revisar reservas</a></li>
+                <li><a class="acao" href="emprestimos.html?filtro=atrasados">Acompanhar atrasos</a></li>
                 <li><a class="acao" href="movimentacoes.html">Abrir histórico de movimentações</a></li>
               </ul>
             </section>
@@ -113,10 +114,10 @@
     </div>
   </div>
 
-  <script src="../assets/js/auth.js?v=2026.11.06.4"></script>
-  <script src="../assets/js/layout.js?v=2026.11.06.4"></script>
-  <script src="../assets/js/runtime-config.js?v=2026.11.06.4"></script>
-  <script src="../assets/js/api.js?v=2026.11.06.4"></script>
-  <script src="../assets/js/dashboard.js?v=2026.11.06.4"></script>
+  <script src="../assets/js/auth.js?v=2026.11.11.1"></script>
+  <script src="../assets/js/layout.js?v=2026.11.11.1"></script>
+  <script src="../assets/js/runtime-config.js?v=2026.11.11.1"></script>
+  <script src="../assets/js/api.js?v=2026.11.11.1"></script>
+  <script src="../assets/js/dashboard.js?v=2026.11.11.1"></script>
 </body>
 </html>

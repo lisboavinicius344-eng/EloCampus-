@@ -99,7 +99,7 @@
             const tr = document.createElement("tr");
             const data = movimento.data_movimentacao || movimento.data || movimento.criado_em;
             const dataFormatada = data ? new Date(data).toLocaleString("pt-BR") : "—";
-            [dataFormatada, movimento.tipo_movimentacao || movimento.tipo || "—", movimento.descricao || movimento.detalhe || "—", movimento.usuario_nome || movimento.usuario || movimento.responsavel || "—"].forEach((valor) => {
+            [dataFormatada, EloUtil.tipoMovimentacao(movimento.tipo_movimentacao || movimento.tipo), movimento.descricao || movimento.detalhe || movimento.observacoes || "—", movimento.usuario_nome || movimento.usuario || movimento.responsavel || "—"].forEach((valor) => {
               const td = document.createElement("td");
               td.textContent = String(valor);
               tr.appendChild(td);

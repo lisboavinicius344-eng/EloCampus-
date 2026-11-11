@@ -10,10 +10,10 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../assets/css/style.css?v=2026.11.06.4">
-  <link rel="stylesheet" href="../assets/css/layout.css?v=2026.11.06.4">
-  <link rel="stylesheet" href="../assets/css/solicitantes.css?v=2026.11.06.4">
-<link rel="stylesheet" href="../assets/css/page-polish.css?v=2026.11.06.4"></head>
+  <link rel="stylesheet" href="../assets/css/style.css?v=2026.11.11.1">
+  <link rel="stylesheet" href="../assets/css/layout.css?v=2026.11.11.1">
+  <link rel="stylesheet" href="../assets/css/solicitantes.css?v=2026.11.11.1">
+<link rel="stylesheet" href="../assets/css/page-polish.css?v=2026.11.11.1"></head>
 <body data-pagina="solicitantes">
   <div class="app">
     <aside class="sidebar" id="sidebar"></aside>
@@ -86,14 +86,14 @@
             <div class="solicitante-list-heading">
               <div>
                 <h2 id="solicitante-lista-titulo">Cadastros existentes</h2>
-                <p class="muted">O ID é gerado pelo banco e não substitui a matrícula institucional.</p>
+                <p class="muted">A matrícula institucional é a identificação funcional usada no dia a dia.</p>
               </div>
               <span class="solicitante-count" id="solicitante-contagem" aria-live="polite">—</span>
             </div>
             <div class="solicitante-filters">
               <div class="field">
                 <label for="solicitante-busca">Pesquisar</label>
-                <input class="input input-block" id="solicitante-busca" type="search" placeholder="Nome, ID, matrícula ou e-mail" autocomplete="off">
+                    <input class="input input-block" id="solicitante-busca" type="search" placeholder="Nome, matrícula ou e-mail" autocomplete="off">
               </div>
               <div class="field">
                 <label for="solicitante-status">Situação</label>
@@ -117,7 +117,7 @@
             </div>
             <div class="table-wrap">
               <table class="table solicitantes-table">
-                <thead><tr><th>ID</th><th>Solicitante</th><th>Vínculo</th><th>Matrícula / SIAPE</th><th>Contato</th><th>Conta</th><th>Situação</th><th>Ações</th></tr></thead>
+                <thead><tr><th data-id-column>ID</th><th>Solicitante</th><th>Vínculo</th><th>Matrícula / SIAPE</th><th>Contato</th><th>Conta</th><th>Situação</th><th>Ações</th></tr></thead>
                 <tbody id="solicitantes-tbody"><tr><td colspan="8" class="estado-vazio">Carregando cadastros da API…</td></tr></tbody>
               </table>
             </div>
@@ -127,10 +127,10 @@
       </main>
     </div>
   </div>
-  <script src="../assets/js/runtime-config.js?v=2026.11.06.4"></script>
-  <script src="../assets/js/api.js?v=2026.11.06.4"></script>
-  <script src="../assets/js/auth.js?v=2026.11.06.4"></script>
-  <script src="../assets/js/layout.js?v=2026.11.06.4"></script>
-  <script src="../assets/js/solicitantes-manager.js?v=2026.11.06.4"></script>
+  <script src="../assets/js/runtime-config.js?v=2026.11.11.1"></script>
+  <script src="../assets/js/api.js?v=2026.11.11.1"></script>
+  <script src="../assets/js/auth.js?v=2026.11.11.1"></script>
+  <script src="../assets/js/layout.js?v=2026.11.11.1"></script>
+  <script src="../assets/js/solicitantes-manager.js?v=2026.11.11.1"></script>
 </body>
 </html>
