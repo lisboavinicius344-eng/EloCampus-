@@ -11,10 +11,10 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-  <link rel="stylesheet" href="../assets/css/style.css?v=2026.11.11.3">
-  <link rel="stylesheet" href="../assets/css/layout.css?v=2026.11.11.3">
+  <link rel="stylesheet" href="../assets/css/style.css?v=2026.11.11.2">
+  <link rel="stylesheet" href="../assets/css/layout.css?v=2026.11.11.2">
   <link rel="stylesheet" href="../assets/css/dashboard.css?v=2026.11.11.3">
-  <link rel="stylesheet" href="../assets/css/page-polish.css?v=2026.11.11.3">
+  <link rel="stylesheet" href="../assets/css/page-polish.css?v=2026.11.11.2">
 </head>
 <body data-pagina="painel">
   <div class="app">
@@ -24,17 +24,18 @@
       <header class="topbar" id="topbar"></header>
 
       <main class="main">
-        <div class="page-head dashboard-page-head">
+        <header class="page-head dashboard-page-head">
           <div class="dashboard-heading-copy">
-            <span class="self-greeting-label">SEU ESPAÇO</span>
+            <span class="dashboard-eyebrow">CENTRO DE OPERAÇÕES</span>
             <h1>Painel</h1>
-            <p>Veja o que você precisa e resolva tudo em poucos passos.</p>
+            <p>Uma visão clara do acervo, dos prazos e das próximas ações da equipe.</p>
           </div>
           <div class="page-head-actions">
             <a class="btn btn-primary" href="novo-emprestimo.html">+ Novo empréstimo</a>
-            <a class="btn btn-line" href="equipamento-form.html">Cadastrar equipamento</a>
+            <a class="btn btn-ghost" href="equipamento-form.html">Cadastrar equipamento</a>
           </div>
-        </div>
+          <div class="dashboard-live-status"><span aria-hidden="true"></span><span>Dados do acervo em tempo real</span></div>
+        </header>
         <div class="alert alert-error dashboard-api-alert" id="erro" role="alert" hidden></div>
         <div class="dashboard-overdue-alert" id="alerta-atrasos" role="alert" aria-live="polite" hidden></div>
 
@@ -77,51 +78,75 @@
           </div>
         </section>
 
+        <section class="dashboard-actions" aria-labelledby="t-acoes">
+          <header class="dashboard-section-heading">
+            <span class="dashboard-section-kicker" id="t-acoes">AÇÕES RÁPIDAS</span>
+          </header>
+          <div class="admin-actions">
+            <a class="self-action admin-action admin-action-loan" href="novo-emprestimo.html">
+              <span class="self-action-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg></span>
+              <span class="self-action-copy"><strong>Novo empréstimo</strong><small>Registre uma retirada e vincule os equipamentos ao solicitante.</small></span>
+              <span class="self-action-arrow" aria-hidden="true">→</span>
+            </a>
+            <a class="self-action admin-action admin-action-return" href="devolucoes.html">
+              <span class="self-action-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14 4 9l5-5"/><path d="M4 9h10a6 6 0 0 1 0 12h-3"/></svg></span>
+              <span class="self-action-copy"><strong>Registrar devolução</strong><small>Confira os itens que voltaram, mesmo antes do prazo.</small></span>
+              <span class="self-action-arrow" aria-hidden="true">→</span>
+            </a>
+            <a class="self-action admin-action admin-action-inventory" href="equipamentos.html">
+              <span class="self-action-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m3 7 9-4 9 4v10l-9 4-9-4z"/><path d="m3 7 9 4 9-4M12 11v10"/></svg></span>
+              <span class="self-action-copy"><strong>Consultar equipamentos</strong><small>Localize patrimônio, situação, setor e histórico do acervo.</small></span>
+              <span class="self-action-arrow" aria-hidden="true">→</span>
+            </a>
+            <a class="self-action admin-action admin-action-reserve" href="reservas.html">
+              <span class="self-action-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M7 3v4M17 3v4M3 10h18M8 14h3M8 17h6"/></svg></span>
+              <span class="self-action-copy"><strong>Revisar reservas</strong><small>Analise pedidos pendentes e confirme as aprovações com segurança.</small></span>
+              <span class="self-action-arrow" aria-hidden="true">→</span>
+            </a>
+            <a class="self-action admin-action admin-action-late" href="emprestimos.html?filtro=atrasados">
+              <span class="self-action-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4M12 17h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/></svg></span>
+              <span class="self-action-copy"><strong>Acompanhar atrasos</strong><small>Priorize prazos vencidos e reduza pendências do acervo.</small></span>
+              <span class="self-action-arrow" aria-hidden="true">→</span>
+            </a>
+            <a class="self-action admin-action admin-action-history" href="movimentacoes.html">
+              <span class="self-action-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M4 12h16M4 18h10"/><circle cx="18" cy="18" r="3"/><path d="M18 16.5v1.7l1 1"/></svg></span>
+              <span class="self-action-copy"><strong>Histórico de movimentações</strong><small>Veja as últimas retiradas, devoluções e manutenções.</small></span>
+              <span class="self-action-arrow" aria-hidden="true">→</span>
+            </a>
+          </div>
+        </section>
+
+
         <section aria-label="Indicadores">
           <div class="kpis" id="kpis" aria-live="polite">
             <p class="muted">Carregando indicadores…</p>
           </div>
         </section>
 
-        <section class="panel" aria-labelledby="t-dist">
+        <section class="panel dashboard-distribution" aria-labelledby="t-dist">
           <h2 class="panel-title" id="t-dist">Situação dos equipamentos</h2>
           <div id="dist"><p class="muted">Carregando…</p></div>
         </section>
 
-        <section class="dashboard-actions" aria-labelledby="t-acoes">
-          <div class="dashboard-actions-head">
-            <div><span class="dashboard-kicker">OPERAÇÕES DO ACERVO</span><h2 id="t-acoes">Ações rápidas</h2></div>
-            <p>Os atalhos mais usados pela equipe, organizados para consulta imediata.</p>
-          </div>
-          <div class="dashboard-action-grid">
-            <a class="dashboard-action" href="novo-emprestimo.html"><span class="dashboard-action-icon">+</span><span><strong>Novo empréstimo</strong><small>Registrar retirada</small></span><b aria-hidden="true">→</b></a>
-            <a class="dashboard-action" href="devolucoes.html"><span class="dashboard-action-icon">↩</span><span><strong>Registrar devolução</strong><small>Conferir retorno</small></span><b aria-hidden="true">→</b></a>
-            <a class="dashboard-action" href="reservas.html"><span class="dashboard-action-icon">▣</span><span><strong>Revisar reservas</strong><small>Analisar solicitações</small></span><b aria-hidden="true">→</b></a>
-            <a class="dashboard-action" href="equipamentos.html"><span class="dashboard-action-icon">□</span><span><strong>Consultar equipamentos</strong><small>Localizar patrimônio</small></span><b aria-hidden="true">→</b></a>
-          </div>
-        </section>
 
         <div class="dash-grid">
           <section class="panel" aria-labelledby="t-acomp">
-            <h2 class="panel-title" id="t-acomp">Empréstimos a acompanhar</h2>
+            <header class="panel-heading-row"><div><span class="panel-kicker">ATENÇÃO OPERACIONAL</span><h2 class="panel-title" id="t-acomp">Empréstimos a acompanhar</h2></div><a class="panel-link" href="emprestimos.html">Ver todos</a></header>
             <div class="table-wrap" id="acompanhar"><p class="muted">Carregando…</p></div>
           </section>
-
-          <div class="dash-col">
-            <section class="panel" aria-labelledby="t-movs">
-              <h2 class="panel-title" id="t-movs">Movimentações recentes</h2>
-              <div id="movs"><p class="muted">Carregando…</p></div>
-            </section>
-          </div>
+          <section class="panel" aria-labelledby="t-movs">
+            <header class="panel-heading-row"><div><span class="panel-kicker">RASTREABILIDADE</span><h2 class="panel-title" id="t-movs">Movimentações recentes</h2></div><a class="panel-link" href="movimentacoes.html">Abrir histórico</a></header>
+            <div id="movs"><p class="muted">Carregando…</p></div>
+          </section>
         </div>
       </main>
     </div>
   </div>
 
-  <script src="../assets/js/auth.js?v=2026.11.11.3"></script>
-  <script src="../assets/js/layout.js?v=2026.11.11.3"></script>
-  <script src="../assets/js/runtime-config.js?v=2026.11.11.3"></script>
-  <script src="../assets/js/api.js?v=2026.11.11.3"></script>
-  <script src="../assets/js/dashboard.js?v=2026.11.11.3"></script>
+  <script src="../assets/js/auth.js?v=2026.11.11.2"></script>
+  <script src="../assets/js/layout.js?v=2026.11.11.2"></script>
+  <script src="../assets/js/runtime-config.js?v=2026.11.11.2"></script>
+  <script src="../assets/js/api.js?v=2026.11.11.2"></script>
+  <script src="../assets/js/dashboard.js?v=2026.11.11.2"></script>
 </body>
 </html>

@@ -11,10 +11,10 @@
   <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../assets/css/emprestimos.css?v=2026.11.11.2">
   <link rel="stylesheet" href="../assets/css/style.css?v=2026.11.11.2">
-  <link rel="stylesheet" href="../assets/css/devolucoes.css?v=2026.11.11.3">
+  <link rel="stylesheet" href="../assets/css/devolucoes.css?v=2026.11.11.2">
   <link rel="stylesheet" href="../assets/css/layout.css?v=2026.11.11.2">
   <link rel="stylesheet" href="../assets/css/salz-bridge.css?v=2026.11.11.2">
-  <link rel="stylesheet" href="../assets/css/page-polish.css?v=2026.11.11.3">
+  <link rel="stylesheet" href="../assets/css/page-polish.css?v=2026.11.11.2">
 </head>
 <body data-pagina="devolucoes">
   <div class="app">
@@ -60,18 +60,6 @@
     <div class="split">
       <!-- Histórico + fila -->
       <div class="grow-2 stack">
-        <section class="card" aria-label="Aguardando devolução hoje">
-          <div class="card-title"><h2>Aguardando hoje</h2></div>
-          <ul class="queue" id="fila-devolucao"><li class="muted">Carregando itens com devolução prevista para hoje…</li></ul>
-        </section>
-
-        <section class="card active-loans-card" aria-label="Empréstimos em andamento">
-          <div class="card-title">
-            <div><h2>Empréstimos em andamento</h2><p class="muted small">Localize qualquer item ativo e registre uma devolução antecipada.</p></div>
-          </div>
-          <div class="active-loans-list" id="lista-emprestimos-ativos" aria-live="polite"><p class="muted">Carregando empréstimos ativos…</p></div>
-        </section>
-
         <section class="card" aria-label="Devoluções recentes">
           <div class="card-title">
             <h2>Devoluções recentes</h2>
@@ -83,10 +71,26 @@
           </div>
           <div class="table-wrap">
             <table>
-              <thead><tr><th>Equipamento</th><th>Devolvido por</th><th>Data e hora</th><th>Condição</th></tr></thead>
+              <thead>
+                <tr>
+                  <th>Equipamento</th><th>Devolvido por</th><th>Data e hora</th><th>Condição</th>
+                </tr>
+              </thead>
               <tbody id="lista-devolucoes-recentes"><tr><td colspan="4" class="muted">Carregando devoluções…</td></tr></tbody>
             </table>
           </div>
+        </section>
+
+        <section class="card" aria-label="Aguardando devolução hoje">
+          <div class="card-title"><h2>Aguardando hoje</h2></div>
+          <ul class="queue" id="fila-devolucao"><li class="muted">Carregando itens com devolução prevista para hoje…</li></ul>
+        </section>
+
+        <section class="card active-loans-card" aria-label="Empréstimos em andamento">
+          <div class="card-title">
+            <div><h2>Empréstimos em andamento</h2><p class="muted small">Localize qualquer item ativo e registre uma devolução antecipada.</p></div>
+          </div>
+          <div class="active-loans-list" id="lista-emprestimos-ativos" aria-live="polite"><p class="muted">Carregando empréstimos ativos…</p></div>
         </section>
       </div>
 
