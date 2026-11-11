@@ -8,19 +8,19 @@
 
   const SITUACOES = [
     { chave: "disponiveis", rotulo: "Disponível",    cls: "ok",    cor: "var(--st-ok)" },
-    { chave: "emprestados", rotulo: "Emprestado",    cls: "loan",  cor: "#9b7cf7" },
-    { chave: "atrasados",   rotulo: "Atrasado",      cls: "late",  cor: "#b18af8" },
-    { chave: "manutencao",  rotulo: "Em manutenção", cls: "maint", cor: "#7c5ce7" },
-    { chave: "inativos",    rotulo: "Inativo",       cls: "off",   cor: "#6550b8" },
+    { chave: "emprestados", rotulo: "Emprestado",    cls: "loan",  cor: "var(--st-loan)" },
+    { chave: "atrasados",   rotulo: "Atrasado",      cls: "late",  cor: "var(--st-late)" },
+    { chave: "manutencao",  rotulo: "Em manutenção", cls: "maint", cor: "var(--st-maint)" },
+    { chave: "inativos",    rotulo: "Inativo",       cls: "off",   cor: "var(--st-off)" },
   ];
 
   function renderKpis(r) {
     const pct = (n) => (r.total ? Math.round((n / r.total) * 100) : 0);
     const itens = [
       { rot: "Total de equipamentos", v: r.total, nota: "Itens cadastrados", cor: "var(--purple)" },
-      { rot: "Disponíveis", v: r.disponiveis, nota: `${pct(r.disponiveis)}% do acervo, prontos para empréstimo`, cor: "var(--purple)" },
-      { rot: "Emprestados", v: r.emprestados, nota: "Em circulação", cor: "#9b7cf7" },
-      { rot: "Em atraso", v: r.atrasados, cor: "#b18af8", alerta: r.atrasados > 0,
+      { rot: "Disponíveis", v: r.disponiveis, nota: `${pct(r.disponiveis)}% do acervo, prontos para empréstimo`, cor: "var(--st-ok)" },
+      { rot: "Emprestados", v: r.emprestados, nota: "Em circulação", cor: "var(--st-loan)" },
+      { rot: "Em atraso", v: r.atrasados, cor: "var(--st-late)", alerta: r.atrasados > 0,
         nota: r.atrasados > 0 ? "Prazo vencido e ainda não devolvidos" : "Nenhum prazo vencido" },
     ];
     $("kpis").innerHTML = itens.map((k) => `
@@ -29,6 +29,15 @@
         <p class="kpi-valor">${k.v}</p>
         <p class="kpi-nota">${k.nota}</p>
       </article>`).join("");
+  }
+
+  function renderAlertaAtrasos(r) {
+    const area = $("alerta-atrasos");
+    if (!area) return;
+    const total = Number(r?.atrasados || 0);
+    area.hidden = total === 0;
+    if (!total) { area.innerHTML = ""; return; }
+    area.innerHTML = `<strong>Atenção: ${total} empréstimo${total === 1 ? " está" : "s estão"} em atraso.</strong><span>Revise os itens vencidos e registre as devoluções pendentes.</span><a class="btn btn-danger btn-sm" href="emprestimos.html?filtro=atrasados">Ver empréstimos atrasados</a>`;
   }
 
   function renderDistribuicao(r) {
@@ -64,7 +73,7 @@
               <td class="cell-main"><strong>${esc(l.equipamento.nome)}</strong><small>${esc(l.equipamento.patrimonio)}</small></td>
               <td>${esc(l.solicitante.nome)}</td>
               <td>${dataHora(l.prevista)}</td>
-              <td><span class="badge badge-${p.classe}">${p.texto}</span></td>
+              <td><span class="badge badge-${p.classe}">${p.texto}</span><a class="table-action" href="devolucoes.html?itemId=${encodeURIComponent(l.id)}&amp;emprestimoId=${encodeURIComponent(l.emprestimoId || "")}">Registrar devolução</a></td>
             </tr>`;
           }).join("")}
         </tbody>
@@ -117,9 +126,11 @@
     const primeiroNome = nome.split(/\s+/)[0] || "bem-vindo(a)";
     const h1 = document.querySelector(".page-head h1");
     const intro = document.querySelector(".page-head p");
-    const botaoCadastro = document.querySelector(".page-head > .btn");
+    const eyebrow = document.querySelector(".dashboard-eyebrow");
+    const botaoCadastro = document.querySelector(".page-head > .page-head-actions");
     if (h1) h1.textContent = `Olá, ${primeiroNome}`;
     if (intro) intro.textContent = "O que você precisa fazer hoje?";
+    if (eyebrow) eyebrow.textContent = "SEU ESPAÇO";
     if (botaoCadastro) botaoCadastro.hidden = true;
     const indicadores = document.querySelector('section[aria-label="Indicadores"]');
     const distribuicao = document.querySelector('section[aria-labelledby="t-dist"]');
@@ -127,8 +138,6 @@
     if (indicadores) indicadores.hidden = true;
     if (distribuicao) distribuicao.hidden = true;
     if (painelEquipe) painelEquipe.hidden = true;
-    const acoesRapidas = document.querySelector('section[aria-labelledby="t-acoes"]');
-    if (acoesRapidas) acoesRapidas.hidden = true;
 
     const area = $("inicio-usuario");
     area.hidden = false;
@@ -165,6 +174,7 @@
       ELO.resumoDashboard(), ELO.emprestimos(), ELO.movimentacoes().catch(() => []),
     ]);
     renderKpis(resumo);
+    renderAlertaAtrasos(resumo);
     renderDistribuicao(resumo);
     renderAcompanhar(todosEmprestimos);
     renderMovimentacoes(todasMovimentacoes);

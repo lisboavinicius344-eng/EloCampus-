@@ -528,34 +528,3 @@ form.split .summary button[type="submit"]:focus-visible,
   .novo-emprestimo-page .add-row { grid-template-columns:minmax(0,1fr); }
   .novo-emprestimo-page #adicionar-equip { width:100%; }
 }
-
-/* Rodada final: mobile-first para ações e tabelas operacionais. */
-.dashboard-head-actions { display: flex; flex-wrap: wrap; gap: .65rem; justify-content: flex-end; }
-.table-actions, .loan-actions { display: flex; flex-wrap: wrap; gap: .45rem; align-items: center; }
-.danger-zone { border: 1px solid rgba(255, 100, 140, .45); }
-@media (max-width: 640px) {
-  html, body { max-width: 100%; }
-  .main, .card, .panel, .page-head, .toolbar, form { min-width: 0; max-width: 100%; }
-  input, select, textarea { font-size: 16px !important; }
-  input, select, textarea, button, a.btn { min-height: 46px; }
-  .dashboard-head-actions { width: 100%; justify-content: stretch; }
-  .dashboard-head-actions .btn { flex: 1 1 100%; width: 100%; }
-  .table-wrap { overflow-x: auto; overflow-y: hidden; max-width: 100%; touch-action: pan-x; }
-  .table-wrap table { min-width: 620px; }
-  #lista-emprestimos, #acompanhar { overflow: visible; }
-  #lista-emprestimos table, #acompanhar table { min-width: 0; width: 100%; display: block; }
-  #lista-emprestimos thead, #acompanhar thead { display: none; }
-  #lista-emprestimos tbody, #acompanhar tbody { display: grid; gap: .75rem; }
-  #lista-emprestimos tr, #acompanhar tr { display: grid; grid-template-columns: 1fr; border: 1px solid var(--line, #2e3678); border-radius: 1rem; overflow: hidden; background: var(--surface, #141a45); }
-  #lista-emprestimos td, #acompanhar td { display: flex; justify-content: space-between; gap: .75rem; border-top: 0; border-bottom: 1px solid var(--surface-3, #262d63); padding: .75rem .85rem; min-width: 0; }
-  #lista-emprestimos td:last-child, #acompanhar td:last-child { border-bottom: 0; }
-  #lista-emprestimos td::before, #acompanhar td::before { color: var(--text-2); font-size: .75rem; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; flex: 0 0 6rem; }
-  #lista-emprestimos td:nth-child(1)::before, #acompanhar td:nth-child(1)::before { content: "Item"; }
-  #lista-emprestimos td:nth-child(2)::before, #acompanhar td:nth-child(2)::before { content: "Pessoa"; }
-  #lista-emprestimos td:nth-child(3)::before, #acompanhar td:nth-child(3)::before { content: "Prazo"; }
-  #lista-emprestimos td:nth-child(4)::before, #acompanhar td:nth-child(4)::before { content: "Situação"; }
-  #lista-emprestimos td:nth-child(5)::before, #acompanhar td:nth-child(5)::before { content: "Ações"; }
-  #lista-emprestimos td > *, #acompanhar td > * { max-width: calc(100% - 6.75rem); overflow-wrap: anywhere; }
-  .loan-actions, .table-actions { justify-content: flex-end; }
-  .loan-actions .btn, .table-actions .btn { flex: 1 1 auto; }
-}

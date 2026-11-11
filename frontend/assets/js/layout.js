@@ -52,7 +52,7 @@ const EloUtil = {
     const rotulos = {
       emprestimo: "Empréstimo", retirada: "Empréstimo", devolucao: "Devolução",
       manutencao: "Manutenção aberta", manutencao_concluida: "Manutenção concluída", manutencao_cancelada: "Manutenção cancelada",
-      baixa: "Baixa", cadastro: "Cadastro", reativacao: "Reativação", cobranca: "Cobrança",
+      baixa: "Baixa", cadastro: "Cadastro", reativacao: "Reativação",
     };
     if (rotulos[chave]) return rotulos[chave];
     const texto = chave.replace(/[_-]+/g, " ").trim();
@@ -73,8 +73,8 @@ const EloUtil = {
   },
 
   podeVerIdsInternos() {
-    const sessao = obterSessao() || {};
-    return sessao.master === true || sessao.usuario?.master === true;
+    const perfil = String(obterSessao()?.perfil || "").toLowerCase().replace(/[-\s]+/g, "_");
+    return ["master", "administrador_geral", "administrador_master"].includes(perfil);
   },
 };
 

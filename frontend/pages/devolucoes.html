@@ -50,6 +50,11 @@
         </div>
         <div><div class="stat-value" id="com-avaria">0</div><div class="stat-label">Com avaria</div></div>
       </div>
+      <div class="card stat">
+        <div class="stat-icon active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h10"/><circle cx="18" cy="18" r="3"/><path d="M18 16.5v1.7l1 1"/></svg>
+        </div>
+        <div><div class="stat-value" id="emprestimos-ativos">0</div><div class="stat-label">Empréstimos ativos</div></div>
+      </div>
     </section>
 
     <div class="split">
@@ -79,6 +84,13 @@
         <section class="card" aria-label="Aguardando devolução hoje">
           <div class="card-title"><h2>Aguardando hoje</h2></div>
           <ul class="queue" id="fila-devolucao"><li class="muted">Carregando itens com devolução prevista para hoje…</li></ul>
+        </section>
+
+        <section class="card active-loans-card" aria-label="Empréstimos em andamento">
+          <div class="card-title">
+            <div><h2>Empréstimos em andamento</h2><p class="muted small">Localize qualquer item ativo e registre uma devolução antecipada.</p></div>
+          </div>
+          <div class="active-loans-list" id="lista-emprestimos-ativos" aria-live="polite"><p class="muted">Carregando empréstimos ativos…</p></div>
         </section>
       </div>
 

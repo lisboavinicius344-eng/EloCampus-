@@ -8,9 +8,15 @@
 </head>
 <body data-pagina="solicitacoes-acesso">
 <div class="app"><aside class="sidebar" id="sidebar"></aside><div class="content"><header class="topbar" id="topbar"></header><main class="main">
-  <header class="page-head"><div><h1>Solicitações de acesso</h1><p>Analise os pedidos de alunos e professores antes de liberar uma conta.</p></div><button class="btn btn-ghost" id="solicitacoes-atualizar" type="button">Atualizar lista</button></header>
+  <header class="page-head"><div><span class="admin-page-kicker">ADMINISTRAÇÃO · ACESSOS</span><h1>Solicitações de acesso</h1><p>Analise os pedidos com rapidez, mantendo a decisão e a justificativa rastreáveis.</p></div><button class="btn btn-ghost" id="solicitacoes-atualizar" type="button">Atualizar lista</button></header>
   <div id="solicitacoes-aviso" class="alert" role="status" aria-live="polite" hidden></div>
-  <nav class="tabs" aria-label="Solicitações"><button class="tab" type="button" data-status="pendente" aria-selected="true">Pendentes</button><button class="tab" type="button" data-status="auditoria" aria-selected="false">Histórico / Auditoria</button></nav>
+  <section class="access-toolbar" aria-label="Filtros de solicitações">
+    <div class="access-tabs" role="tablist" aria-label="Visão das solicitações">
+      <button class="access-tab is-active" type="button" role="tab" aria-selected="true" data-access-view="pendente">Pendentes <span id="pendentes-total">—</span></button>
+      <button class="access-tab" type="button" role="tab" aria-selected="false" data-access-view="auditoria">Auditoria <span id="auditoria-total">—</span></button>
+    </div>
+    <label class="access-search"><span class="sr-only">Buscar solicitação</span><input class="input" id="solicitacoes-busca" type="search" placeholder="Buscar por nome ou e-mail"></label>
+  </section>
   <section id="solicitacoes-lista" class="access-grid"><div class="card">Carregando solicitações pendentes…</div></section>
 </main></div></div>
 <script src="../assets/js/runtime-config.js?v=2026.11.11.2"></script><script src="../assets/js/api.js?v=2026.11.11.2"></script><script src="../assets/js/auth.js?v=2026.11.11.2"></script><script src="../assets/js/layout.js?v=2026.11.11.2"></script><script src="../assets/js/solicitacoes-acesso.js?v=2026.11.11.2"></script>

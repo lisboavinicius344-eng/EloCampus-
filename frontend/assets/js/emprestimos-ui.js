@@ -84,18 +84,15 @@
       if (l.observacoesDevolucao) eventos.push(["dot-pink", "Observação da devolução", esc(l.observacoesDevolucao)]);
       timeline.innerHTML = eventos.map(([dot, titulo, detalhe]) => `<li><span class="dot ${dot}"></span><div><strong>${titulo}</strong><div class="muted">${detalhe}</div></div></li>`).join("");
       const link = $("detalhe-devolver");
-      const cobrar = $("detalhe-cobrar");
       if (usuarioFinal) {
         link.removeAttribute("href");
         link.textContent = l.devolvida ? "Devolução registrada" : "Entregue à equipe do acervo";
         link.setAttribute("aria-disabled", "true");
         link.classList.add("is-disabled");
-        if (cobrar) cobrar.hidden = true;
       } else {
         link.href = l.devolvida ? "devolucoes.html" : `devolucoes.html?itemId=${encodeURIComponent(l.id)}&emprestimoId=${encodeURIComponent(l.emprestimoId)}`;
         link.setAttribute("aria-disabled", String(Boolean(l.devolvida)));
         link.classList.toggle("is-disabled", Boolean(l.devolvida));
-        if (cobrar) { cobrar.hidden = Boolean(l.devolvida); cobrar.disabled = false; cobrar.dataset.cobrar = l.chave; }
       }
     }
     function renderizar() {
@@ -128,7 +125,7 @@
           <td>${esc(l.solicitante.nome)}<small>por ${esc(l.registradoPor || "—")}</small></td>
           <td>${dataHora(l.devolvida || l.prevista)}</td>
           <td><span class="pill ${status.classe}">${esc(status.texto)}</span></td>
-          <td>${l.devolvida ? '<span class="muted small">Concluído</span>' : `<div class="loan-actions"><button class="btn btn-sm" type="button" data-devolver="${esc(l.chave)}">Devolver</button><button class="btn btn-sm btn-line" type="button" data-cobrar="${esc(l.chave)}">Cobrar</button></div>`}</td>
+          <td>${l.devolvida ? '<span class="muted small">Concluído</span>' : `<button class="btn btn-sm" type="button" data-devolver="${esc(l.chave)}">Devolver</button>`}</td>
         </tr>`;
       }).join("");
       const activeSelection = filtrados.find((l) => l.chave === selecionado?.chave) || filtrados[0];
@@ -137,18 +134,8 @@
 
     abas.forEach((aba) => aba.addEventListener("click", () => { filtro = aba.dataset.filtro; renderizar(); }));
     busca?.addEventListener("input", renderizar);
-    corpo.addEventListener("click", async (event) => {
+    corpo.addEventListener("click", (event) => {
       const devolver = event.target.closest("[data-devolver]");
-      const cobrar = event.target.closest("[data-cobrar]");
-      if (cobrar) {
-        const l = registros.find((x) => x.chave === cobrar.dataset.cobrar);
-        if (!l || l.devolvida || !window.confirm(`Enviar cobrança por e-mail para ${l.solicitante.nome}?`)) return;
-        cobrar.disabled = true;
-        try { const resposta = await ELO.cobrarEmprestimo(l.emprestimoId); aviso(document.querySelector(".page-head")?.nextElementSibling, resposta?.mensagem || `Cobrança enviada para ${l.solicitante.nome}.`, "ok"); }
-        catch (error) { aviso(document.querySelector(".page-head")?.nextElementSibling, error.message || "Não foi possível enviar a cobrança.", "error"); }
-        finally { cobrar.disabled = false; }
-        return;
-      }
       const row = event.target.closest("tr[data-item-id]");
       if (devolver) {
         const l = registros.find((x) => x.chave === devolver.dataset.devolver);
@@ -160,20 +147,9 @@
         if (l) desenharDetalhe(l);
       }
     });
-    $("detalhe-cobrar")?.addEventListener("click", async (event) => {
-      const l = selecionado;
-      if (!l || l.devolvida || !window.confirm(`Enviar cobrança por e-mail para ${l.solicitante.nome}?`)) return;
-      const botao = event.currentTarget; botao.disabled = true;
-      try { const resposta = await ELO.cobrarEmprestimo(l.emprestimoId); window.alert(resposta?.mensagem || `Cobrança enviada para ${l.solicitante.nome}.`); }
-      catch (error) { window.alert(error.message || "Não foi possível enviar a cobrança."); }
-      finally { botao.disabled = false; }
-    });
     try {
       const carregados = await ELO.emprestimos();
       registros = carregados.filter(pertenceAoUsuario);
-      const itemInicial = new URLSearchParams(location.search).get("itemId");
-      const emprestimoInicial = new URLSearchParams(location.search).get("emprestimoId");
-      selecionado = registros.find((l) => String(l.id) === String(itemInicial) && (!emprestimoInicial || String(l.emprestimoId) === String(emprestimoInicial))) || null;
       if (usuarioFinal) {
         const titulo = document.querySelector(".page-head h1");
         const descricao = document.querySelector(".page-head p");
@@ -207,6 +183,7 @@
     const abas = [...document.querySelectorAll("[data-periodo]")];
     const corpoRecentes = $("lista-devolucoes-recentes");
     const fila = $("fila-devolucao");
+    const listaAtivos = $("lista-emprestimos-ativos");
     const inputPatrimonio = $("patrimonio");
     const itensContainer = $("itens-devolucao");
     const mensagem = $("mensagem-devolucao");
@@ -270,6 +247,26 @@
         return `<tr><td><strong>${esc(l.equipamento.nome)}</strong><small>${esc(l.equipamento.patrimonio)}</small></td>${pessoa}<td>${dataHora(l.devolvida)}</td><td><span class="pill ${pill}">${esc(cond)}</span></td></tr>`;
       }).join("") : `<tr><td colspan="4" class="muted">${registros.some((l) => l.devolvida) ? "Nenhuma devolução corresponde ao período ou à pesquisa." : "Nenhuma devolução registrada no sistema."}</td></tr>`;
     }
+    function desenharAtivos() {
+      if (!listaAtivos) return;
+      const termo = norm(busca?.value.trim());
+      const ativos = registros.filter((l) => !l.devolvida && (!termo || norm([l.equipamento.nome, l.equipamento.patrimonio, l.solicitante.nome, l.solicitante.matricula].join(" ")).includes(termo)))
+        .sort((a, b) => {
+          const grupoA = mesmoDia(a.prevista, new Date()) ? 0 : EloUtil.vencido(a.prevista) ? 1 : 2;
+          const grupoB = mesmoDia(b.prevista, new Date()) ? 0 : EloUtil.vencido(b.prevista) ? 1 : 2;
+          return grupoA - grupoB || new Date(a.prevista) - new Date(b.prevista);
+        });
+      if (!ativos.length) {
+        listaAtivos.innerHTML = '<p class="muted">Nenhum empréstimo em andamento corresponde à pesquisa.</p>';
+        return;
+      }
+      listaAtivos.innerHTML = `<div class="active-loans-table-wrap"><table class="active-loans-table"><thead><tr><th>Equipamento</th><th>Patrimônio</th><th>Solicitante</th><th>Empréstimo</th><th>Devolução prevista</th><th>Situação</th><th>Ação</th></tr></thead><tbody>${ativos.map((l) => {
+        const hoje = mesmoDia(l.prevista, new Date());
+        const prazo = EloUtil.prazo(l.prevista);
+        const situacao = hoje ? { texto: "Aguardando hoje", classe: "pill-warn" } : prazo.classe === "late" ? { texto: prazo.texto, classe: "pill-late" } : { texto: "Em andamento", classe: "pill-ok" };
+        return `<tr class="${hoje ? "is-due-today" : prazo.classe === "late" ? "is-overdue" : ""}"><td data-label="Equipamento"><strong>${esc(l.equipamento.nome)}</strong></td><td data-label="Patrimônio">${esc(l.equipamento.patrimonio || "—")}</td><td data-label="Solicitante"><strong>${esc(l.solicitante.nome)}</strong><small>${esc(l.solicitante.matricula || l.solicitante.vinculo || "")}</small></td><td data-label="Empréstimo">${dataHora(l.retirada)}</td><td data-label="Devolução prevista">${dataHora(l.prevista)}</td><td data-label="Situação"><span class="pill ${situacao.classe}">${esc(situacao.texto)}</span></td><td data-label="Ação"><button class="btn btn-sm active-return-btn" type="button" data-receber="${esc(l.chave)}">Registrar devolução</button></td></tr>`;
+      }).join("")}</tbody></table></div>`;
+    }
     function desenharFila() {
       const hoje = new Date();
       const aguardando = registros.filter((l) => !l.devolvida && mesmoDia(l.prevista, hoje)).sort((a,b) => new Date(a.prevista) - new Date(b.prevista));
@@ -277,6 +274,7 @@
       $("devolvidos-hoje").textContent = registros.filter((l) => l.devolvida && mesmoDia(l.devolvida, hoje)).length;
       $("aguardando-hoje").textContent = aguardando.length;
       $("com-avaria").textContent = registros.filter((l) => l.devolvida && l.condicaoDevolucao === "Danificado").length;
+      $("emprestimos-ativos").textContent = registros.filter((l) => !l.devolvida).length;
     }
     function desenharItensRetorno(prefill, selecionarTodos = false) {
       itensContainer.innerHTML = "";
@@ -312,8 +310,8 @@
       $("confirmar-devolucao").textContent = "Revisar devolução";
     });
     abas.forEach((a) => a.addEventListener("click", () => { periodo = a.dataset.periodo; desenharRecentes(); }));
-    busca?.addEventListener("input", desenharRecentes);
-    fila.addEventListener("click", (event) => {
+    busca?.addEventListener("input", () => { desenharRecentes(); desenharAtivos(); });
+    const selecionarParaDevolucao = (event) => {
       const button = event.target.closest("[data-receber]"); if (!button) return;
       const l = registros.find((x) => x.chave === button.dataset.receber);
       if (l) {
@@ -321,7 +319,9 @@
         revisar = false; $("revisao-devolucao")?.remove(); $("confirmar-devolucao").textContent = "Revisar devolução";
         itensContainer.innerHTML = ""; desenharItensRetorno([l]); form.scrollIntoView({ behavior: "smooth", block: "start" });
       }
-    });
+    };
+    fila.addEventListener("click", selecionarParaDevolucao);
+    listaAtivos?.addEventListener("click", selecionarParaDevolucao);
 
     form.addEventListener("submit", async (event) => {
       event.preventDefault();
@@ -349,7 +349,7 @@
           assinaturaRecebida: $("assinatura-recebida").checked,
         });
         registros = (await ELO.emprestimos()).filter(pertenceAoUsuario);
-        desenharRecentes(); desenharFila();
+        desenharRecentes(); desenharFila(); desenharAtivos();
         history.replaceState(null, "", location.pathname);
         revisar = false;
         form.reset();
@@ -370,7 +370,7 @@
 
     try {
       registros = (await ELO.emprestimos()).filter(pertenceAoUsuario);
-      desenharRecentes(); desenharFila();
+      desenharRecentes(); desenharFila(); desenharAtivos();
       let prefill = [];
       if (itemInicial) {
         const item = registros.find((l) => String(l.id) === String(itemInicial) && !l.devolvida && (!emprestimoInicial || String(l.emprestimoId) === String(emprestimoInicial)));

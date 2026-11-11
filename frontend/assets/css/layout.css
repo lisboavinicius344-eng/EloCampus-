@@ -181,6 +181,17 @@ a.nav-item:hover {
   font-size: 1.05rem;
 }
 
+.page-head-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+.page-head-actions[hidden] { display: none; }
+@media (max-width: 640px) {
+  .page-head-actions { width: 100%; }
+  .page-head-actions .btn { flex: 1 1 100%; text-align: center; }
+}
+
 .panel {
   padding: clamp(1.25rem, 2.5vw, 1.75rem);
   background: var(--surface);
@@ -472,9 +483,6 @@ a.nav-item:hover {
   .kpis {
     grid-template-columns: 1fr;
   }
-  .table {
-    min-width: 0;
-  }
   .table-wrap {
     margin-inline: -0.25rem;
   }
@@ -485,6 +493,18 @@ a.nav-item:hover {
   .toolbar .input {
     width: 100% !important;
   }
+  .table-wrap {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-x: contain;
+  }
+  .table th { white-space: nowrap; }
+  .solicitantes-table { min-width: 860px; }
+@media (max-width: 640px) {
+  .table th, .table td { padding: 0.6rem 0.65rem; font-size: 0.85rem; }
+}
 }
 
 .nav-section {

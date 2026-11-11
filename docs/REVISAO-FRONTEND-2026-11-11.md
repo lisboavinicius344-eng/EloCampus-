@@ -1,13 +1,34 @@
+# Revisão do frontend — ELO Campus
 
+**Versão do frontend:** `2026.11.11.1`
 
-## Rodada adicional — versão `2026.11.11.2`
+## Correções realizadas
 
-Nesta rodada foram integrados os contratos novos do backend. O dashboard administrativo agora apresenta, no topo, os botões **Cadastrar empréstimo** e **Registrar devolução**. Em cada empréstimo ativo da área “Empréstimos a acompanhar” há as ações **Devolver**, **Cobrar** e **Ver**; a cobrança exige confirmação explícita e usa `POST /emprestimos/<id>/cobrar`, exibindo a mensagem devolvida pela API. A mesma ação está disponível na página de empréstimos e no painel de detalhe.
+- Dashboard administrativo com ações rápidas operacionais: novo empréstimo, devolução, equipamentos, reservas e acompanhamento de atrasos.
+- Alerta de destaque para empréstimos vencidos, com quantidade e acesso direto à lista filtrada.
+- Ação direta de registro de devolução nos empréstimos exibidos no painel.
+- Remoção do botão de lembrete por e-mail que não possuía endpoint/listener funcional.
+- Fluxo de novo empréstimo com opção de vínculo `Outro`, campo obrigatório de explicação e inclusão da informação em `observacoes`.
+- Tradução dos tipos de movimentação no histórico individual do equipamento e uso das observações quando disponíveis.
+- Ocultação de identificadores internos nas interfaces comuns de QR público, categorias, reservas e solicitantes. A visualização permanece disponível somente para perfis master/administrador geral reconhecidos pelo frontend.
+- Perfis `master`, `administrador_geral`, `administrador-geral` e `administrador_master` reconhecidos para navegação administrativa e auditoria.
+- Cache-busting atualizado para `2026.11.11.1` em HTML, CSS e JavaScript.
 
-O campo de vínculo do novo empréstimo passa a ser preenchido automaticamente conforme o tipo do solicitante e fica bloqueado: aluno → aluno, professor → professor, servidor/técnico → servidor e externo → grupo/setor. A lista exibe matrícula ou e-mail para usuários comuns e ID somente quando `sessao.master === true`.
+## Validação executada
 
-Solicitações de acesso ganharam as abas **Pendentes** e **Histórico / Auditoria**. A aprovação aceita justificativa opcional, a recusa exige motivo e todas as ações permanecem sujeitas a confirmação. O perfil master passou a ter uma área separada para **Zerar dados operacionais**, protegida por confirmação dupla e pela digitação exata de `ZERAR DADOS`.
+- `node --check` em todos os arquivos JavaScript do frontend: **PASS**.
+- `node tests/frontend-regressions.cjs`: **PASS**.
+- `node tests/api-contract-smoke.cjs`: **PASS**.
+- Verificação residual de `ID do sistema`, `senha_provisoria` e botão de lembrete no frontend: **sem ocorrências**.
 
-Para telas móveis, tabelas operacionais de empréstimos foram convertidas em cartões compactos; as demais tabelas permanecem com rolagem horizontal confinada ao próprio contêiner. Campos de texto, seleção e botões usam tamanho de fonte de 16 px em telas estreitas para evitar zoom automático do navegador e têm área mínima de toque. A validação realizada é estática e por sintaxe/regressão; a confirmação final em aparelhos físicos de 390 px ainda deve ser feita no dispositivo real.
+## Pendências que dependem do backend
 
-As cores dos estados do dashboard foram separadas semanticamente: verde para disponível, azul para emprestado, vermelho para atraso, âmbar para manutenção e cinza para inativo, mantendo azul/rosa/roxo apenas como identidade visual.
+Estas funcionalidades não foram simuladas no frontend:
+
+- Auditoria histórica de aprovações/recusas, incluindo responsável, data/hora e justificativa, caso esses campos ainda não sejam retornados pela API.
+- Envio de cobranças e notificações de devolução; requer endpoint real e confirmação de idempotência.
+- Geração assistida por IA de mensagens de e-mail; requer serviço/endpoint seguro no backend, sem chave exposta no navegador.
+- Autorização real e filtragem de identificadores: o backend deve continuar impondo permissões e evitando o retorno indevido de IDs ou dados sensíveis.
+- Garantia transacional entre abertura de manutenção, mudança para “Em manutenção” e eventual inativação.
+
+A API continua sendo a autoridade para regras de negócio, permissões, estados, prazos e persistência.

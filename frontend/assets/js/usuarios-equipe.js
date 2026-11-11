@@ -23,9 +23,11 @@
   function perfilLegivel(papel) {
     return ({ admin: "Administrador", administrador: "Administrador", operador: "Operador", aluno: "Aluno", professor: "Professor", servidor: "Servidor (TAE)", tae: "Servidor (TAE)" })[String(papel || "").toLowerCase()] || "—";
   }
-  function adicionarCelula(linha, texto) {
+  function adicionarCelula(linha, texto, rotulo, classe = "") {
     const celula = document.createElement("td");
     celula.textContent = texto || "—";
+    if (rotulo) celula.dataset.label = rotulo;
+    if (classe) celula.className = classe;
     linha.appendChild(celula);
     return celula;
   }
@@ -52,16 +54,18 @@
       }
       usuarios.forEach((usuario) => {
         const linha = document.createElement("tr");
-        adicionarCelula(linha, usuario.nome);
-        adicionarCelula(linha, usuario.email);
-        adicionarCelula(linha, perfilLegivel(usuario.papel));
+        adicionarCelula(linha, usuario.nome, "Nome", "team-name");
+        adicionarCelula(linha, usuario.email, "E-mail", "team-email");
+        adicionarCelula(linha, perfilLegivel(usuario.papel), "Perfil", "team-profile");
         const primeiroAcesso = document.createElement("td");
+        primeiroAcesso.dataset.label = "Primeiro acesso";
         const etiqueta = document.createElement("span");
         etiqueta.className = `pill ${usuario.deve_trocar_senha ? "pill-warn" : "pill-ok"}`;
         etiqueta.textContent = usuario.deve_trocar_senha ? "Aguardando primeiro acesso" : "Concluído";
         primeiroAcesso.appendChild(etiqueta);
         linha.appendChild(primeiroAcesso);
         const status = document.createElement("td");
+        status.dataset.label = "Situação";
         const ativo = usuario.ativo !== false;
         const statusPill = document.createElement("span");
         statusPill.className = `pill ${ativo ? "pill-ok" : "pill-warn"}`;
@@ -69,6 +73,8 @@
         status.appendChild(statusPill);
         linha.appendChild(status);
         const acoes = document.createElement("td");
+        acoes.dataset.label = "Ações";
+        acoes.className = "team-actions";
         if (ativo) {
         const reenviar = document.createElement("button");
         reenviar.type = "button";

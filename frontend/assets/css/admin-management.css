@@ -398,3 +398,116 @@ body[data-pagina="solicitacoes-acesso"] #solicitacoes-aviso[hidden] {
     width: 100%;
   }
 }
+
+/* Filtros e auditoria: a decisão fica separada da leitura dos pedidos. */
+.admin-page-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: .45rem;
+  color: #c4b5fd;
+  font-size: .7rem;
+  font-weight: 800;
+  letter-spacing: .16em;
+}
+.admin-page-kicker::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--cyan);
+  box-shadow: 0 0 0 4px rgba(34, 211, 238, .1);
+}
+.access-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.15rem;
+  padding: .55rem;
+  border: 1px solid rgba(120, 137, 173, .18);
+  border-radius: 17px;
+  background: rgba(17, 24, 43, .72);
+}
+.access-tabs {
+  display: flex;
+  gap: .35rem;
+  min-width: 0;
+}
+.access-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: .45rem;
+  min-height: 42px;
+  padding: 0 .9rem;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  background: transparent;
+  color: var(--muted);
+  font: 600 .88rem var(--font);
+  cursor: pointer;
+}
+.access-tab span {
+  min-width: 1.6rem;
+  padding: .14rem .38rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, .06);
+  color: #cbd5e1;
+  font-size: .72rem;
+  text-align: center;
+}
+.access-tab:hover { color: var(--text); background: rgba(139, 92, 246, .08); }
+.access-tab.is-active { border-color: rgba(139, 92, 246, .3); background: rgba(139, 92, 246, .14); color: #f5f3ff; }
+.access-tab.is-active span { background: rgba(139, 92, 246, .25); color: #ddd6fe; }
+.access-search { display: block; width: min(100%, 300px); }
+.access-search .input { min-height: 42px; border-radius: 12px; }
+.access-request-message {
+  margin: 0;
+  padding: .75rem .85rem;
+  border-left: 3px solid rgba(34, 211, 238, .55);
+  border-radius: 0 10px 10px 0;
+  background: rgba(34, 211, 238, .055);
+  color: #cbd5e1;
+  font-size: .86rem;
+  line-height: 1.55;
+  overflow-wrap: anywhere;
+}
+.access-decision-note { border-left-color: rgba(139, 92, 246, .65); background: rgba(139, 92, 246, .06); }
+.access-audit-details {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: .75rem;
+  margin: 0;
+}
+.access-audit-details > div {
+  min-width: 0;
+  padding: .8rem;
+  border: 1px solid rgba(41, 52, 77, .7);
+  border-radius: 12px;
+  background: rgba(9, 14, 27, .28);
+}
+.access-audit-details dt { color: var(--muted); font-size: .74rem; font-weight: 700; }
+.access-audit-details dd { margin: .25rem 0 0; color: #eef2ff; font-size: .88rem; overflow-wrap: anywhere; }
+.access-empty,
+.access-loading { display: grid; gap: .35rem; padding: 1.35rem; }
+.access-empty strong { font-size: 1rem; }
+.access-empty span { color: var(--muted); font-size: .88rem; }
+
+@media (max-width: 760px) {
+  .access-toolbar { align-items: stretch; flex-direction: column; }
+  .access-tabs { width: 100%; }
+  .access-tab { flex: 1 1 0; justify-content: center; }
+  .access-search { width: 100%; }
+  .access-audit-details { grid-template-columns: minmax(0, 1fr); }
+  body[data-pagina="usuarios"] .table-wrap { overflow: visible; border: 0; background: transparent; }
+  body[data-pagina="usuarios"] .table-wrap table { min-width: 0; border-spacing: 0 .7rem; }
+  body[data-pagina="usuarios"] .table-wrap thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  body[data-pagina="usuarios"] .table-wrap tbody,
+  body[data-pagina="usuarios"] .table-wrap tr,
+  body[data-pagina="usuarios"] .table-wrap td { display: block; }
+  body[data-pagina="usuarios"] .table-wrap tr { padding: .7rem .8rem; border: 1px solid var(--border); border-radius: 15px; background: rgba(255, 255, 255, .018); }
+  body[data-pagina="usuarios"] .table-wrap td { display: grid; grid-template-columns: minmax(7.2rem, .8fr) minmax(0, 1.2fr); gap: .7rem; min-width: 0; padding: .45rem 0; border: 0; }
+  body[data-pagina="usuarios"] .table-wrap td::before { content: attr(data-label); color: var(--muted); font-size: .72rem; font-weight: 700; }
+  body[data-pagina="usuarios"] .table-wrap td:last-child { min-width: 0; padding-top: .7rem; border-top: 1px solid rgba(41, 52, 77, .7); }
+  body[data-pagina="usuarios"] .team-actions { display: flex; flex-wrap: wrap; gap: .5rem; }
+  body[data-pagina="usuarios"] .team-actions .btn { width: auto; flex: 1 1 130px; }
+}
