@@ -19,7 +19,7 @@
     const itens = [
       { rot: "Total de equipamentos", v: r.total, nota: "Itens cadastrados", cor: "var(--purple)" },
       { rot: "Disponíveis", v: r.disponiveis, nota: `${pct(r.disponiveis)}% do acervo, prontos para empréstimo`, cor: "var(--purple)" },
-      { rot: "Emprestados", v: r.emprestados, nota: "Em circulação, dentro do prazo", cor: "#9b7cf7" },
+      { rot: "Emprestados", v: r.emprestados, nota: "Em circulação", cor: "#9b7cf7" },
       { rot: "Em atraso", v: r.atrasados, cor: "#b18af8", alerta: r.atrasados > 0,
         nota: r.atrasados > 0 ? "Prazo vencido e ainda não devolvidos" : "Nenhum prazo vencido" },
     ];
@@ -29,6 +29,15 @@
         <p class="kpi-valor">${k.v}</p>
         <p class="kpi-nota">${k.nota}</p>
       </article>`).join("");
+  }
+
+  function renderAlertaAtrasos(r) {
+    const area = $("alerta-atrasos");
+    if (!area) return;
+    const total = Number(r?.atrasados || 0);
+    area.hidden = total === 0;
+    if (!total) { area.innerHTML = ""; return; }
+    area.innerHTML = `<strong>Atenção: ${total} empréstimo${total === 1 ? " está" : "s estão"} em atraso.</strong><span>Revise os itens vencidos e registre as devoluções pendentes.</span><a class="btn btn-danger btn-sm" href="emprestimos.html?filtro=atrasados">Ver empréstimos atrasados</a>`;
   }
 
   function renderDistribuicao(r) {
@@ -64,7 +73,7 @@
               <td class="cell-main"><strong>${esc(l.equipamento.nome)}</strong><small>${esc(l.equipamento.patrimonio)}</small></td>
               <td>${esc(l.solicitante.nome)}</td>
               <td>${dataHora(l.prevista)}</td>
-              <td><span class="badge badge-${p.classe}">${p.texto}</span></td>
+              <td><span class="badge badge-${p.classe}">${p.texto}</span><a class="table-action" href="devolucoes.html?itemId=${encodeURIComponent(l.id)}&amp;emprestimoId=${encodeURIComponent(l.emprestimoId || "")}">Registrar devolução</a></td>
             </tr>`;
           }).join("")}
         </tbody>
@@ -81,8 +90,8 @@
       <li class="mov mov-${esc(m.classe)}">
         <span class="mov-ponto" aria-hidden="true"></span>
         <div>
-          <strong>${esc(m.tipo)}</strong>
-          <span>${esc(m.equipamento.nome)} · ${esc(m.equipamento.patrimonio)}</span>
+          <strong>${esc(EloUtil.tipoMovimentacao(m.tipo))}</strong>
+          <span>${esc(m.equipamento.nome)}${m.equipamento.patrimonio ? ` · ${esc(m.equipamento.patrimonio)}` : ""}</span>
           <small>${m.detalhe ? esc(m.detalhe) + " · " : ""}${dataHora(m.quando)} · por ${esc(m.por)}</small>
         </div>
       </li>`).join("")}</ul>`;
@@ -163,6 +172,7 @@
       ELO.resumoDashboard(), ELO.emprestimos(), ELO.movimentacoes().catch(() => []),
     ]);
     renderKpis(resumo);
+    renderAlertaAtrasos(resumo);
     renderDistribuicao(resumo);
     renderAcompanhar(todosEmprestimos);
     renderMovimentacoes(todasMovimentacoes);

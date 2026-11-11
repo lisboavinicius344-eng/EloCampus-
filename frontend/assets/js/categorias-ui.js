@@ -20,6 +20,8 @@
   async function carregar() {
     try {
       const list = await ELO.categorias();
+      const mostrarIds = EloUtil.podeVerIdsInternos();
+      document.querySelectorAll("[data-id-column]").forEach((el) => { el.hidden = !mostrarIds; });
       tb.replaceChildren();
       if (!list.length) {
         tb.innerHTML = '<tr><td colspan="5">Nenhuma categoria cadastrada.</td></tr>';
@@ -27,7 +29,7 @@
       }
       list.forEach((c) => {
         const tr = document.createElement("tr");
-        tr.innerHTML = `<td><span class="api-code">#${esc(c.id)}</span></td><td>${esc(c.nome)}</td><td>${esc(c.descricao || "—")}</td><td>${c.ativo === false ? "Inativa" : "Ativa"}</td><td><div class="api-actions"></div></td>`;
+        tr.innerHTML = `${mostrarIds ? `<td><span class="api-code">#${esc(c.id)}</span></td>` : ""}<td>${esc(c.nome)}</td><td>${esc(c.descricao || "—")}</td><td>${c.ativo === false ? "Inativa" : "Ativa"}</td><td><div class="api-actions"></div></td>`;
         const actions = tr.querySelector(".api-actions"),
           b = document.createElement("button");
         b.className = "btn btn-line";

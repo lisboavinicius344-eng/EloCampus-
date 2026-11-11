@@ -725,6 +725,22 @@ a.acao:hover {
 }
 .kpi-alerta .kpi-valor { color: #b69aff; }
 
+.dashboard-overdue-alert {
+  display: flex;
+  align-items: center;
+  gap: .8rem;
+  flex-wrap: wrap;
+  margin: 0 0 1.1rem;
+  padding: 1rem 1.1rem;
+  border: 1px solid rgba(251, 113, 133, .56);
+  border-left: 4px solid #fb7185;
+  border-radius: .9rem;
+  background: linear-gradient(100deg, rgba(190, 24, 93, .22), rgba(139, 92, 246, .08));
+}
+.dashboard-overdue-alert strong { color: #fecdd3; }
+.dashboard-overdue-alert span { color: var(--muted); flex: 1 1 18rem; }
+.table-action { display: inline-block; margin-top: .35rem; font-size: .78rem; font-weight: 700; color: #c4b5fd; text-decoration: underline; text-underline-offset: 3px; }
+
 /* Área inicial: todos os atalhos seguem o destaque roxo original do ELO. */
 .self-action-browse,
 .self-action-request,

@@ -32,7 +32,7 @@
         <div class="qr-equipamento-acoes">
           <a class="btn btn-line" href="${esc(ELO_QR.download(e, "png"))}">Baixar PNG</a>
           <a class="btn btn-line" href="${esc(ELO_QR.download(e, "svg"))}">Baixar SVG</a>
-          <a class="btn btn-primary" href="etiquetas.html?ids=${encodeURIComponent(idEquip)}&amp;imprimir=1" target="_blank" rel="noopener">Imprimir etiqueta</a>
+          <a class="btn btn-primary" href="etiquetas.html?ids=${encodeURIComponent(idEquip)}&amp;imprimir=1">Imprimir etiqueta</a>
         </div>
       </div>
     </section>`;
@@ -48,6 +48,8 @@
     const e = await ELO.equipamento(id);
     $("editar").href = `equipamento-form.html?id=${encodeURIComponent(e.id ?? id)}`;
     document.title = `${e.nome} — ELO Campus`;
+    // Item já baixado não pode ser retirado de novo (o backend recusa); o botão nem aparece.
+    const baixado = e.status === "baixado" || e.situacao === "inativo";
     box.innerHTML = `<div class="detalhe-layout"><div>${visual(e)}</div><div class="detalhe-copy">
       <div class="item-head"><div><h2>${esc(e.nome)}</h2><span class="muted">Patrimônio ${esc(e.patrimonio)}</span></div></div>
       <dl class="detalhe-grid">
@@ -59,7 +61,7 @@
       </dl>
       <div class="detalhe-acoes">
         <button class="btn btn-line" id="ver-historico" type="button">Ver histórico</button>
-        <button class="btn btn-danger" id="retirar" type="button">Retirar equipamento</button>
+        ${baixado ? "" : '<button class="btn btn-danger" id="retirar" type="button">Retirar equipamento</button>'}
       </div>
     </div></div>
     ${qrMarkup(e)}
@@ -97,7 +99,7 @@
             const tr = document.createElement("tr");
             const data = movimento.data_movimentacao || movimento.data || movimento.criado_em;
             const dataFormatada = data ? new Date(data).toLocaleString("pt-BR") : "—";
-            [dataFormatada, movimento.tipo_movimentacao || movimento.tipo || "—", movimento.descricao || movimento.detalhe || "—", movimento.usuario_nome || movimento.usuario || movimento.responsavel || "—"].forEach((valor) => {
+            [dataFormatada, EloUtil.tipoMovimentacao(movimento.tipo_movimentacao || movimento.tipo), movimento.descricao || movimento.detalhe || movimento.observacoes || "—", movimento.usuario_nome || movimento.usuario || movimento.responsavel || "—"].forEach((valor) => {
               const td = document.createElement("td");
               td.textContent = String(valor);
               tr.appendChild(td);
@@ -113,7 +115,7 @@
       } finally { botao.disabled = false; }
     });
 
-    $("retirar").addEventListener("click", () => { $("modal-exclusao").hidden = false; $("confirmar-exclusao").focus(); });
+    $("retirar")?.addEventListener("click", () => { $("modal-exclusao").hidden = false; $("confirmar-exclusao").focus(); });
     $("cancelar-exclusao").addEventListener("click", () => { $("modal-exclusao").hidden = true; });
     $("confirmar-exclusao").addEventListener("click", async () => {
       const botao = $("confirmar-exclusao");

@@ -46,6 +46,19 @@ const EloUtil = {
     return { classe: "ok", texto: "Em dia" };
   },
 
+  // Rótulo em português para o tipo de movimentação vindo da API (GET /historico).
+  tipoMovimentacao(tipo) {
+    const chave = String(tipo ?? "").trim().toLowerCase();
+    const rotulos = {
+      emprestimo: "Empréstimo", retirada: "Empréstimo", devolucao: "Devolução",
+      manutencao: "Manutenção aberta", manutencao_concluida: "Manutenção concluída", manutencao_cancelada: "Manutenção cancelada",
+      baixa: "Baixa", cadastro: "Cadastro", reativacao: "Reativação",
+    };
+    if (rotulos[chave]) return rotulos[chave];
+    const texto = chave.replace(/[_-]+/g, " ").trim();
+    return texto ? texto[0].toLocaleUpperCase("pt-BR") + texto.slice(1) : "Movimentação";
+  },
+
   // Identifica se um empréstimo normalizado pertence à sessão. Usa o ID do solicitante
   // quando ambos existem; nome/matrícula ficam só como fallback (homônimos colidem).
   pertenceAoUsuario(l, sessao) {
@@ -58,16 +71,21 @@ const EloUtil = {
     if (matriculaSessao && matriculaRegistro) return matriculaSessao === matriculaRegistro;
     return Boolean(chave(sessao?.nome)) && chave(l?.solicitante?.nome) === chave(sessao?.nome);
   },
+
+  podeVerIdsInternos() {
+    const perfil = String(obterSessao()?.perfil || "").toLowerCase().replace(/[-\s]+/g, "_");
+    return ["master", "administrador_geral", "administrador_master"].includes(perfil);
+  },
 };
 
 (function () {
   let sessao = obterSessao();
   const publico = document.body.dataset.publico === "true";
-  const perfisValidos = new Set(["administrador", "operador", "aluno", "professor"]);
+  const perfisValidos = new Set(["administrador", "administrador_geral", "administrador-geral", "administrador_master", "master", "operador", "aluno", "professor"]);
   if (!sessao && !publico) { window.location.replace("../index.html"); return; }
   if (!sessao) sessao = { nome: "Consulta pública", perfil: "visitante" };
   const perfilAtual = String(sessao.perfil || "").toLowerCase();
-  const equipe = ["administrador", "operador"].includes(perfilAtual);
+  const equipe = ["administrador", "administrador_geral", "administrador-geral", "administrador_master", "master", "operador"].includes(perfilAtual);
   const usuarioFinal = ["aluno", "professor"].includes(perfilAtual);
   const paginaAtual = document.body.dataset.pagina;
   const arquivoAtual = window.location.pathname.split("/").pop();
@@ -95,7 +113,7 @@ const EloUtil = {
   }
   // A API limita a gestão de contas (/usuarios) ao administrador, embora
   // operadores também possam gerir solicitantes.
-  if (!publico && ["usuarios.html", "solicitacoes-acesso.html"].includes(arquivoAtual) && perfilAtual !== "administrador") {
+  if (!publico && ["usuarios.html", "solicitacoes-acesso.html"].includes(arquivoAtual) && !["administrador", "administrador_geral", "administrador-geral", "administrador_master", "master"].includes(perfilAtual)) {
     window.location.replace("dashboard.html");
     return;
   }
@@ -168,7 +186,7 @@ const EloUtil = {
 
   const atual = usuarioFinal && arquivoAtual === "novo-emprestimo.html" ? "pedir" : document.body.dataset.pagina;
   // Itens "admin" só aparecem para administrador (as próprias páginas redirecionam operadores).
-  const itemPermitido = (i) => !i.admin || perfilAtual === "administrador";
+  const itemPermitido = (i) => !i.admin || ["administrador", "administrador_geral", "administrador-geral", "administrador_master", "master"].includes(perfilAtual);
   const itemHtml = (i) => {
     if (!itemPermitido(i)) return "";
     const ativo = i.id === atual;

@@ -4,7 +4,7 @@
 const SESSION_KEY = "elo.sessao";
 const REMEMBER_EMAIL_KEY = "elo.login.salvo";
 const DASHBOARD_URL = "pages/dashboard.html";
-const PERFIS_VALIDOS = new Set(["administrador", "operador", "aluno", "professor"]);
+const PERFIS_VALIDOS = new Set(["administrador", "administrador_geral", "administrador-geral", "administrador_master", "master", "operador", "aluno", "professor"]);
 
 function obterBaseApiAuth() {
   return String(window.ELO_API_BASE_URL || "").replace(/\/+$/, "");
@@ -43,7 +43,7 @@ async function autenticar(email, senha) {
   };
   const usuario = limparCamposSecretos(usuarioBruto);
   const papelApi = String(usuario.papel || usuario.perfil || "").toLowerCase();
-  const perfil = ({ admin: "administrador", administrador: "administrador", operador: "operador", aluno: "aluno", professor: "professor" })[papelApi];
+  const perfil = ({ admin: "administrador", administrador: "administrador", administrador_geral: "administrador_geral", "administrador-geral": "administrador-geral", administrador_master: "administrador_master", master: "master", operador: "operador", aluno: "aluno", professor: "professor" })[papelApi];
   if (!corpo.token || !usuario.id || !perfil) throw new Error("A resposta de autenticação do servidor está incompleta. Procure a equipe técnica.");
   return {
     ...usuario,

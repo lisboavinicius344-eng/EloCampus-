@@ -19,8 +19,10 @@
     const ate = lerData($("historico-ate")?.value, true);
     return eventos.filter((m) => {
       const data = new Date(m.quando);
-      const texto = [m.tipo, m.equipamento?.nome, m.equipamento?.patrimonio, m.equipamento?.categoria, m.detalhe, m.por].join(" ");
-      return (!q || norm(texto).includes(q)) && (!tipo || m.classe === tipo) && (!de || data >= de) && (!ate || data <= ate);
+      const texto = [EloUtil.tipoMovimentacao(m.tipo), m.equipamento?.nome, m.equipamento?.patrimonio, m.equipamento?.categoria, m.detalhe, m.por].join(" ");
+      // "manutencao" agrupa abertura, conclusão e cancelamento.
+      const tipoOk = !tipo || (tipo === "manutencao" ? String(m.classe || "").startsWith("manutencao") : m.classe === tipo);
+      return (!q || norm(texto).includes(q)) && tipoOk && (!de || data >= de) && (!ate || data <= ate);
     });
   }
   function render() {
@@ -29,10 +31,18 @@
       box.innerHTML = `<p class="estado-vazio">${eventos.length ? "Nenhuma movimentação corresponde aos filtros selecionados." : "Nenhuma movimentação foi encontrada no sistema."}</p>`;
       return;
     }
-    box.innerHTML = `<p class="muted small" style="margin-bottom:.75rem">Exibindo ${lista.length} de ${eventos.length} movimentações.</p><div class="table-wrap"><table class="table"><thead><tr><th>Data e hora</th><th>Tipo</th><th>Equipamento</th><th>Categoria</th><th>Detalhe</th><th>Responsável</th></tr></thead><tbody>${lista.map((m) => `<tr><td>${EloUtil.dataHora(m.quando)}</td><td><span class="badge badge-${esc(m.classe)}">${esc(m.tipo)}</span></td><td><strong>${esc(m.equipamento?.nome || "—")}</strong><small>${esc(m.equipamento?.patrimonio || "—")}</small></td><td><span class="category-tag">${esc(m.equipamento?.categoria || "Equipamento")}</span></td><td>${esc(m.detalhe || "—")}</td><td>${esc(m.por || "—")}</td></tr>`).join("")}</tbody></table></div>`;
+    box.innerHTML = `<p class="muted small" style="margin-bottom:.75rem">Exibindo ${lista.length} de ${eventos.length} movimentações.</p><div class="table-wrap"><table class="table"><thead><tr><th>Data e hora</th><th>Tipo</th><th>Equipamento</th><th>Categoria</th><th>Detalhe</th><th>Responsável</th></tr></thead><tbody>${lista.map((m) => `<tr><td>${EloUtil.dataHora(m.quando)}</td><td><span class="badge badge-${esc(m.classe)}">${esc(EloUtil.tipoMovimentacao(m.tipo))}</span></td><td><strong>${esc(m.equipamento?.nome || "—")}</strong>${m.equipamento?.patrimonio ? `<small>${esc(m.equipamento.patrimonio)}</small>` : ""}</td><td>${m.equipamento?.categoria ? `<span class="category-tag">${esc(m.equipamento.categoria)}</span>` : '<span class="muted">—</span>'}</td><td>${esc(m.detalhe || "—")}</td><td>${esc(m.por || "—")}</td></tr>`).join("")}</tbody></table></div>`;
   }
   try {
     eventos = await ELO.movimentacoes();
+    // GET /historico não traz patrimônio nem categoria; completa a partir do catálogo quando disponível.
+    try {
+      const catalogo = new Map((await ELO.equipamentos()).map((e) => [String(e.id), e]));
+      eventos = eventos.map((m) => {
+        const e = catalogo.get(String(m.equipamento?.id ?? ""));
+        return e ? { ...m, equipamento: { ...m.equipamento, nome: m.equipamento?.nome || e.nome, patrimonio: e.patrimonio, categoria: e.categoria } } : m;
+      });
+    } catch { /* o histórico continua legível sem o catálogo */ }
     eventos = [...eventos].sort((a, b) => new Date(b.quando) - new Date(a.quando));
     controls.filter(Boolean).forEach((control) => control.addEventListener("input", render));
     $("filtros-historico")?.addEventListener("submit", (event) => { event.preventDefault(); render(); });

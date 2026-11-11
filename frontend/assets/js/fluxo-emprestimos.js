@@ -38,14 +38,16 @@
   const formatarCampoData = (valor) => valor ? EloUtil.dataHora(new Date(valor)) : "—";
   const nomeData = (e) => `${e.nome} — ${e.patrimonio}`;
   const vinculosPerfil = { aluno: "aluno", professor: "professor", servidor: "servidor" };
-  const rotulosVinculo = { aluno: "Discente / Aluno", professor: "Docente / Professor", servidor: "Servidor / TAE", grupo_setor: "Grupo ou setor" };
+  const rotulosVinculo = { aluno: "Discente / Aluno", professor: "Docente / Professor", servidor: "Servidor / TAE", grupo_setor: "Grupo ou setor", outro: "Outro" };
   const normalizarBusca = (valor) => norm(valor).replace(/\s+/g, " ").trim();
   function atualizarCampoVinculo() {
-    const grupo = campoVinculo.value === "grupo_setor";
-    if (vinculoDetalheWrap) vinculoDetalheWrap.hidden = !grupo;
+    const exigeDetalhe = ["grupo_setor", "outro"].includes(campoVinculo.value);
+    if (vinculoDetalheWrap) vinculoDetalheWrap.hidden = !exigeDetalhe;
     if (campoVinculoDetalhe) {
-      campoVinculoDetalhe.required = grupo;
-      if (!grupo) campoVinculoDetalhe.value = "";
+      campoVinculoDetalhe.required = exigeDetalhe;
+      const label = document.querySelector('label[for="vinculo-detalhe"]');
+      if (label) label.textContent = campoVinculo.value === "outro" ? "Explique o vínculo" : "Nome do grupo ou setor";
+      if (!exigeDetalhe) campoVinculoDetalhe.value = "";
     }
   }
   campoVinculo.addEventListener("change", atualizarCampoVinculo);
@@ -156,7 +158,7 @@
           campoSolicitante.placeholder = "Pesquise por nome ou matrícula";
           campoSolicitante.required = true;
           const lista = $("lista-solicitantes");
-          lista.replaceChildren(...solicitantesDisponiveis.map(x => new Option(`${x.nome} · ${x.matricula || x.id}`, `${x.nome} · ${x.matricula || x.id}`)));
+              lista.replaceChildren(...solicitantesDisponiveis.map(x => new Option(`${x.nome} · ${x.matricula || "cadastro sem matrícula"}`, `${x.nome} · ${x.matricula || "cadastro sem matrícula"}`)));
           const selecionarSolicitante = () => {
             const termo = normalizarBusca(campoSolicitante.value);
             solicitanteSelecionado = solicitantesDisponiveis.find(x =>
@@ -168,7 +170,7 @@
             if (solicitanteSelecionado) {
               const tipo = normalizarBusca(solicitanteSelecionado.tipo);
               campoVinculo.value = tipo.includes("prof") ? "professor" : tipo.includes("serv") || tipo.includes("tecn") ? "servidor" : "aluno";
-              $("resumo-solicitante").textContent = `${solicitanteSelecionado.nome} · #${solicitanteSelecionado.id}`;
+              $("resumo-solicitante").textContent = `${solicitanteSelecionado.nome}${solicitanteSelecionado.matricula ? ` · ${solicitanteSelecionado.matricula}` : ""}`;
             } else {
               $("resumo-solicitante").textContent = "Selecione um cadastro válido";
             }
@@ -251,6 +253,7 @@
     esconderMensagem();
     if (!form.reportValidity()) return;
     if (!usuarioFinal && (!solicitanteSelecionado || String(campoSolicitante.value).trim() === "")) return mostrarMensagem("Pesquise e selecione um solicitante cadastrado pelo nome ou matrícula.");
+    if (!usuarioFinal && campoVinculo.value === "outro" && !campoVinculoDetalhe.value.trim()) return mostrarMensagem("Explique o vínculo selecionado em ‘Outro’ antes de continuar.");
     if (!selecionados.length) return mostrarMensagem("Adicione pelo menos um equipamento antes de continuar.");
     const retirada = new Date($("retirada").value);
     const devolucao = new Date($("devolucao").value);
@@ -267,7 +270,7 @@
       retirada: retirada.toISOString(),
       prevista: devolucao.toISOString(),
       finalidade: $("finalidade").value,
-      observacoes: [$("obs").value.trim(), (!usuarioFinal && campoVinculo.value === "grupo_setor" ? `Grupo/setor: ${campoVinculoDetalhe.value.trim()}` : "")].filter(Boolean).join(" — "),
+      observacoes: [$("obs").value.trim(), (!usuarioFinal && campoVinculo.value === "grupo_setor" ? `Grupo/setor: ${campoVinculoDetalhe.value.trim()}` : ""), (!usuarioFinal && campoVinculo.value === "outro" ? `Vínculo: ${campoVinculoDetalhe.value.trim()}` : "")].filter(Boolean).join(" — "),
     };
     resumoReview.innerHTML = `<div class="stack-sm">${usuarioFinal ? "" : `<div class="summary-row"><span>Solicitante</span><strong>${esc(dadosParaConfirmar.solicitante)}</strong></div><div class="summary-row"><span>Vínculo</span><strong>${esc(rotulosVinculo[dadosParaConfirmar.vinculo] || dadosParaConfirmar.vinculo)}${dadosParaConfirmar.vinculo === "grupo_setor" ? ` · ${esc(campoVinculoDetalhe.value.trim())}` : ""}</strong></div><div class="summary-row"><span>Retirada</span><strong>No momento da confirmação (horário do servidor)</strong></div>`}<div class="summary-row"><span>Devolução prevista</span><strong>${esc(formatarCampoData($("devolucao").value))}</strong></div><div><strong>Equipamentos</strong><ul>${selecionados.map((e) => `<li>${esc(e.nome)} · ${esc(e.patrimonio)}</li>`).join("")}</ul></div>${dadosParaConfirmar.observacoes ? `<p><strong>Observações:</strong> ${esc(dadosParaConfirmar.observacoes)}</p>` : ""}</div><p class="muted">${usuarioFinal ? "Seu pedido será enviado ao servidor para análise da equipe. O equipamento só estará liberado após aprovação e registro da retirada." : "A confirmação enviará a retirada para registro no sistema oficial."}</p>`;
     form.hidden = true;
