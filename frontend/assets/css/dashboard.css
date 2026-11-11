@@ -51,12 +51,12 @@
 }
 
 .kpi-alerta {
-  border-color: rgba(255, 93, 115, 0.58);
-  background: linear-gradient(135deg, rgba(255, 93, 115, 0.16), var(--surface) 60%);
-  box-shadow: 0 0 32px -12px rgba(255, 93, 115, 0.48);
+  border-color: rgba(139, 92, 246, 0.48);
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.14), var(--surface) 60%);
+  box-shadow: 0 0 32px -12px rgba(139, 92, 246, 0.48);
 }
 .kpi-alerta .kpi-valor {
-  color: #ff5d73;
+  color: var(--st-late);
 }
 
 /* Distribuição por situação */
