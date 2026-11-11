@@ -1,76 +1,255 @@
-/* Administração de solicitações de acesso. Senha provisória nunca é persistida. */
+/* Administração de solicitações de acesso: análise rápida, ações explícitas e auditoria. */
 "use strict";
 (() => {
   const $ = (id) => document.getElementById(id);
-  const lista = $("solicitacoes-lista"), aviso = $("solicitacoes-aviso"), atualizar = $("solicitacoes-atualizar");
+  const lista = $("solicitacoes-lista");
+  const aviso = $("solicitacoes-aviso");
+  const atualizar = $("solicitacoes-atualizar");
+  const busca = $("solicitacoes-busca");
+  const tabs = [...document.querySelectorAll("[data-access-view]")];
   if (!lista) return;
+
   const esc = (v) => EloUtil.esc(v ?? "—");
   let ocupada = false;
-  let statusAtual = "pendente";
-  function informar(texto, tipo = "info") { aviso.textContent = texto; aviso.className = `alert ${tipo === "ok" ? "alert-ok" : tipo === "error" ? "alert-error" : "alert-info"}`; aviso.hidden = false; }
+  let visaoAtual = "pendente";
+  let pedidosAtuais = [];
+
+  function informar(texto, tipo = "info") {
+    aviso.textContent = texto;
+    aviso.className = `alert ${tipo === "ok" ? "alert-ok" : tipo === "error" ? "alert-error" : "alert-info"}`;
+    aviso.hidden = false;
+  }
+
+  function normalizarStatus(pedido) {
+    return String(pedido?.status || pedido?.situacao || "pendente").toLowerCase().replace(/[_\s-]+/g, "_");
+  }
+
+  function statusInfo(pedido) {
+    const status = normalizarStatus(pedido);
+    if (["aprovada", "aprovado", "approved"].includes(status)) return { texto: "Aprovada", classe: "pill-ok" };
+    if (["recusada", "rejeitada", "rejeitado", "denied", "refused"].includes(status)) return { texto: "Recusada", classe: "pill-late" };
+    return { texto: "Pendente", classe: "pill-warn" };
+  }
+
+  function nomeSolicitante(pedido) {
+    return pedido.nome || pedido.solicitante_nome || pedido.email || "Solicitante não informado";
+  }
+
+  function dataPedido(pedido) {
+    const valor = pedido.criado_em || pedido.created_at || pedido.data_solicitacao;
+    return valor ? new Date(valor).toLocaleString("pt-BR") : "Data não informada";
+  }
+
+  function dataDecisao(pedido) {
+    const valor = pedido.decidido_em || pedido.data_decisao || pedido.analisado_em || pedido.updated_at;
+    return valor ? new Date(valor).toLocaleString("pt-BR") : "Data da decisão não informada";
+  }
+
+  function responsavelDecisao(pedido) {
+    return pedido.responsavel_nome || pedido.responsavel || pedido.analisado_por || pedido.aprovado_por || pedido.recusado_por || pedido.usuario_nome || "Responsável não informado";
+  }
+
   function inputField(labelText, name, value = "", required = false, type = "text") {
-    const wrap = document.createElement("div"); wrap.className = "field";
-    const label = document.createElement("label"); label.textContent = labelText; label.htmlFor = `access-${name}`;
-    const input = document.createElement(type === "textarea" ? "textarea" : "input"); input.id = `access-${name}`; input.name = name; input.className = "input input-block"; input.value = value == null ? "" : String(value); input.required = required; input.maxLength = name === "mensagem" ? 1000 : 120;
+    const wrap = document.createElement("div");
+    wrap.className = "field";
+    const label = document.createElement("label");
+    label.textContent = labelText;
+    label.htmlFor = `access-${name}`;
+    const input = document.createElement(type === "textarea" ? "textarea" : "input");
+    input.id = `access-${name}`;
+    input.name = name;
+    input.className = "input input-block";
+    input.value = value == null ? "" : String(value);
+    input.required = required;
+    input.maxLength = name === "mensagem" ? 1000 : 160;
     if (type !== "textarea") input.type = type;
-    wrap.append(label, input); return { wrap, input };
+    wrap.append(label, input);
+    return { wrap, input };
   }
+
+  function montarCabecalho(card, pedido, auditoria = false) {
+    const head = document.createElement("div");
+    head.className = "access-card-head";
+    const ident = document.createElement("div");
+    const h = document.createElement("h2");
+    h.textContent = nomeSolicitante(pedido);
+    const meta = document.createElement("p");
+    meta.className = "access-meta";
+    meta.textContent = [
+      pedido.email || "E-mail não informado",
+      pedido.tipo || "Vínculo não informado",
+      pedido.matricula ? `Matrícula/SIAPE: ${pedido.matricula}` : "",
+      auditoria ? `Solicitada em ${dataPedido(pedido)}` : `Recebida em ${dataPedido(pedido)}`,
+    ].filter(Boolean).join(" · ");
+    ident.append(h, meta);
+    const status = statusInfo(pedido);
+    const pill = document.createElement("span");
+    pill.className = `pill ${status.classe}`;
+    pill.textContent = status.texto;
+    head.append(ident, pill);
+    card.append(head);
+  }
+
+  function montarAuditoria(pedido) {
+    const card = document.createElement("article");
+    card.className = "card access-card access-card-audit";
+    montarCabecalho(card, pedido, true);
+    const detalhe = document.createElement("dl");
+    detalhe.className = "access-audit-details";
+    [["Responsável pela análise", responsavelDecisao(pedido)], ["Data da decisão", dataDecisao(pedido)]].forEach(([label, value]) => {
+      const item = document.createElement("div");
+      const dt = document.createElement("dt"); dt.textContent = label;
+      const dd = document.createElement("dd"); dd.textContent = value;
+      item.append(dt, dd); detalhe.append(item);
+    });
+    card.append(detalhe);
+    if (pedido.mensagem) {
+      const msg = document.createElement("p"); msg.className = "access-request-message"; msg.textContent = `Mensagem enviada: ${pedido.mensagem}`; card.append(msg);
+    }
+    const justificativa = pedido.motivo || pedido.justificativa || pedido.mensagem_decisao || pedido.observacoes;
+    if (justificativa) {
+      const motivo = document.createElement("p"); motivo.className = "access-request-message access-decision-note"; motivo.textContent = `Justificativa: ${justificativa}`; card.append(motivo);
+    }
+    return card;
+  }
+
+  function montarPendente(pedido) {
+    const card = document.createElement("article");
+    card.className = "card access-card";
+    montarCabecalho(card, pedido);
+    if (pedido.mensagem) {
+      const msg = document.createElement("p"); msg.className = "access-request-message"; msg.textContent = `Mensagem enviada: ${pedido.mensagem}`; card.append(msg);
+    }
+    const fields = document.createElement("div");
+    fields.className = "access-fields";
+    const tipoField = document.createElement("div");
+    tipoField.className = "field";
+    const tipoLabel = document.createElement("label");
+    tipoLabel.htmlFor = `access-tipo-${pedido.id}`;
+    tipoLabel.textContent = "Vínculo";
+    const tipoSelect = document.createElement("select");
+    tipoSelect.id = tipoLabel.htmlFor;
+    tipoSelect.name = "tipo";
+    tipoSelect.className = "input input-block";
+    [["", "Selecione o vínculo"], ["aluno", "Aluno"], ["professor", "Professor"]].forEach(([v, t]) => tipoSelect.add(new Option(t, v)));
+    if (["aluno", "professor"].includes(pedido.tipo)) tipoSelect.value = pedido.tipo;
+    tipoSelect.required = !pedido.tipo;
+    tipoField.append(tipoLabel, tipoSelect);
+    fields.append(tipoField);
+    const nomeField = inputField("Nome do solicitante", "nome", pedido.nome || "", false);
+    const matField = inputField("Matrícula / SIAPE", "matricula", pedido.matricula || "", false);
+    const setorField = inputField("Setor / curso", "setor", pedido.setor || "", false);
+    const telField = inputField("Telefone", "telefone", pedido.telefone || "", false, "tel");
+    [nomeField, matField, setorField, telField].forEach((field) => fields.append(field.wrap));
+    card.append(fields);
+
+    const actions = document.createElement("div");
+    actions.className = "access-actions";
+    const approve = document.createElement("button");
+    approve.type = "button";
+    approve.className = "btn btn-primary";
+    approve.textContent = "Aprovar acesso";
+    const reject = document.createElement("button");
+    reject.type = "button";
+    reject.className = "btn btn-ghost";
+    reject.textContent = "Recusar";
+    approve.addEventListener("click", async () => {
+      if (ocupada) return;
+      if (!tipoSelect.value) { informar("Selecione Aluno ou Professor antes de aprovar.", "error"); tipoSelect.focus(); return; }
+      const confirmada = window.confirm(`Confirma a aprovação do acesso de ${nomeField.input.value.trim() || nomeSolicitante(pedido)}?\n\nVínculo: ${tipoSelect.value === "aluno" ? "Aluno" : "Professor"}\nE-mail: ${pedido.email || "não informado"}\n\nA conta será criada e a pessoa receberá as instruções por e-mail.`);
+      if (!confirmada) return;
+      const payload = { tipo: tipoSelect.value };
+      if (nomeField.input.value.trim()) payload.nome = nomeField.input.value.trim();
+      if (matField.input.value.trim()) payload.matricula = matField.input.value.trim();
+      if (setorField.input.value.trim()) payload.setor = setorField.input.value.trim();
+      if (telField.input.value.trim()) payload.telefone = telField.input.value.trim();
+      ocupada = true; approve.disabled = true; reject.disabled = true;
+      try {
+        const result = await ELO.aprovarSolicitacaoAcesso(pedido.id, payload);
+        informar(result?.mensagem || "Solicitação aprovada.", "ok");
+        if (result?.email_enviado === false) informar("Solicitação aprovada, mas o e-mail não foi enviado. Reenvie as instruções em Equipe do sistema.", "info");
+        await atualizarContador();
+        await carregar();
+      } catch (e) { informar(e.message || "Não foi possível aprovar a solicitação.", "error"); approve.disabled = false; reject.disabled = false; }
+      finally { ocupada = false; }
+    });
+    reject.addEventListener("click", async () => {
+      if (ocupada) return;
+      const motivo = window.prompt("Motivo da recusa (opcional):", "");
+      if (motivo === null) return;
+      if (!window.confirm(`Recusar a solicitação de ${nomeSolicitante(pedido)}?`)) return;
+      ocupada = true; reject.disabled = true; approve.disabled = true;
+      try { const result = await ELO.recusarSolicitacaoAcesso(pedido.id, motivo); informar(result?.mensagem || "Solicitação recusada.", "ok"); await atualizarContador(); await carregar(); }
+      catch (e) { informar(e.message || "Não foi possível recusar a solicitação.", "error"); approve.disabled = false; reject.disabled = false; }
+      finally { ocupada = false; }
+    });
+    actions.append(approve, reject);
+    card.append(actions);
+    return card;
+  }
+
+  function atualizarAbas() {
+    tabs.forEach((tab) => {
+      const ativo = tab.dataset.accessView === visaoAtual;
+      tab.classList.toggle("is-active", ativo);
+      tab.setAttribute("aria-selected", String(ativo));
+    });
+  }
+
+  function renderizar() {
+    const termo = String(busca?.value || "").trim().toLocaleLowerCase("pt-BR");
+    const filtrados = pedidosAtuais.filter((pedido) => !termo || [pedido.nome, pedido.email, pedido.tipo, pedido.matricula, pedido.setor].join(" ").toLocaleLowerCase("pt-BR").includes(termo));
+    lista.replaceChildren();
+    if (!filtrados.length) {
+      const vazio = document.createElement("div");
+      vazio.className = "card access-empty";
+      vazio.innerHTML = visaoAtual === "pendente" ? "<strong>Nenhuma solicitação pendente.</strong><span>Quando um novo pedido chegar, ele aparecerá aqui para análise.</span>" : "<strong>Nenhuma decisão encontrada.</strong><span>A auditoria das aprovações e recusas aparecerá nesta área.</span>";
+      lista.append(vazio);
+      return;
+    }
+    filtrados.forEach((pedido) => lista.append(visaoAtual === "pendente" ? montarPendente(pedido) : montarAuditoria(pedido)));
+  }
+
+  async function carregarAuditoria() {
+    const respostas = await Promise.allSettled(["aprovada", "recusada", "rejeitada"].map((status) => ELO.solicitacoesAcesso(status)));
+    const pedidos = respostas.flatMap((resultado) => resultado.status === "fulfilled" && Array.isArray(resultado.value) ? resultado.value : []);
+    if (!pedidos.length && respostas.every((resultado) => resultado.status === "rejected")) throw respostas[0].reason;
+    return [...new Map(pedidos.map((pedido) => [String(pedido.id), pedido])).values()];
+  }
+
   async function atualizarContador() {
-    const contador = document.getElementById("solicitacoes-pendentes-count");
-    if (!contador) return;
-    try { const pedidos = await ELO.solicitacoesAcesso("pendente"); contador.textContent = String(pedidos.length); contador.hidden = pedidos.length === 0; contador.setAttribute("aria-label", `${pedidos.length} solicitações pendentes`); } catch { /* o menu não deve falhar por causa do contador */ }
-  }
-  async function carregar(status = statusAtual) {
-    statusAtual = status;
-    atualizar.disabled = true; atualizar.textContent = "Atualizando…"; lista.replaceChildren();
-    const loading = document.createElement("div"); loading.className = "card"; loading.textContent = status === "auditoria" ? "Consultando histórico…" : "Consultando pedidos pendentes…"; lista.append(loading);
+    const contador = $("solicitacoes-pendentes-count");
+    const total = $("pendentes-total");
     try {
-      const pedidos = status === "auditoria" ? (await Promise.all([ELO.solicitacoesAcesso("aprovada"), ELO.solicitacoesAcesso("recusada")])).flat() : await ELO.solicitacoesAcesso("pendente"); lista.replaceChildren();
-      if (!pedidos.length) { const vazio = document.createElement("div"); vazio.className = "card"; vazio.textContent = status === "auditoria" ? "Ainda não há registros de auditoria." : "Não há solicitações de acesso pendentes."; lista.append(vazio); informar("Lista atualizada.", "ok"); return; }
-      pedidos.forEach((pedido) => {
-        const card = document.createElement("article"); card.className = "card access-card";
-        const head = document.createElement("div"); head.className = "access-card-head";
-        const ident = document.createElement("div"); const h = document.createElement("h2"); h.textContent = pedido.nome || "Nome não informado"; h.style.margin = "0";
-        const meta = document.createElement("p"); meta.className = "access-meta"; meta.textContent = [pedido.email, pedido.tipo || "Vínculo não informado", pedido.matricula ? `Matrícula/SIAPE: ${pedido.matricula}` : "", pedido.criado_em ? `Recebida em ${new Date(pedido.criado_em).toLocaleString("pt-BR")}` : ""].filter(Boolean).join(" · "); ident.append(h, meta);
-        const statusPill = document.createElement("span"); statusPill.className = `pill ${status === "auditoria" ? (pedido.status === "aprovada" ? "pill-ok" : "pill-late") : "pill-warn"}`; statusPill.textContent = status === "auditoria" ? (pedido.status === "aprovada" ? "Aprovada" : "Recusada") : "Pendente"; head.append(ident, statusPill); card.append(head);
-        if (status === "auditoria") { const auditoria = document.createElement("p"); auditoria.className = "muted"; auditoria.textContent = `Analisado por: ${pedido.analisado_por_nome || "—"} · ${pedido.analisado_em ? new Date(pedido.analisado_em).toLocaleString("pt-BR") : "data não informada"} · Justificativa: ${pedido.justificativa || pedido.motivo || "—"}`; card.append(auditoria); lista.append(card); return; }
-        if (pedido.mensagem) { const msg = document.createElement("p"); msg.textContent = `Mensagem: ${pedido.mensagem}`; card.append(msg); }
-        const fields = document.createElement("div"); fields.className = "access-fields";
-        const tipoField = document.createElement("div"); tipoField.className = "field"; const tipoLabel = document.createElement("label"); tipoLabel.htmlFor = `access-tipo-${pedido.id}`; tipoLabel.textContent = "Vínculo"; const tipoSelect = document.createElement("select"); tipoSelect.id = tipoLabel.htmlFor; tipoSelect.name = "tipo"; tipoSelect.className = "input input-block"; [["", "Selecione o vínculo"],["aluno","Aluno"],["professor","Professor"]].forEach(([v,t]) => { const o = new Option(t,v); tipoSelect.add(o); }); if (["aluno","professor"].includes(pedido.tipo)) tipoSelect.value = pedido.tipo; tipoSelect.required = !pedido.tipo; tipoField.append(tipoLabel,tipoSelect); fields.append(tipoField);
-        const nomeField = inputField("Nome", "nome", pedido.nome || "", false); const matField = inputField("Matrícula / SIAPE", "matricula", pedido.matricula || "", false); const setorField = inputField("Setor / curso", "setor", pedido.setor || "", false); const telField = inputField("Telefone", "telefone", pedido.telefone || "", false, "tel");
-        const justificativaField = inputField("Justificativa (opcional)", "justificativa", "", false, "textarea");
-        [nomeField,matField,setorField,telField,justificativaField].forEach((f)=>fields.append(f.wrap)); card.append(fields);
-        const actions = document.createElement("div"); actions.className = "access-actions";
-        const approve = document.createElement("button"); approve.type = "button"; approve.className = "btn btn-primary"; approve.textContent = "Aprovar acesso";
-        approve.addEventListener("click", async () => {
-          if (ocupada) return;
-          if (!tipoSelect.value) { informar("Selecione Aluno ou Professor antes de aprovar.", "error"); tipoSelect.focus(); return; }
-          const payload = {};
-          if (tipoSelect.value) payload.tipo = tipoSelect.value;
-          if (nomeField.input.value.trim()) payload.nome = nomeField.input.value.trim();
-          if (matField.input.value.trim()) payload.matricula = matField.input.value.trim();
-          if (setorField.input.value.trim()) payload.setor = setorField.input.value.trim();
-          if (telField.input.value.trim()) payload.telefone = telField.input.value.trim();
-          if (justificativaField.input.value.trim()) payload.justificativa = justificativaField.input.value.trim();
-          ocupada = true; approve.disabled = true;
-          try {
-            const result = await ELO.aprovarSolicitacaoAcesso(pedido.id, payload);
-            card.replaceChildren(); const done = document.createElement("div"); done.className = "access-card";
-            const text = document.createElement("p"); text.textContent = result?.mensagem || "Solicitação aprovada."; done.append(text);
-            // O backend não devolve mais senha provisória; se o e-mail falhar, use "Reenviar instruções".
-            if (result?.email_enviado === false) { const note = document.createElement("p"); note.textContent = "O e-mail não foi enviado. Depois de corrigir o envio, use “Reenviar instruções” em Equipe do sistema para mandar o acesso a essa pessoa."; done.append(note); }
-            card.append(done); informar("Solicitação aprovada.", "ok"); await atualizarContador();
-          } catch (e) { informar(e.message || "Não foi possível aprovar a solicitação.", "error"); approve.disabled = false; }
-          finally { ocupada = false; }
-        });
-        const reject = document.createElement("button"); reject.type = "button"; reject.className = "btn btn-ghost"; reject.textContent = "Recusar";
-        reject.addEventListener("click", async () => { if (ocupada) return; const motivo = window.prompt("Motivo obrigatório da recusa:", ""); if (motivo === null || !motivo.trim()) { informar("Informe o motivo da recusa.", "error"); return; } if (!window.confirm(`Recusar a solicitação de ${pedido.nome || pedido.email}?`)) return; ocupada = true; reject.disabled = true; try { const r = await ELO.recusarSolicitacaoAcesso(pedido.id, motivo); informar(r?.mensagem || "Solicitação recusada.", "ok"); await atualizarContador(); await carregar(statusAtual); } catch (e) { informar(e.message || "Não foi possível recusar a solicitação.", "error"); reject.disabled = false; } finally { ocupada = false; } });
-        actions.append(approve, reject); card.append(actions); lista.append(card);
-      });
-      aviso.hidden = true;
-    } catch (e) { lista.replaceChildren(); const erro = document.createElement("div"); erro.className = "card"; erro.textContent = e.message || "Não foi possível carregar as solicitações."; lista.append(erro); informar(erro.textContent, "error"); }
-    finally { atualizar.disabled = false; atualizar.textContent = "Atualizar lista"; }
+      const pendentes = await ELO.solicitacoesAcesso("pendente");
+      if (contador) { contador.textContent = String(pendentes.length); contador.hidden = pendentes.length === 0; contador.setAttribute("aria-label", `${pendentes.length} solicitações pendentes`); }
+      if (total) total.textContent = String(pendentes.length);
+      return pendentes;
+    } catch { return []; }
   }
-  document.querySelectorAll("[data-status]").forEach((tab) => tab.addEventListener("click", () => { document.querySelectorAll("[data-status]").forEach((item) => item.setAttribute("aria-selected", String(item === tab))); carregar(tab.dataset.status); }));
-  atualizar.addEventListener("click", () => carregar(statusAtual)); carregar();
+
+  async function carregar() {
+    atualizar.disabled = true;
+    atualizar.textContent = "Atualizando…";
+    lista.innerHTML = `<div class="card access-loading">${visaoAtual === "pendente" ? "Consultando pedidos pendentes…" : "Consultando histórico de decisões…"}</div>`;
+    try {
+      pedidosAtuais = visaoAtual === "pendente" ? await ELO.solicitacoesAcesso("pendente") : await carregarAuditoria();
+      const total = $(visaoAtual === "pendente" ? "pendentes-total" : "auditoria-total");
+      if (total) total.textContent = String(pedidosAtuais.length);
+      atualizarAbas();
+      renderizar();
+      informar(visaoAtual === "pendente" ? "Lista de pendências atualizada." : "Auditoria atualizada.", "ok");
+    } catch (e) {
+      lista.innerHTML = `<div class="card access-empty"><strong>Não foi possível carregar esta visão.</strong><span>${esc(e.message || "Tente atualizar a lista.")}</span></div>`;
+      informar(e.message || "Não foi possível carregar as solicitações.", "error");
+    } finally {
+      atualizar.disabled = false;
+      atualizar.textContent = "Atualizar lista";
+    }
+  }
+
+  tabs.forEach((tab) => tab.addEventListener("click", () => { if (ocupada || tab.dataset.accessView === visaoAtual) return; visaoAtual = tab.dataset.accessView; carregar(); }));
+  busca?.addEventListener("input", renderizar);
+  atualizar.addEventListener("click", carregar);
+  atualizarContador().finally(carregar);
 })();

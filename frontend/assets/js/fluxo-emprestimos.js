@@ -5,7 +5,6 @@
   const $ = (id) => document.getElementById(id);
   const esc = (value) => EloUtil.esc(value ?? "");
   const sessaoAtual = typeof obterSessao === "function" ? obterSessao() : null;
-  const sessaoMaster = sessaoAtual?.master === true || sessaoAtual?.usuario?.master === true;
   const perfilAtual = String(sessaoAtual?.perfil || "").toLowerCase();
   const usuarioFinal = ["aluno", "professor", "servidor"].includes(perfilAtual);
   const parametrosIniciais = new URLSearchParams(location.search);
@@ -39,7 +38,6 @@
   const formatarCampoData = (valor) => valor ? EloUtil.dataHora(new Date(valor)) : "—";
   const nomeData = (e) => `${e.nome} — ${e.patrimonio}`;
   const vinculosPerfil = { aluno: "aluno", professor: "professor", servidor: "servidor" };
-  const vinculoPorTipo = { aluno: "aluno", professor: "professor", servidor: "servidor", tecnico: "servidor", externo: "grupo_setor" };
   const rotulosVinculo = { aluno: "Discente / Aluno", professor: "Docente / Professor", servidor: "Servidor / TAE", grupo_setor: "Grupo ou setor", outro: "Outro" };
   const normalizarBusca = (valor) => norm(valor).replace(/\s+/g, " ").trim();
   function atualizarCampoVinculo() {
@@ -160,22 +158,19 @@
           campoSolicitante.placeholder = "Pesquise por nome ou matrícula";
           campoSolicitante.required = true;
           const lista = $("lista-solicitantes");
-          const identificador = (x) => sessaoMaster ? (x.matricula || x.id || "cadastro sem matrícula") : (x.matricula || x.email || "cadastro sem matrícula");
-          lista.replaceChildren(...solicitantesDisponiveis.map(x => new Option(`${x.nome} · ${identificador(x)}`, `${x.nome} · ${identificador(x)}`)));
+              lista.replaceChildren(...solicitantesDisponiveis.map(x => new Option(`${x.nome} · ${x.matricula || "cadastro sem matrícula"}`, `${x.nome} · ${x.matricula || "cadastro sem matrícula"}`)));
           const selecionarSolicitante = () => {
             const termo = normalizarBusca(campoSolicitante.value);
             solicitanteSelecionado = solicitantesDisponiveis.find(x =>
               normalizarBusca(x.nome) === termo ||
-              normalizarBusca(`${x.nome} · ${identificador(x)}`) === termo ||
+              normalizarBusca(`${x.nome} · ${x.matricula || x.id}`) === termo ||
               normalizarBusca(x.matricula) === termo ||
               normalizarBusca(String(x.id)) === termo
             ) || null;
             if (solicitanteSelecionado) {
               const tipo = normalizarBusca(solicitanteSelecionado.tipo);
-              campoVinculo.value = vinculoPorTipo[tipo] || "servidor";
-              campoVinculo.disabled = true;
-              const resumoId = sessaoMaster && solicitanteSelecionado.id ? ` · #${solicitanteSelecionado.id}` : "";
-              $("resumo-solicitante").textContent = `${solicitanteSelecionado.nome}${solicitanteSelecionado.matricula ? ` · ${solicitanteSelecionado.matricula}` : ""}${resumoId}`;
+              campoVinculo.value = tipo.includes("prof") ? "professor" : tipo.includes("serv") || tipo.includes("tecn") ? "servidor" : "aluno";
+              $("resumo-solicitante").textContent = `${solicitanteSelecionado.nome}${solicitanteSelecionado.matricula ? ` · ${solicitanteSelecionado.matricula}` : ""}`;
             } else {
               $("resumo-solicitante").textContent = "Selecione um cadastro válido";
             }
@@ -186,9 +181,8 @@
           selecionarSolicitante();
           campoSolicitante.addEventListener("input", () => {
             const termo = normalizarBusca(campoSolicitante.value);
-            if (!solicitantesDisponiveis.some(x => normalizarBusca(`${x.nome} · ${identificador(x)}`) === termo || normalizarBusca(x.nome) === termo || normalizarBusca(x.matricula) === termo || normalizarBusca(x.email) === termo)) {
+            if (!solicitantesDisponiveis.some(x => normalizarBusca(`${x.nome} · ${x.matricula || x.id}`) === termo || normalizarBusca(x.nome) === termo || normalizarBusca(x.matricula) === termo)) {
               solicitanteSelecionado = null;
-              campoVinculo.disabled = false;
               $("resumo-solicitante").textContent = "Selecione um cadastro válido";
             }
           });
