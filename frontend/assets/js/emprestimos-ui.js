@@ -338,6 +338,13 @@
       const pendente = conferencias.find(([campo]) => campo && !campo.checked);
       if (pendente) { aviso(mensagem, pendente[1], "error"); pendente[0]?.focus(); return; }
       if (!revisar) { mostrarRevisao(selecionados); return; }
+      const quantidade = selecionados.length;
+      const nomes = selecionados.map((l) => l.equipamento.nome).join(", ");
+      const confirmacao = quantidade === 1
+        ? `Tem certeza de que deseja devolver este equipamento?\n\n${nomes}`
+        : `Tem certeza de que deseja devolver estes ${quantidade} equipamentos?\n\n${nomes}`;
+      if (!window.confirm(confirmacao)) return;
+
       const botao = $("confirmar-devolucao"); botao.disabled = true;
       try {
         const result = await ELO.registrarDevolucao({
