@@ -84,15 +84,18 @@
       if (l.observacoesDevolucao) eventos.push(["dot-pink", "Observação da devolução", esc(l.observacoesDevolucao)]);
       timeline.innerHTML = eventos.map(([dot, titulo, detalhe]) => `<li><span class="dot ${dot}"></span><div><strong>${titulo}</strong><div class="muted">${detalhe}</div></div></li>`).join("");
       const link = $("detalhe-devolver");
+      const cobrar = $("detalhe-cobrar");
       if (usuarioFinal) {
         link.removeAttribute("href");
         link.textContent = l.devolvida ? "Devolução registrada" : "Entregue à equipe do acervo";
         link.setAttribute("aria-disabled", "true");
         link.classList.add("is-disabled");
+        if (cobrar) cobrar.hidden = true;
       } else {
         link.href = l.devolvida ? "devolucoes.html" : `devolucoes.html?itemId=${encodeURIComponent(l.id)}&emprestimoId=${encodeURIComponent(l.emprestimoId)}`;
         link.setAttribute("aria-disabled", String(Boolean(l.devolvida)));
         link.classList.toggle("is-disabled", Boolean(l.devolvida));
+        if (cobrar) { cobrar.hidden = Boolean(l.devolvida); cobrar.disabled = false; cobrar.dataset.cobrar = l.chave; }
       }
     }
     function renderizar() {
@@ -125,7 +128,7 @@
           <td>${esc(l.solicitante.nome)}<small>por ${esc(l.registradoPor || "—")}</small></td>
           <td>${dataHora(l.devolvida || l.prevista)}</td>
           <td><span class="pill ${status.classe}">${esc(status.texto)}</span></td>
-          <td>${l.devolvida ? '<span class="muted small">Concluído</span>' : `<button class="btn btn-sm" type="button" data-devolver="${esc(l.chave)}">Devolver</button>`}</td>
+          <td>${l.devolvida ? '<span class="muted small">Concluído</span>' : `<div class="loan-actions"><button class="btn btn-sm" type="button" data-devolver="${esc(l.chave)}">Devolver</button><button class="btn btn-sm btn-line" type="button" data-cobrar="${esc(l.chave)}">Cobrar</button></div>`}</td>
         </tr>`;
       }).join("");
       const activeSelection = filtrados.find((l) => l.chave === selecionado?.chave) || filtrados[0];
@@ -134,8 +137,18 @@
 
     abas.forEach((aba) => aba.addEventListener("click", () => { filtro = aba.dataset.filtro; renderizar(); }));
     busca?.addEventListener("input", renderizar);
-    corpo.addEventListener("click", (event) => {
+    corpo.addEventListener("click", async (event) => {
       const devolver = event.target.closest("[data-devolver]");
+      const cobrar = event.target.closest("[data-cobrar]");
+      if (cobrar) {
+        const l = registros.find((x) => x.chave === cobrar.dataset.cobrar);
+        if (!l || l.devolvida || !window.confirm(`Enviar cobrança por e-mail para ${l.solicitante.nome}?`)) return;
+        cobrar.disabled = true;
+        try { const resposta = await ELO.cobrarEmprestimo(l.emprestimoId); aviso(document.querySelector(".page-head")?.nextElementSibling, resposta?.mensagem || `Cobrança enviada para ${l.solicitante.nome}.`, "ok"); }
+        catch (error) { aviso(document.querySelector(".page-head")?.nextElementSibling, error.message || "Não foi possível enviar a cobrança.", "error"); }
+        finally { cobrar.disabled = false; }
+        return;
+      }
       const row = event.target.closest("tr[data-item-id]");
       if (devolver) {
         const l = registros.find((x) => x.chave === devolver.dataset.devolver);
@@ -147,9 +160,20 @@
         if (l) desenharDetalhe(l);
       }
     });
+    $("detalhe-cobrar")?.addEventListener("click", async (event) => {
+      const l = selecionado;
+      if (!l || l.devolvida || !window.confirm(`Enviar cobrança por e-mail para ${l.solicitante.nome}?`)) return;
+      const botao = event.currentTarget; botao.disabled = true;
+      try { const resposta = await ELO.cobrarEmprestimo(l.emprestimoId); window.alert(resposta?.mensagem || `Cobrança enviada para ${l.solicitante.nome}.`); }
+      catch (error) { window.alert(error.message || "Não foi possível enviar a cobrança."); }
+      finally { botao.disabled = false; }
+    });
     try {
       const carregados = await ELO.emprestimos();
       registros = carregados.filter(pertenceAoUsuario);
+      const itemInicial = new URLSearchParams(location.search).get("itemId");
+      const emprestimoInicial = new URLSearchParams(location.search).get("emprestimoId");
+      selecionado = registros.find((l) => String(l.id) === String(itemInicial) && (!emprestimoInicial || String(l.emprestimoId) === String(emprestimoInicial))) || null;
       if (usuarioFinal) {
         const titulo = document.querySelector(".page-head h1");
         const descricao = document.querySelector(".page-head p");
