@@ -174,12 +174,14 @@
             if (solicitanteSelecionado) {
               const tipo = normalizarBusca(solicitanteSelecionado.tipo);
               campoVinculo.value = tipo.includes("prof") ? "professor" : tipo.includes("serv") || tipo.includes("tecn") ? "servidor" : "aluno";
+              campoVinculo.disabled = true; // o vínculo vem do cadastro da pessoa
               const identificadorResumo = mostrarIdsPessoas
                 ? [solicitanteSelecionado.matricula, `#${solicitanteSelecionado.id}`].filter(Boolean).join(" · ")
                 : (solicitanteSelecionado.matricula || solicitanteSelecionado.email);
               $("resumo-solicitante").textContent = `${solicitanteSelecionado.nome}${identificadorResumo ? ` · ${identificadorResumo}` : ""}`;
             } else {
               $("resumo-solicitante").textContent = "Selecione um cadastro válido";
+              campoVinculo.disabled = false;
             }
             atualizarCampoVinculo();
           };
@@ -191,6 +193,7 @@
             if (!solicitantesDisponiveis.some(x => normalizarBusca(rotuloSolicitante(x)) === termo || normalizarBusca(x.nome) === termo || normalizarBusca(x.matricula) === termo || normalizarBusca(x.email) === termo || normalizarBusca(String(x.id)) === termo)) {
               solicitanteSelecionado = null;
               $("resumo-solicitante").textContent = "Selecione um cadastro válido";
+              campoVinculo.disabled = false;
             }
           });
         } catch (e) { mostrarMensagem(`Não foi possível carregar solicitantes: ${e.message}`); }

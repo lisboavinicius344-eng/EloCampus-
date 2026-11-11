@@ -186,6 +186,8 @@ const ELO = {
     equipamento: { id: movimento.equipamento_id, nome: movimento.equipamento_nome, patrimonio: "", categoria: "" },
     detalhe: movimento.descricao, por: movimento.usuario_nome, emprestimoId: movimento.emprestimo_id,
   })),
+  // Cobrança por e-mail. A API responde 400 (cobrado há menos de 10 min ou sem e-mail) e 503 (falha no envio).
+  cobrarEmprestimo: (id) => requisitar(`/emprestimos/${encodeURIComponent(id)}/cobrar`, { metodo: "POST" }),
   registrarEmprestimo: async (dados) => {
     const sessao = obterSessao() || {};
     let solicitanteId = dados.solicitante_id ?? sessao.solicitante_id;
@@ -384,6 +386,8 @@ const ELO = {
   },
   // Senha atual incorreta pode voltar como 401: mostra o erro na tela em vez de derrubar a sessão.
   trocarSenha: (dados) => requisitar("/auth/trocar-senha", { metodo: "POST", naoRedirecionar401: true, corpo: { nova_senha: String(dados.nova_senha || ""), ...(dados.senha_atual ? { senha_atual: String(dados.senha_atual) } : {}) } }),
+  // Exclusivo do perfil master: apaga dados operacionais (contas, solicitantes e categorias são preservados).
+  zerarDados: (confirmacao) => requisitar("/administracao/zerar-dados", { metodo: "POST", corpo: { confirmacao } }),
   usuarios: async () => (await requisitar("/usuarios")).usuarios,
   criarUsuario: (dados) => requisitar("/usuarios", { metodo: "POST", corpo: { nome: String(dados.nome || "").trim(), email: String(dados.email || "").trim().toLowerCase(), papel: dados.papel } }),
   reenviarSenha: (id) => requisitar(`/usuarios/${encodeURIComponent(id)}/reenviar-senha`, { metodo: "PATCH" }),

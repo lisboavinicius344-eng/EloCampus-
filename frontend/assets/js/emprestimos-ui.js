@@ -73,6 +73,7 @@
         timeline.innerHTML = '<li><div class="muted">Selecione um empréstimo para ver as datas e movimentações.</div></li>';
         $("detalhe-devolver").href = "devolucoes.html";
         $("detalhe-devolver").setAttribute("aria-disabled", "true");
+        if ($("detalhe-cobrar")) $("detalhe-cobrar").hidden = true;
         return;
       }
       const eventos = [
@@ -93,6 +94,23 @@
         link.href = l.devolvida ? "devolucoes.html" : `devolucoes.html?itemId=${encodeURIComponent(l.id)}&emprestimoId=${encodeURIComponent(l.emprestimoId)}`;
         link.setAttribute("aria-disabled", String(Boolean(l.devolvida)));
         link.classList.toggle("is-disabled", Boolean(l.devolvida));
+      }
+      const cobrar = $("detalhe-cobrar");
+      if (cobrar) { cobrar.hidden = usuarioFinal || Boolean(l.devolvida); cobrar.disabled = false; cobrar.dataset.cobrar = l.chave; }
+    }
+    // Envia a cobrança por e-mail; a API recusa (400) se a pessoa foi cobrada há menos de 10 minutos ou não tem e-mail.
+    async function cobrar(l, botao) {
+      if (!l || l.devolvida || !window.confirm(`Enviar cobrança por e-mail para ${l.solicitante.nome}?`)) return;
+      const alvo = $("emprestimos-aviso");
+      botao.disabled = true;
+      try {
+        const resposta = await ELO.cobrarEmprestimo(l.emprestimoId);
+        aviso(alvo, resposta?.mensagem || `Cobrança enviada para ${l.solicitante.nome}.`, "ok");
+      } catch (error) {
+        aviso(alvo, error.message || "Não foi possível enviar a cobrança.", "error");
+      } finally {
+        botao.disabled = false;
+        alvo?.scrollIntoView?.({ block: "nearest" });
       }
     }
     function renderizar() {
@@ -125,7 +143,7 @@
           <td>${esc(l.solicitante.nome)}<small>por ${esc(l.registradoPor || "—")}</small></td>
           <td>${dataHora(l.devolvida || l.prevista)}</td>
           <td><span class="pill ${status.classe}">${esc(status.texto)}</span></td>
-          <td>${l.devolvida ? '<span class="muted small">Concluído</span>' : `<button class="btn btn-sm" type="button" data-devolver="${esc(l.chave)}">Devolver</button>`}</td>
+          <td>${l.devolvida ? '<span class="muted small">Concluído</span>' : `<div class="loan-actions"><button class="btn btn-sm" type="button" data-devolver="${esc(l.chave)}">Devolver</button><button class="btn btn-sm btn-line" type="button" data-cobrar="${esc(l.chave)}">Cobrar</button></div>`}</td>
         </tr>`;
       }).join("");
       const activeSelection = filtrados.find((l) => l.chave === selecionado?.chave) || filtrados[0];
@@ -134,7 +152,12 @@
 
     abas.forEach((aba) => aba.addEventListener("click", () => { filtro = aba.dataset.filtro; renderizar(); }));
     busca?.addEventListener("input", renderizar);
+    $("detalhe-cobrar")?.addEventListener("click", (event) => {
+      cobrar(registros.find((x) => x.chave === event.currentTarget.dataset.cobrar), event.currentTarget);
+    });
     corpo.addEventListener("click", (event) => {
+      const botaoCobrar = event.target.closest("[data-cobrar]");
+      if (botaoCobrar) { cobrar(registros.find((x) => x.chave === botaoCobrar.dataset.cobrar), botaoCobrar); return; }
       const devolver = event.target.closest("[data-devolver]");
       const row = event.target.closest("tr[data-item-id]");
       if (devolver) {

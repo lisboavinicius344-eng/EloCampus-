@@ -108,7 +108,7 @@
         status.texto,
         pedido.analisado_por_nome || responsavelDecisao(pedido),
         pedido.analisado_em ? new Date(pedido.analisado_em).toLocaleString("pt-BR") : dataDecisao(pedido),
-        pedido.justificativa || "—",
+        pedido.justificativa || pedido.motivo_recusa || "—",
       ];
       valores.forEach((valor, indice) => {
         const td = document.createElement("td");
@@ -224,7 +224,7 @@
 
   function renderizar() {
     const termo = String(busca?.value || "").trim().toLocaleLowerCase("pt-BR");
-    const filtrados = pedidosAtuais.filter((pedido) => !termo || [pedido.nome, pedido.email, pedido.tipo, pedido.matricula, pedido.setor, pedido.analisado_por_nome, pedido.justificativa].join(" ").toLocaleLowerCase("pt-BR").includes(termo));
+    const filtrados = pedidosAtuais.filter((pedido) => !termo || [pedido.nome, pedido.email, pedido.tipo, pedido.matricula, pedido.setor, pedido.analisado_por_nome, pedido.justificativa, pedido.motivo_recusa].join(" ").toLocaleLowerCase("pt-BR").includes(termo));
     lista.replaceChildren();
     if (!filtrados.length) {
       const vazio = document.createElement("div");

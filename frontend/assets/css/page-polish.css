@@ -528,3 +528,16 @@ form.split .summary button[type="submit"]:focus-visible,
   .novo-emprestimo-page .add-row { grid-template-columns:minmax(0,1fr); }
   .novo-emprestimo-page #adicionar-equip { width:100%; }
 }
+
+/* Ações em linha (empréstimos e painel): Devolver / Cobrar */
+.table-actions, .loan-actions { display: inline-flex; flex-wrap: wrap; gap: .45rem; align-items: center; }
+.table-actions { margin-left: .5rem; }
+@media (max-width: 760px) {
+  .loan-actions, .table-actions { display: flex; justify-content: flex-end; margin-left: 0; margin-top: .35rem; }
+  .loan-actions .btn, .table-actions .btn { flex: 1 1 auto; }
+}
+
+/* Zona master do perfil */
+.danger-zone { margin-top: 1.5rem; border: 1px solid var(--st-late, #fb7185); }
+.danger-zone h2 { color: var(--st-late, #fb7185); margin-top: 0; }
+.danger-zone .alert { margin-top: .85rem; }

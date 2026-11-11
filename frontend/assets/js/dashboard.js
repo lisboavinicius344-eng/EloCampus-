@@ -73,11 +73,32 @@
               <td class="cell-main"><strong>${esc(l.equipamento.nome)}</strong><small>${esc(l.equipamento.patrimonio)}</small></td>
               <td>${esc(l.solicitante.nome)}</td>
               <td>${dataHora(l.prevista)}</td>
-              <td><span class="badge badge-${p.classe}">${p.texto}</span><a class="table-action" href="devolucoes.html?itemId=${encodeURIComponent(l.id)}&amp;emprestimoId=${encodeURIComponent(l.emprestimoId || "")}">Registrar devolução</a></td>
+              <td><span class="badge badge-${p.classe}">${p.texto}</span><span class="table-actions"><a class="table-action" href="devolucoes.html?itemId=${encodeURIComponent(l.id)}&amp;emprestimoId=${encodeURIComponent(l.emprestimoId || "")}">Registrar devolução</a><button class="btn btn-sm btn-line" type="button" data-dashboard-cobrar="${esc(l.chave)}">Cobrar</button></span></td>
             </tr>`;
           }).join("")}
         </tbody>
       </table>`;
+    $("acompanhar").onclick = async (event) => {
+      const botao = event.target.closest("[data-dashboard-cobrar]");
+      if (!botao) return;
+      const item = ativos.find((l) => l.chave === botao.dataset.dashboardCobrar);
+      if (!item || !window.confirm(`Enviar cobrança por e-mail para ${item.solicitante.nome}?`)) return;
+      const alerta = $("erro");
+      botao.disabled = true;
+      try {
+        const resposta = await ELO.cobrarEmprestimo(item.emprestimoId);
+        alerta.textContent = resposta?.mensagem || `Cobrança enviada para ${item.solicitante.nome}.`;
+        alerta.className = "alert alert-ok dashboard-api-alert";
+      } catch (error) {
+        // 400: cobrado há menos de 10 minutos ou sem e-mail; 503: falha no envio.
+        alerta.textContent = error.message || "Não foi possível enviar a cobrança.";
+        alerta.className = "alert alert-error dashboard-api-alert";
+      } finally {
+        alerta.hidden = false;
+        botao.disabled = false;
+        alerta.scrollIntoView?.({ block: "nearest" });
+      }
+    };
   }
 
   function renderMovimentacoes(lista) {
