@@ -31,15 +31,6 @@
       </article>`).join("");
   }
 
-  function renderAlertaAtrasos(r) {
-    const area = $("alerta-atrasos");
-    if (!area) return;
-    const total = Number(r?.atrasados || 0);
-    area.hidden = total === 0;
-    if (!total) { area.innerHTML = ""; return; }
-    area.innerHTML = `<strong>Atenção: ${total} empréstimo${total === 1 ? " está" : "s estão"} em atraso.</strong><span>Revise os itens vencidos e registre as devoluções pendentes.</span><a class="btn btn-danger btn-sm" href="emprestimos.html?filtro=atrasados">Ver empréstimos atrasados</a>`;
-  }
-
   function renderDistribuicao(r) {
     const partes = SITUACOES.filter((s) => r[s.chave] > 0);
     const resumo = SITUACOES.map((s) => `${r[s.chave]} ${s.rotulo.toLowerCase()}`).join(", ");
@@ -73,7 +64,7 @@
               <td class="cell-main"><strong>${esc(l.equipamento.nome)}</strong><small>${esc(l.equipamento.patrimonio)}</small></td>
               <td>${esc(l.solicitante.nome)}</td>
               <td>${dataHora(l.prevista)}</td>
-              <td><span class="badge badge-${p.classe}">${p.texto}</span><a class="table-action" href="devolucoes.html?itemId=${encodeURIComponent(l.id)}&amp;emprestimoId=${encodeURIComponent(l.emprestimoId || "")}">Registrar devolução</a></td>
+              <td><span class="badge badge-${p.classe}">${p.texto}</span></td>
             </tr>`;
           }).join("")}
         </tbody>
@@ -126,7 +117,7 @@
     const primeiroNome = nome.split(/\s+/)[0] || "bem-vindo(a)";
     const h1 = document.querySelector(".page-head h1");
     const intro = document.querySelector(".page-head p");
-    const botaoCadastro = document.querySelector(".page-head > .page-head-actions");
+    const botaoCadastro = document.querySelector(".page-head > .btn");
     if (h1) h1.textContent = `Olá, ${primeiroNome}`;
     if (intro) intro.textContent = "O que você precisa fazer hoje?";
     if (botaoCadastro) botaoCadastro.hidden = true;
@@ -136,6 +127,8 @@
     if (indicadores) indicadores.hidden = true;
     if (distribuicao) distribuicao.hidden = true;
     if (painelEquipe) painelEquipe.hidden = true;
+    const acoesRapidas = document.querySelector('section[aria-labelledby="t-acoes"]');
+    if (acoesRapidas) acoesRapidas.hidden = true;
 
     const area = $("inicio-usuario");
     area.hidden = false;
@@ -172,7 +165,6 @@
       ELO.resumoDashboard(), ELO.emprestimos(), ELO.movimentacoes().catch(() => []),
     ]);
     renderKpis(resumo);
-    renderAlertaAtrasos(resumo);
     renderDistribuicao(resumo);
     renderAcompanhar(todosEmprestimos);
     renderMovimentacoes(todasMovimentacoes);
