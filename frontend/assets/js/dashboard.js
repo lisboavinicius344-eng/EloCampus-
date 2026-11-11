@@ -117,7 +117,7 @@
     const primeiroNome = nome.split(/\s+/)[0] || "bem-vindo(a)";
     const h1 = document.querySelector(".page-head h1");
     const intro = document.querySelector(".page-head p");
-    const botaoCadastro = document.querySelector(".page-head > .btn");
+    const botaoCadastro = document.querySelector(".page-head > .page-head-actions");
     if (h1) h1.textContent = `Olá, ${primeiroNome}`;
     if (intro) intro.textContent = "O que você precisa fazer hoje?";
     if (botaoCadastro) botaoCadastro.hidden = true;
