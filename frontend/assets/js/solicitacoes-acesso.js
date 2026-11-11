@@ -46,8 +46,9 @@
   }
 
   function responsavelDecisao(pedido) {
-    return pedido.responsavel_nome || pedido.responsavel || pedido.analisado_por || pedido.aprovado_por || pedido.recusado_por || pedido.usuario_nome || "Responsável não informado";
+    return pedido.analisado_por_nome || pedido.responsavel_nome || pedido.responsavel || pedido.analisado_por || pedido.aprovado_por || pedido.recusado_por || pedido.usuario_nome || "Responsável não informado";
   }
+
 
   function inputField(labelText, name, value = "", required = false, type = "text") {
     const wrap = document.createElement("div");
@@ -61,7 +62,7 @@
     input.className = "input input-block";
     input.value = value == null ? "" : String(value);
     input.required = required;
-    input.maxLength = name === "mensagem" ? 1000 : 160;
+    input.maxLength = ["mensagem", "justificativa", "motivo"].includes(name) ? 1000 : 160;
     if (type !== "textarea") input.type = type;
     wrap.append(label, input);
     return { wrap, input };
@@ -90,28 +91,45 @@
     card.append(head);
   }
 
-  function montarAuditoria(pedido) {
-    const card = document.createElement("article");
-    card.className = "card access-card access-card-audit";
-    montarCabecalho(card, pedido, true);
-    const detalhe = document.createElement("dl");
-    detalhe.className = "access-audit-details";
-    [["Responsável pela análise", responsavelDecisao(pedido)], ["Data da decisão", dataDecisao(pedido)]].forEach(([label, value]) => {
-      const item = document.createElement("div");
-      const dt = document.createElement("dt"); dt.textContent = label;
-      const dd = document.createElement("dd"); dd.textContent = value;
-      item.append(dt, dd); detalhe.append(item);
+  function montarAuditoriaTabela(pedidos) {
+    const wrap = document.createElement("div");
+    wrap.className = "table-wrap access-audit-wrap";
+    const table = document.createElement("table");
+    table.className = "table access-audit-table";
+    table.innerHTML = `<thead><tr><th>Pessoa</th><th>E-mail</th><th>Tipo</th><th>Status</th><th>Analisado por</th><th>Data e hora</th><th>Justificativa</th></tr></thead>`;
+    const tbody = document.createElement("tbody");
+    pedidos.forEach((pedido) => {
+      const tr = document.createElement("tr");
+      const status = statusInfo(pedido);
+      const valores = [
+        nomeSolicitante(pedido),
+        pedido.email || "—",
+        pedido.tipo || pedido.vinculo || "—",
+        status.texto,
+        pedido.analisado_por_nome || responsavelDecisao(pedido),
+        pedido.analisado_em ? new Date(pedido.analisado_em).toLocaleString("pt-BR") : dataDecisao(pedido),
+        pedido.justificativa || "—",
+      ];
+      valores.forEach((valor, indice) => {
+        const td = document.createElement("td");
+        td.dataset.label = ["Pessoa", "E-mail", "Tipo", "Status", "Analisado por", "Data e hora", "Justificativa"][indice];
+        if (indice === 3) {
+          const pill = document.createElement("span");
+          pill.className = `pill ${status.classe}`;
+          pill.textContent = valor;
+          td.append(pill);
+        } else {
+          td.textContent = valor;
+        }
+        tr.append(td);
+      });
+      tbody.append(tr);
     });
-    card.append(detalhe);
-    if (pedido.mensagem) {
-      const msg = document.createElement("p"); msg.className = "access-request-message"; msg.textContent = `Mensagem enviada: ${pedido.mensagem}`; card.append(msg);
-    }
-    const justificativa = pedido.motivo || pedido.justificativa || pedido.mensagem_decisao || pedido.observacoes;
-    if (justificativa) {
-      const motivo = document.createElement("p"); motivo.className = "access-request-message access-decision-note"; motivo.textContent = `Justificativa: ${justificativa}`; card.append(motivo);
-    }
-    return card;
+    table.append(tbody);
+    wrap.append(table);
+    return wrap;
   }
+
 
   function montarPendente(pedido) {
     const card = document.createElement("article");
@@ -140,7 +158,9 @@
     const matField = inputField("Matrícula / SIAPE", "matricula", pedido.matricula || "", false);
     const setorField = inputField("Setor / curso", "setor", pedido.setor || "", false);
     const telField = inputField("Telefone", "telefone", pedido.telefone || "", false, "tel");
-    [nomeField, matField, setorField, telField].forEach((field) => fields.append(field.wrap));
+    const justificativaField = inputField("Justificativa (opcional)", "justificativa", "", false, "textarea");
+    justificativaField.input.placeholder = "Registre o motivo da decisão, se necessário…";
+    [nomeField, matField, setorField, telField, justificativaField].forEach((field) => fields.append(field.wrap));
     card.append(fields);
 
     const actions = document.createElement("div");
@@ -163,6 +183,7 @@
       if (matField.input.value.trim()) payload.matricula = matField.input.value.trim();
       if (setorField.input.value.trim()) payload.setor = setorField.input.value.trim();
       if (telField.input.value.trim()) payload.telefone = telField.input.value.trim();
+      if (justificativaField.input.value.trim()) payload.justificativa = justificativaField.input.value.trim();
       ocupada = true; approve.disabled = true; reject.disabled = true;
       try {
         const result = await ELO.aprovarSolicitacaoAcesso(pedido.id, payload);
@@ -175,9 +196,14 @@
     });
     reject.addEventListener("click", async () => {
       if (ocupada) return;
-      const motivo = window.prompt("Motivo da recusa (opcional):", "");
-      if (motivo === null) return;
-      if (!window.confirm(`Recusar a solicitação de ${nomeSolicitante(pedido)}?`)) return;
+      const motivo = justificativaField.input.value.trim();
+      if (!motivo) {
+        justificativaField.wrap.querySelector("label").textContent = "Motivo da recusa (obrigatório)";
+        informar("Informe o motivo da recusa antes de continuar.", "error");
+        justificativaField.input.focus();
+        return;
+      }
+      if (!window.confirm(`Recusar a solicitação de ${nomeSolicitante(pedido)}?\n\nMotivo: ${motivo}`)) return;
       ocupada = true; reject.disabled = true; approve.disabled = true;
       try { const result = await ELO.recusarSolicitacaoAcesso(pedido.id, motivo); informar(result?.mensagem || "Solicitação recusada.", "ok"); await atualizarContador(); await carregar(); }
       catch (e) { informar(e.message || "Não foi possível recusar a solicitação.", "error"); approve.disabled = false; reject.disabled = false; }
@@ -198,7 +224,7 @@
 
   function renderizar() {
     const termo = String(busca?.value || "").trim().toLocaleLowerCase("pt-BR");
-    const filtrados = pedidosAtuais.filter((pedido) => !termo || [pedido.nome, pedido.email, pedido.tipo, pedido.matricula, pedido.setor].join(" ").toLocaleLowerCase("pt-BR").includes(termo));
+    const filtrados = pedidosAtuais.filter((pedido) => !termo || [pedido.nome, pedido.email, pedido.tipo, pedido.matricula, pedido.setor, pedido.analisado_por_nome, pedido.justificativa].join(" ").toLocaleLowerCase("pt-BR").includes(termo));
     lista.replaceChildren();
     if (!filtrados.length) {
       const vazio = document.createElement("div");
@@ -207,14 +233,16 @@
       lista.append(vazio);
       return;
     }
-    filtrados.forEach((pedido) => lista.append(visaoAtual === "pendente" ? montarPendente(pedido) : montarAuditoria(pedido)));
+    if (visaoAtual === "auditoria") {
+      lista.append(montarAuditoriaTabela(filtrados));
+    } else {
+      filtrados.forEach((pedido) => lista.append(montarPendente(pedido)));
+    }
   }
 
   async function carregarAuditoria() {
-    const respostas = await Promise.allSettled(["aprovada", "recusada", "rejeitada"].map((status) => ELO.solicitacoesAcesso(status)));
-    const pedidos = respostas.flatMap((resultado) => resultado.status === "fulfilled" && Array.isArray(resultado.value) ? resultado.value : []);
-    if (!pedidos.length && respostas.every((resultado) => resultado.status === "rejected")) throw respostas[0].reason;
-    return [...new Map(pedidos.map((pedido) => [String(pedido.id), pedido])).values()];
+    const pedidos = await ELO.solicitacoesAcesso(null);
+    return pedidos.filter((pedido) => ["aprovada", "aprovado", "approved", "recusada", "rejeitada", "rejeitado", "denied", "refused"].includes(normalizarStatus(pedido)));
   }
 
   async function atualizarContador() {

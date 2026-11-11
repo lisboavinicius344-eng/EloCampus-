@@ -511,3 +511,30 @@ body[data-pagina="solicitacoes-acesso"] #solicitacoes-aviso[hidden] {
   body[data-pagina="usuarios"] .team-actions { display: flex; flex-wrap: wrap; gap: .5rem; }
   body[data-pagina="usuarios"] .team-actions .btn { width: auto; flex: 1 1 130px; }
 }
+
+
+/* Auditoria de solicitações: tabela com os campos registrados pela API. */
+body[data-pagina="solicitacoes-acesso"] .access-audit-wrap {
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: rgba(17, 24, 43, .58);
+}
+body[data-pagina="solicitacoes-acesso"] .access-audit-table {
+  min-width: 1050px;
+}
+body[data-pagina="solicitacoes-acesso"] .access-audit-table td {
+  font-size: .86rem;
+  overflow-wrap: anywhere;
+}
+body[data-pagina="solicitacoes-acesso"] .access-audit-table td:last-child {
+  min-width: 220px;
+  white-space: normal;
+}
+body[data-pagina="solicitacoes-acesso"] .access-fields textarea {
+  min-height: 84px;
+  resize: vertical;
+}
+@media (max-width: 760px) {
+  body[data-pagina="solicitacoes-acesso"] .access-audit-wrap { overflow-x: auto; }
+  body[data-pagina="solicitacoes-acesso"] .access-audit-table { min-width: 1050px; }
+}

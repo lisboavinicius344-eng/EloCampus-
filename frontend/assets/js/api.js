@@ -359,7 +359,8 @@ const ELO = {
     ...(String(dados.mensagem || "").trim() ? { mensagem: String(dados.mensagem).trim() } : {}),
   } }),
   solicitacoesAcesso: async (status = "pendente") => {
-    const resposta = await requisitar(`/solicitacoes-acesso?status=${encodeURIComponent(status)}`);
+    const consulta = status ? `?status=${encodeURIComponent(status)}` : "";
+    const resposta = await requisitar(`/solicitacoes-acesso${consulta}`);
     if (Array.isArray(resposta)) return resposta;
     return Array.isArray(resposta?.solicitacoes) ? resposta.solicitacoes : Array.isArray(resposta?.solicitacoes_acesso) ? resposta.solicitacoes_acesso : [];
   },
