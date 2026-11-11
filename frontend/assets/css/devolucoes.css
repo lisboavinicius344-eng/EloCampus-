@@ -220,33 +220,40 @@ textarea.input-block {
 .self-return-item { border:1px solid var(--border); transition:border-color .15s ease,background .15s ease,box-shadow .15s ease; }
 .self-return-item input { flex:none; width:18px; height:18px; accent-color:#a78bfa; }
 
-/* Fila operacional: hoje primeiro, atrasos destacados sem usar o mesmo rótulo. */
-.stat-icon.active { background: linear-gradient(135deg, #8b5cf6, #22d3ee); }
-.active-loans-card { min-width: 0; }
+/* Empréstimos ativos seguem exatamente o padrão das tabelas de devoluções. */
+.stat-icon.active { background: var(--grad-main); }
 .active-loans-card .card-title { align-items: flex-start; }
 .active-loans-card .card-title h2 { margin: 0; }
-.active-loans-card .card-title p { margin-top: .35rem; }
-.active-loans-table-wrap { width: 100%; overflow-x: auto; border: 1px solid rgba(41, 52, 77, .82); border-radius: 15px; -webkit-overflow-scrolling: touch; }
-.active-loans-table { width: 100%; min-width: 850px; border-collapse: separate; border-spacing: 0; text-align: left; }
-.active-loans-table th { padding: .78rem .85rem; color: var(--muted); background: rgba(139, 92, 246, .075); font-size: .7rem; font-weight: 800; letter-spacing: .055em; text-transform: uppercase; white-space: nowrap; }
-.active-loans-table td { padding: .8rem .85rem; border-top: 1px solid rgba(41, 52, 77, .65); vertical-align: middle; font-size: .86rem; line-height: 1.4; }
-.active-loans-table tbody tr:hover td { background: rgba(139, 92, 246, .045); }
-.active-loans-table tbody tr.is-due-today td:first-child { border-left: 3px solid var(--st-maint); }
-.active-loans-table tbody tr.is-overdue td:first-child { border-left: 3px solid var(--st-late); }
+.active-loans-card .card-title p { margin-top: .25rem; }
+.active-loans-table-wrap { width: 100%; overflow-x: auto; }
+.active-loans-table { width: 100%; min-width: 900px; border-collapse: separate; border-spacing: 0; }
+.active-loans-table th {
+  padding: .82rem .9rem;
+  border-bottom: 1px solid rgba(46, 54, 120, .9);
+  background: rgba(139, 92, 246, .08);
+  color: #b9c2dc;
+  font-size: .72rem;
+  font-weight: 800;
+  letter-spacing: .055em;
+  text-transform: uppercase;
+  text-align: left;
+  white-space: nowrap;
+}
+.active-loans-table td {
+  padding: .85rem .9rem;
+  border-top: 1px solid rgba(46, 54, 120, .62);
+  font-size: .86rem;
+  vertical-align: middle;
+}
+.active-loans-table tbody tr:first-child td { border-top: 0; }
+.active-loans-table tbody tr:hover td { background: rgba(139, 92, 246, .055); }
+.active-loans-table tbody tr.is-due-today td:first-child { box-shadow: inset 3px 0 0 var(--warn-fg); }
+.active-loans-table tbody tr.is-overdue td { background: rgba(251, 113, 133, .07); }
+.active-loans-table tbody tr.is-overdue td:first-child { box-shadow: inset 3px 0 0 var(--late-fg); }
 .active-loans-table td strong, .active-loans-table td small { display: block; }
-.active-loans-table td small { margin-top: .2rem; color: var(--muted); font-size: .76rem; }
-.active-return-btn { min-height: 38px; padding-inline: .75rem; border-radius: 11px; font-size: .78rem; white-space: nowrap; }
-.active-loans-table .pill { white-space: nowrap; }
+.active-loans-table td small { margin-top: .18rem; color: var(--text-2); font-size: .76rem; }
+.active-return-btn { min-height: 38px; padding: .55rem .8rem; font-size: .78rem; white-space: nowrap; }
 @media (max-width: 760px) {
-  .active-loans-table-wrap { overflow: visible; border: 0; }
-  .active-loans-table { min-width: 0; border-collapse: separate; border-spacing: 0 .7rem; }
-  .active-loans-table thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
-  .active-loans-table tbody, .active-loans-table tr, .active-loans-table td { display: block; }
-  .active-loans-table tr { padding: .65rem .8rem; border: 1px solid var(--border); border-left: 3px solid transparent; border-radius: 15px; background: rgba(255, 255, 255, .018); }
-  .active-loans-table tbody tr.is-due-today { border-left-color: var(--st-maint); }
-  .active-loans-table tbody tr.is-overdue { border-left-color: var(--st-late); }
-  .active-loans-table td { display: grid; grid-template-columns: minmax(7.5rem, .75fr) minmax(0, 1.25fr); gap: .7rem; padding: .45rem 0; border: 0; }
-  .active-loans-table td::before { content: attr(data-label); color: var(--muted); font-size: .72rem; font-weight: 700; }
-  .active-loans-table td:last-child { align-items: center; margin-top: .2rem; padding-top: .7rem; border-top: 1px solid rgba(41, 52, 77, .7); }
-  .active-return-btn { width: 100%; }
+  .active-loans-table-wrap { overflow-x: auto; }
+  .active-loans-table { min-width: 900px; }
 }

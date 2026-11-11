@@ -260,11 +260,11 @@
         listaAtivos.innerHTML = '<p class="muted">Nenhum empréstimo em andamento corresponde à pesquisa.</p>';
         return;
       }
-      listaAtivos.innerHTML = `<div class="active-loans-table-wrap"><table class="active-loans-table"><thead><tr><th>Equipamento</th><th>Patrimônio</th><th>Solicitante</th><th>Empréstimo</th><th>Devolução prevista</th><th>Situação</th><th>Ação</th></tr></thead><tbody>${ativos.map((l) => {
+      listaAtivos.innerHTML = `<div class="table-wrap active-loans-table-wrap"><table class="active-loans-table"><thead><tr><th>Equipamento</th><th>Solicitante</th><th>Retirada</th><th>Devolução prevista</th><th>Situação</th><th>Ação</th></tr></thead><tbody>${ativos.map((l) => {
         const hoje = mesmoDia(l.prevista, new Date());
         const prazo = EloUtil.prazo(l.prevista);
         const situacao = hoje ? { texto: "Aguardando hoje", classe: "pill-warn" } : prazo.classe === "late" ? { texto: prazo.texto, classe: "pill-late" } : { texto: "Em andamento", classe: "pill-ok" };
-        return `<tr class="${hoje ? "is-due-today" : prazo.classe === "late" ? "is-overdue" : ""}"><td data-label="Equipamento"><strong>${esc(l.equipamento.nome)}</strong></td><td data-label="Patrimônio">${esc(l.equipamento.patrimonio || "—")}</td><td data-label="Solicitante"><strong>${esc(l.solicitante.nome)}</strong><small>${esc(l.solicitante.matricula || l.solicitante.vinculo || "")}</small></td><td data-label="Empréstimo">${dataHora(l.retirada)}</td><td data-label="Devolução prevista">${dataHora(l.prevista)}</td><td data-label="Situação"><span class="pill ${situacao.classe}">${esc(situacao.texto)}</span></td><td data-label="Ação"><button class="btn btn-sm active-return-btn" type="button" data-receber="${esc(l.chave)}">Registrar devolução</button></td></tr>`;
+        return `<tr class="${hoje ? "is-due-today" : prazo.classe === "late" ? "is-overdue" : ""}"><td data-label="Equipamento"><strong>${esc(l.equipamento.nome)}</strong><small>${esc(l.equipamento.patrimonio || "—")}</small></td><td data-label="Solicitante"><strong>${esc(l.solicitante.nome)}</strong><small>${esc(l.solicitante.matricula || l.solicitante.vinculo || "")}</small></td><td data-label="Retirada">${dataHora(l.retirada)}</td><td data-label="Devolução prevista">${dataHora(l.prevista)}</td><td data-label="Situação"><span class="pill ${situacao.classe}">${esc(situacao.texto)}</span></td><td data-label="Ação"><button class="btn btn-sm active-return-btn" type="button" data-receber="${esc(l.chave)}">Registrar devolução</button></td></tr>`;
       }).join("")}</tbody></table></div>`;
     }
     function desenharFila() {

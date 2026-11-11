@@ -470,6 +470,46 @@ form.split .summary button[type="submit"]:focus-visible,
   .nav a { transition: none; }
 }
 
+/* Tabelas: um único padrão de leitura para gestão, empréstimos e histórico. */
+.table-wrap {
+  border: 1px solid rgba(46, 54, 120, .9);
+  border-radius: 14px;
+  background: rgba(9, 14, 27, .24);
+  scrollbar-color: rgba(139, 92, 246, .65) rgba(255, 255, 255, .04);
+}
+.table-wrap table {
+  min-width: 640px;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+.table-wrap thead th {
+  padding: .82rem .9rem;
+  border-bottom: 1px solid rgba(46, 54, 120, .9);
+  background: rgba(139, 92, 246, .08);
+  color: #b9c2dc;
+  font-size: .72rem;
+  font-weight: 800;
+  letter-spacing: .055em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.table-wrap tbody td {
+  padding: .85rem .9rem;
+  border-top: 1px solid rgba(46, 54, 120, .62);
+  color: var(--text);
+  font-size: .88rem;
+  vertical-align: middle;
+}
+.table-wrap tbody tr:first-child td { border-top: 0; }
+.table-wrap tbody tr:hover td { background: rgba(139, 92, 246, .055); }
+.table-wrap tbody tr.is-late td { background: rgba(251, 113, 133, .07); }
+.table-wrap td strong, .table-wrap td small { display: block; }
+.table-wrap td small { margin-top: .18rem; color: var(--muted); font-size: .76rem; }
+@media (max-width: 760px) {
+  .table-wrap { max-width: 100%; overflow-x: auto; }
+  .table-wrap table { min-width: 620px; }
+}
+
 .nav a[data-fluxo="emprestimo"]:hover,
 .nav a[data-fluxo="emprestimo"].is-active {
   background:linear-gradient(115deg,rgba(75,15,240,.28),rgba(139,44,245,.2));
