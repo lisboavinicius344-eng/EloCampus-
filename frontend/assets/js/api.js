@@ -180,6 +180,7 @@ const ELO = {
     if (!Array.isArray(resposta?.emprestimos)) throw new Error("A resposta da API de empréstimos está fora do contrato esperado. Confirme se GET /emprestimos retorna { emprestimos: [...] }.");
     return resposta.emprestimos.flatMap(normalizarEmprestimo);
   },
+  cobrarEmprestimo: (id) => requisitar(`/emprestimos/${encodeURIComponent(id)}/cobrar`, { metodo: "POST" }),
   movimentacoes: async () => (await requisitar("/historico")).map((movimento) => ({
     id: movimento.id, quando: movimento.data_movimentacao, tipo: movimento.tipo_movimentacao,
     classe: movimento.tipo_movimentacao,
@@ -388,4 +389,5 @@ const ELO = {
   reenviarSenha: (id) => requisitar(`/usuarios/${encodeURIComponent(id)}/reenviar-senha`, { metodo: "PATCH" }),
   desativarUsuario: (id) => requisitar(`/usuarios/${encodeURIComponent(id)}/desativar`, { metodo: "PATCH" }),
   reativarUsuario: (id) => requisitar(`/usuarios/${encodeURIComponent(id)}/reativar`, { metodo: "PATCH" }),
+  zerarDados: (confirmacao) => requisitar("/administracao/zerar-dados", { metodo: "POST", corpo: { confirmacao } }),
 };

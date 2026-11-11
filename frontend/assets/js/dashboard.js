@@ -7,11 +7,11 @@
   const { esc, data, dataHora, prazo } = EloUtil;
 
   const SITUACOES = [
-    { chave: "disponiveis", rotulo: "Disponível",    cls: "ok",    cor: "var(--st-ok)" },
-    { chave: "emprestados", rotulo: "Emprestado",    cls: "loan",  cor: "#9b7cf7" },
-    { chave: "atrasados",   rotulo: "Atrasado",      cls: "late",  cor: "#b18af8" },
-    { chave: "manutencao",  rotulo: "Em manutenção", cls: "maint", cor: "#7c5ce7" },
-    { chave: "inativos",    rotulo: "Inativo",       cls: "off",   cor: "#6550b8" },
+    { chave: "disponiveis", rotulo: "Disponível",    cls: "ok",    cor: "#39d98a" },
+    { chave: "emprestados", rotulo: "Emprestado",    cls: "loan",  cor: "#4da3ff" },
+    { chave: "atrasados",   rotulo: "Atrasado",      cls: "late",  cor: "#ff5d73" },
+    { chave: "manutencao",  rotulo: "Em manutenção", cls: "maint", cor: "#ffb84d" },
+    { chave: "inativos",    rotulo: "Inativo",       cls: "off",   cor: "#8b93a7" },
   ];
 
   function renderKpis(r) {
@@ -19,8 +19,8 @@
     const itens = [
       { rot: "Total de equipamentos", v: r.total, nota: "Itens cadastrados", cor: "var(--purple)" },
       { rot: "Disponíveis", v: r.disponiveis, nota: `${pct(r.disponiveis)}% do acervo, prontos para empréstimo`, cor: "var(--purple)" },
-      { rot: "Emprestados", v: r.emprestados, nota: "Em circulação", cor: "#9b7cf7" },
-      { rot: "Em atraso", v: r.atrasados, cor: "#b18af8", alerta: r.atrasados > 0,
+      { rot: "Emprestados", v: r.emprestados, nota: "Em circulação", cor: "#4da3ff" },
+      { rot: "Em atraso", v: r.atrasados, cor: "#ff5d73", alerta: r.atrasados > 0,
         nota: r.atrasados > 0 ? "Prazo vencido e ainda não devolvidos" : "Nenhum prazo vencido" },
     ];
     $("kpis").innerHTML = itens.map((k) => `
@@ -55,7 +55,7 @@
   function renderAcompanhar(lista) {
     const ativos = (Array.isArray(lista) ? lista : [])
       .filter((l) => l && l.equipamento && l.solicitante && !l.devolvida)
-      .sort((a, b) => new Date(a.prevista) - new Date(b.prevista))
+      .sort((a, b) => Number(EloUtil.vencido(b.prevista)) - Number(EloUtil.vencido(a.prevista)) || new Date(a.prevista) - new Date(b.prevista))
       .slice(0, 6);
 
     if (!ativos.length) {
@@ -63,9 +63,10 @@
       return;
     }
 
-    $("acompanhar").innerHTML = `
+    const area = $("acompanhar");
+    area.innerHTML = `
       <table class="table">
-        <thead><tr><th scope="col">Equipamento</th><th scope="col">Quem retirou</th><th scope="col">Devolução</th><th scope="col">Situação</th></tr></thead>
+        <thead><tr><th scope="col">Equipamento</th><th scope="col">Quem retirou</th><th scope="col">Devolução</th><th scope="col">Situação</th><th scope="col">Ações</th></tr></thead>
         <tbody>
           ${ativos.map((l) => {
             const p = prazo(l.prevista);
@@ -73,11 +74,33 @@
               <td class="cell-main"><strong>${esc(l.equipamento.nome)}</strong><small>${esc(l.equipamento.patrimonio)}</small></td>
               <td>${esc(l.solicitante.nome)}</td>
               <td>${dataHora(l.prevista)}</td>
-              <td><span class="badge badge-${p.classe}">${p.texto}</span><a class="table-action" href="devolucoes.html?itemId=${encodeURIComponent(l.id)}&amp;emprestimoId=${encodeURIComponent(l.emprestimoId || "")}">Registrar devolução</a></td>
+              <td><span class="badge badge-${p.classe}">${p.texto}</span></td>
+              <td class="table-actions"><button class="btn btn-sm" type="button" data-dashboard-devolver="${esc(l.chave)}">Devolver</button><button class="btn btn-sm btn-line" type="button" data-dashboard-cobrar="${esc(l.chave)}">Cobrar</button><a class="btn btn-sm btn-ghost" href="emprestimos.html?itemId=${encodeURIComponent(l.id)}&amp;emprestimoId=${encodeURIComponent(l.emprestimoId || "")}">Ver</a></td>
             </tr>`;
           }).join("")}
         </tbody>
       </table>`;
+    area.onclick = async (event) => {
+      const chave = event.target.closest("[data-dashboard-cobrar], [data-dashboard-devolver]")?.dataset;
+      if (!chave) return;
+      const item = ativos.find((l) => l.chave === (chave.dashboardCobrar || chave.dashboardDevolver));
+      if (!item) return;
+      if (chave.dashboardDevolver) {
+        location.href = `devolucoes.html?itemId=${encodeURIComponent(item.id)}&emprestimoId=${encodeURIComponent(item.emprestimoId || "")}`;
+        return;
+      }
+      if (!window.confirm(`Enviar cobrança por e-mail para ${item.solicitante.nome}?`)) return;
+      const botao = event.target.closest("[data-dashboard-cobrar]");
+      botao.disabled = true;
+      try {
+        const resposta = await ELO.cobrarEmprestimo(item.emprestimoId);
+        const erro = $("erro");
+        if (erro) { erro.textContent = resposta?.mensagem || `Cobrança enviada para ${item.solicitante.nome}.`; erro.className = "alert alert-ok dashboard-api-alert"; erro.hidden = false; }
+      } catch (error) {
+        const erro = $("erro");
+        if (erro) { erro.textContent = error.message || "Não foi possível enviar a cobrança."; erro.className = "alert alert-error dashboard-api-alert"; erro.hidden = false; }
+      } finally { botao.disabled = false; }
+    };
   }
 
   function renderMovimentacoes(lista) {
@@ -126,10 +149,10 @@
     const primeiroNome = nome.split(/\s+/)[0] || "bem-vindo(a)";
     const h1 = document.querySelector(".page-head h1");
     const intro = document.querySelector(".page-head p");
-    const botaoCadastro = document.querySelector(".page-head > .page-head-actions");
+    const botaoCadastro = document.querySelector(".page-head > .btn");
     if (h1) h1.textContent = `Olá, ${primeiroNome}`;
     if (intro) intro.textContent = "O que você precisa fazer hoje?";
-    if (botaoCadastro) botaoCadastro.hidden = true;
+    document.querySelectorAll(".equipe-action").forEach((botao) => { botao.hidden = true; });
     const indicadores = document.querySelector('section[aria-label="Indicadores"]');
     const distribuicao = document.querySelector('section[aria-labelledby="t-dist"]');
     const painelEquipe = document.querySelector(".dash-grid");

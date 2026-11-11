@@ -4,6 +4,7 @@
   const $ = (id) => document.getElementById(id);
   const nomesPapeis = { admin: "Administrador", administrador: "Administrador", operador: "Operador", aluno: "Aluno", professor: "Professor" };
   const msg = $("perfil-mensagem");
+  const sessao = typeof obterSessao === "function" ? obterSessao() : null;
   const avisar = (texto, ok) => { msg.textContent = texto; msg.className = `alert ${ok ? "alert-ok" : "alert-error"}`; msg.hidden = false; };
   const iniciais = (nome) => nome.split(/\s+/).filter(Boolean).slice(0, 2).map((p) => p[0]).join("").toLocaleUpperCase("pt-BR") || "?";
 
@@ -47,4 +48,22 @@
   });
 
   $("perfil-sair")?.addEventListener("click", () => { if (confirm("Deseja sair da conta?")) sair(); });
+
+  const zonaMaster = $("zona-master");
+  const zerar = $("zerar-dados");
+  const zerarMsg = $("zerar-dados-mensagem");
+  if (sessao?.master === true || sessao?.usuario?.master === true) zonaMaster.hidden = false;
+  zerar?.addEventListener("click", async () => {
+    const explicacao = "Esta operação apagará TODOS os equipamentos, reservas, empréstimos, manutenções e o histórico. Contas, solicitantes, categorias e solicitações de acesso serão preservados. Não há como desfazer.";
+    if (!window.confirm(explicacao)) return;
+    const confirmacao = window.prompt('Para confirmar, digite exatamente "ZERAR DADOS":', "");
+    if (confirmacao !== "ZERAR DADOS") { if (confirmacao !== null) zerarMsg.textContent = "Confirmação incorreta. Nenhum dado foi apagado."; zerarMsg.className = "alert alert-error"; zerarMsg.hidden = false; return; }
+    zerar.disabled = true;
+    try {
+      const resultado = await ELO.zerarDados(confirmacao);
+      zerarMsg.textContent = `Operação concluída. Resumo: ${Object.entries(resultado?.apagados || resultado || {}).map(([chave, valor]) => `${chave}: ${valor}`).join(" · ") || "dados operacionais apagados"}.`;
+      zerarMsg.className = "alert alert-ok"; zerarMsg.hidden = false;
+    } catch (error) { zerarMsg.textContent = error.message || "Não foi possível zerar os dados."; zerarMsg.className = "alert alert-error"; zerarMsg.hidden = false; }
+    finally { zerar.disabled = false; }
+  });
 })();
