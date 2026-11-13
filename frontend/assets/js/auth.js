@@ -116,13 +116,17 @@ function sair() {
   };
 
   const parametros = new URLSearchParams(window.location.search);
+  // Página pedida antes do login (ex.: item aberto pelo QR Code). Só aceita
+  // páginas do próprio site, para o link não servir de redirecionamento externo.
+  const voltar = parametros.get("voltar") || "";
+  const destinoPosLogin = /^\/pages\/[a-z0-9-]+\.html(\?[a-z0-9=&%._-]*)?$/i.test(voltar) ? voltar : DASHBOARD_URL;
   if (parametros.get("sessao") === "expirada") mostrarMensagem("Sua sessão expirou. Entre novamente.", "info");
   if (parametros.get("cadastro") === "ok") mostrarMensagem("Solicitação recebida. Confira seu e-mail para obter a senha provisória.", "ok");
   if (["sessao", "cadastro"].some((chave) => parametros.has(chave))) window.history.replaceState(null, "", window.location.pathname);
 
   const sessaoAtual = obterSessao();
   if (sessaoAtual && PERFIS_VALIDOS.has(String(sessaoAtual.perfil || "").toLowerCase())) {
-    window.location.replace(sessaoAtual.deve_trocar_senha ? "pages/trocar-senha.html" : DASHBOARD_URL);
+    window.location.replace(sessaoAtual.deve_trocar_senha ? "pages/trocar-senha.html" : destinoPosLogin);
     return;
   }
   if (sessaoAtual) limparSessao();
@@ -191,7 +195,7 @@ function sair() {
       salvarSessao(sessao);
       persistirEmailLembrado();
       senha.value = "";
-      window.location.replace(sessao.deve_trocar_senha ? "pages/trocar-senha.html" : DASHBOARD_URL);
+      window.location.replace(sessao.deve_trocar_senha ? "pages/trocar-senha.html" : destinoPosLogin);
     } catch (falha) {
       mostrarMensagem(falha.message || "Não foi possível entrar. Tente novamente.");
       botao.disabled = false;

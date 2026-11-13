@@ -25,6 +25,8 @@
     preencher(p);
     const sessao = obterSessao();
     if (sessao && sessao.master !== (p.master === true)) salvarSessao({ ...sessao, master: p.master === true });
+    const zona = $("zona-master");
+    if (zona) zona.hidden = p.master !== true;
   })
     .catch((e) => avisar(e.message || "Não foi possível carregar o perfil.", false));
 
@@ -52,4 +54,27 @@
   });
 
   $("perfil-sair")?.addEventListener("click", () => { if (confirm("Deseja sair da conta?")) sair(); });
+  // Zona master: só aparece quando a sessão indica master === true (o backend continua sendo a autoridade).
+  const zonaMaster = $("zona-master");
+  const zerar = $("zerar-dados");
+  const zerarMsg = $("zerar-dados-mensagem");
+  const ehMaster = () => { const s = obterSessao(); return s?.master === true || s?.usuario?.master === true; };
+  const mostrarZerar = (texto, ok) => { zerarMsg.textContent = texto; zerarMsg.className = `alert ${ok ? "alert-ok" : "alert-error"}`; zerarMsg.hidden = false; };
+  if (zonaMaster && ehMaster()) zonaMaster.hidden = false;
+  zerar?.addEventListener("click", async () => {
+    if (!ehMaster()) return;
+    const explicacao = "Esta operação apagará TODOS os equipamentos, reservas, empréstimos, manutenções e o histórico. Contas, solicitantes, categorias e solicitações de acesso serão preservados. Não há como desfazer.";
+    if (!window.confirm(explicacao)) return;
+    const confirmacao = window.prompt('Para confirmar, digite exatamente "ZERAR DADOS":', "");
+    if (confirmacao === null) return;
+    if (confirmacao !== "ZERAR DADOS") { mostrarZerar("Confirmação incorreta. Nenhum dado foi apagado.", false); return; }
+    zerar.disabled = true;
+    try {
+      const resultado = await ELO.zerarDados(confirmacao);
+      const resumo = Object.entries(resultado?.apagados || {}).map(([chave, valor]) => `${chave}: ${valor}`).join(" · ");
+      mostrarZerar(resultado?.mensagem || `Operação concluída.${resumo ? ` Resumo: ${resumo}.` : ""}`, true);
+    } catch (error) {
+      mostrarZerar(error.message || "Não foi possível zerar os dados.", false);
+    } finally { zerar.disabled = false; }
+  });
 })();

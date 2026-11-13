@@ -35,12 +35,24 @@
     const perfil = String(s?.perfil || s?.usuario?.papel || "").toLowerCase();
     return Boolean(s?.token) && ["admin", "administrador", "operador"].includes(perfil);
   };
+  const sessaoUsuarioFinal = () => {
+    const s = typeof obterSessao === "function" ? obterSessao() : null;
+    return Boolean(s?.token) && ["aluno", "professor"].includes(String(s?.perfil || "").toLowerCase());
+  };
+  // Equipe logada: o item abre direto na página do equipamento dentro do sistema.
+  const abrirItemNoSistema = (id, substituir = false) => {
+    if (!sessaoEquipe() || id === undefined || id === null || String(id).trim() === "") return false;
+    const destino = `equipamento-detalhe.html?id=${encodeURIComponent(id)}`;
+    if (substituir) location.replace(destino); else location.assign(destino);
+    return true;
+  };
+  let consultaPorId = false;
   const stop = () => {
     if (timer) { clearTimeout(timer); timer = null; }
     if (stream) { stream.getTracks().forEach(t => t.stop()); stream = null; }
     video.srcObject = null; reader.classList.remove("is-active"); abrirCamera.textContent = "Abrir câmera"; lendo = false;
   };
-  const entregarCodigo = (codigo) => { stop(); campo.value = codigo; form.requestSubmit(); };
+  const entregarCodigo = (codigo) => { stop(); consultaPorId = false; campo.value = codigo; form.requestSubmit(); };
   const lerVideo = async () => {
     if (!lendo || video.readyState < 2) { if (lendo) timer = setTimeout(lerVideo, 250); return; }
     try {
@@ -119,9 +131,12 @@
     const situacao = String(rawState || "").toLowerCase();
     const emprestado = ["emprestado", "atrasado"].includes(situacao) || Boolean(emprestimo);
     const condicao = situacaoTexto(valor(e, ["estado_conservacao", "condicao"]));
+    if (abrirItemNoSistema(e.id)) return;
+    const reservavel = sessaoUsuarioFinal() && ["disponivel", "emprestado"].includes(situacao) && e.id !== undefined && e.id !== null;
+    const reservarMarkup = reservavel ? `<p class="qr-reservar"><a class="btn btn-primary" href="reservas.html?equipamentos=${encodeURIComponent(e.id)}">Reservar este equipamento</a></p>` : "";
     const historicoMarkup = sessaoEquipe() ? '<section class="qr-history"><h3>Movimentações recentes</h3><div data-qr-history><p class="qr-muted-note">Carregando histórico…</p></div></section>' : "";
     const emprestimoMarkup = emprestimo ? `<section class="qr-loan-info"><div class="qr-section-title"><h3>Empréstimo atual</h3><span class="qr-state ${emprestimo.atrasado ? "is-late" : "is-loaned"}">${emprestimo.atrasado ? "Em atraso" : "Em andamento"}</span></div><dl>${campoDetalhe("Solicitante", emprestimo.solicitante)}${campoDetalhe("Retirada", formatarData(emprestimo.data_emprestimo))}${campoDetalhe("Devolução prevista", formatarData(emprestimo.data_prevista_devolucao))}</dl></section>` : (emprestado ? '<p class="qr-privacy-note">O equipamento está emprestado. Por privacidade, os detalhes do empréstimo só são exibidos para a equipe autorizada.</p>' : '<p class="qr-muted-note">A consulta não indica um empréstimo ativo neste momento. Para confirmar movimentações anteriores, consulte o histórico da equipe.</p>');
-    resultado.innerHTML = `<div class="qr-result-title"><div><span class="qr-result-eyebrow">Consulta concluída</span><h2>${esc(nome)}</h2>${patrimonio ? `<p class="qr-result-patrimonio">Patrimônio ${esc(patrimonio)}</p>` : ""}</div><span class="qr-state state-${esc(stateKey)}">${esc(stateText)}</span></div><section class="qr-equipment-info"><h3>Informações do equipamento</h3><dl>${campoDetalhe("Categoria", e.categoria || e.categoria_nome)}${campoDetalhe("Setor", e.setor)}${campoDetalhe("Localização", e.localizacao)}${campoDetalhe("Conservação", condicao)}${campoDetalhe("Código QR", e.qr_code)}${campoDetalhe("Elegibilidade", e.elegibilidade === "somente_funcionarios" ? "Somente funcionários" : e.elegibilidade === "todos" ? "Todos os perfis elegíveis" : e.elegibilidade)}${campoDetalhe("Observações", e.observacoes)}${campoDetalhe("Cadastrado em", formatarData(e.criado_em))}</dl></section>${emprestimoMarkup}${historicoMarkup}`;
+    resultado.innerHTML = `<div class="qr-result-title"><div><span class="qr-result-eyebrow">Consulta concluída</span><h2>${esc(nome)}</h2>${patrimonio ? `<p class="qr-result-patrimonio">Patrimônio ${esc(patrimonio)}</p>` : ""}</div><span class="qr-state state-${esc(stateKey)}">${esc(stateText)}</span></div><section class="qr-equipment-info"><h3>Informações do equipamento</h3><dl>${campoDetalhe("Categoria", e.categoria || e.categoria_nome)}${campoDetalhe("Setor", e.setor)}${campoDetalhe("Localização", e.localizacao)}${campoDetalhe("Conservação", condicao)}${campoDetalhe("Código QR", e.qr_code)}${campoDetalhe("Elegibilidade", e.elegibilidade === "somente_funcionarios" ? "Somente funcionários" : e.elegibilidade === "todos" ? "Todos os perfis elegíveis" : e.elegibilidade)}${campoDetalhe("Observações", e.observacoes)}${campoDetalhe("Cadastrado em", formatarData(e.criado_em))}</dl></section>${reservarMarkup}${emprestimoMarkup}${historicoMarkup}`;
     resultado.hidden = false;
     if (sessaoEquipe() && !historicoMarkup) return;
     if (sessaoEquipe()) carregarHistoricoEquipe(e, resultado);
@@ -136,7 +151,7 @@
     if (!codigo) { msg("Informe o identificador ou leia um QR Code.", "error"); campo.focus(); return; }
     botao.disabled = true; botao.textContent = "Consultando…"; status.className = "qr-status is-info"; status.textContent = "Consultando equipamento…";
     try {
-      const dados = await ELO.consultaQr(codigo);
+      const dados = await ELO.consultaQr(codigo, { porId: consultaPorId });
       if (!dados || (typeof dados === "object" && !Object.keys(dados).length)) throw new Error("O servidor não retornou os dados do equipamento.");
       status.className = "qr-status"; status.textContent = ""; mostrarResultado(dados);
     } catch (e) {
@@ -144,7 +159,12 @@
       status.textContent = e.message || "Não foi possível consultar este equipamento.";
     } finally { botao.disabled = false; botao.textContent = "Consultar"; }
   });
-  const p = new URLSearchParams(location.search), inicial = (p.get("patrimonio") || p.get("codigo") || p.get("qr") || p.get("id") || "").trim();
-  if (inicial) { campo.value = inicial; form.requestSubmit(); }
+  campo.addEventListener("input", () => { consultaPorId = false; });
+  // ?id=36 vem da etiqueta nova (/q/36): a equipe vai direto ao item; os demais veem o resumo.
+  const p = new URLSearchParams(location.search), idInicial = (p.get("id") || "").trim();
+  const inicial = (p.get("patrimonio") || p.get("codigo") || p.get("qr") || "").trim();
+  if (/^\d+$/.test(idInicial)) {
+    if (!abrirItemNoSistema(idInicial, true)) { consultaPorId = true; campo.value = idInicial; form.requestSubmit(); }
+  } else if (inicial) { campo.value = inicial; form.requestSubmit(); }
   window.addEventListener("pagehide", stop);
 })();
