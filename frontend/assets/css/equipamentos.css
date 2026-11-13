@@ -184,9 +184,9 @@ select.input {
   font-weight: 700;
 }
 .form-sec:not(:first-child) {
-  margin-top: 2rem;
-  padding-top: 1.75rem;
-  border-top: 1px solid var(--border);
+  margin-top: 1.2rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(41, 52, 77, .72);
 }
 .form-grid {
   display: grid;
@@ -575,3 +575,19 @@ textarea.input {
 /* Seleção de equipamentos para etiquetas */
 .table-eq .col-selecao { width: 2.5rem; text-align: center; }
 .table-eq .col-selecao input { width: 1.05rem; height: 1.05rem; cursor: pointer; accent-color: var(--purple, #8b5cf6); }
+
+
+.qr-detail {
+  margin-top: 1rem;
+  color: var(--muted);
+  font-size: .76rem;
+}
+.qr-detail summary {
+  width: fit-content;
+  color: #8490aa;
+  cursor: pointer;
+  list-style: none;
+}
+.qr-detail summary::-webkit-details-marker { display: none; }
+.qr-detail summary::before { content: "ⓘ"; margin-right: .35rem; color: #77849d; }
+.qr-detail span { display: inline-block; margin: .35rem 0 0 1.2rem; color: #7f8ba4; }

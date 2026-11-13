@@ -59,12 +59,8 @@
     const total = Number(quantidade.value || 0);
     const patrimonio = campos.patrimonio.value.trim();
     const lista = patrimonio ? patrimonioSequencial(patrimonio, total || 1) : [];
-    if (!patrimonio) { previewPatrimonios.textContent = "Informe o patrimônio para visualizar o resumo."; return; }
-    if (!lista.length) { previewPatrimonios.textContent = "Para cadastrar mais de uma unidade, o patrimônio deve terminar com um número, como 0015 ou TECLADO-0015."; return; }
-    const quantidadeFormatada = String(lista.length).padStart(2, "0");
-    previewPatrimonios.textContent = lista.length === 1
-      ? `Quantidade: ${quantidadeFormatada} · Patrimônio ${lista[0]}.`
-      : `Quantidade: ${quantidadeFormatada} · Patrimônio ${lista[0]} a ${lista.at(-1)}.`;
+    if (!patrimonio || !lista.length) { previewPatrimonios.textContent = "ID final: —"; return; }
+    previewPatrimonios.textContent = `ID final: ${lista.at(-1)}`;
   }
   quantidade?.addEventListener("input", atualizarPreviewLote);
   campos.patrimonio.addEventListener("input", atualizarPreviewLote);
