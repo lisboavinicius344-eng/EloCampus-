@@ -11,22 +11,24 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-  <link rel="stylesheet" href="../assets/css/style.css?v=2026.11.13.5">
-  <link rel="stylesheet" href="../assets/css/layout.css?v=2026.11.13.5">
-  <link rel="stylesheet" href="../assets/css/equipamentos.css?v=2026.11.13.5">
+  <link rel="stylesheet" href="../assets/css/style.css?v=2026.11.13.6">
+  <link rel="stylesheet" href="../assets/css/layout.css?v=2026.11.13.6">
+  <link rel="stylesheet" href="../assets/css/equipamentos.css?v=2026.11.13.6">
   <style>
     .cat-row { display: flex; gap: .5rem; align-items: stretch; }
     .cat-row .input { flex: 1; min-width: 0; }
     .cat-row .btn { white-space: nowrap; }
     .nova-categoria { display: grid; gap: .5rem; margin-top: .6rem; padding: .8rem; border: 1px solid var(--border); border-radius: var(--radius-s); }
-    .batch-field { padding: 1rem; border: 1px solid rgba(139,92,246,.3); border-radius: 16px; background: rgba(139,92,246,.07); }
+    .identificacao-grid { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(180px, .6fr); gap: 1.1rem 1.25rem; align-items: start; }
+    .identificacao-grid .nome-field { grid-column: 1 / -1; }
+    .batch-field { min-width: 0; padding: .9rem 1rem; border: 1px solid rgba(139,92,246,.3); border-radius: 16px; background: rgba(139,92,246,.07); }
     .batch-field-head, .batch-controls { display: flex; align-items: center; gap: .7rem; }
-    .batch-field-head { justify-content: space-between; margin-bottom: .65rem; }
-    .batch-controls .input:first-child { max-width: 9rem; }
-    .batch-controls .input:last-child { flex: 1; min-width: 0; }
+    .batch-field-head { justify-content: space-between; margin-bottom: .55rem; }
+    .batch-controls .input { width: 100%; min-width: 0; }
     .batch-times { color: var(--muted); font-weight: 700; }
+    .batch-reference { color: var(--muted); font-size: .9rem; white-space: nowrap; }
     .batch-badge { padding: .3rem .6rem; border-radius: 999px; color: #ddd6fe; background: rgba(139,92,246,.18); font-size: .75rem; font-weight: 700; white-space: nowrap; }
-    .batch-preview { margin-top: .65rem; color: var(--muted); font-size: .85rem; overflow-wrap: anywhere; }
+    .batch-summary { margin-top: .7rem; padding: .55rem .7rem; border: 1px solid rgba(34,211,238,.2); border-radius: 10px; background: rgba(34,211,238,.06); color: #d7f9ff; font-size: .9rem; font-weight: 600; overflow-wrap: anywhere; }
     .setor-sugestoes { display: flex; flex-wrap: wrap; gap: .4rem; margin-top: .5rem; }
     .setor-sugestao { display: inline-flex; align-items: center; border: 1px solid var(--border); border-radius: 999px; overflow: hidden; background: rgba(139,92,246,.08); }
     .setor-escolher, .setor-remover { border: 0; background: transparent; color: var(--text); cursor: pointer; padding: .3rem .55rem; }
@@ -34,9 +36,10 @@
     .setor-remover { color: var(--muted); border-left: 1px solid var(--border); font-size: 1rem; line-height: 1; }
     .setor-remover:hover { color: var(--st-late, #fb7185); background: rgba(251,113,133,.12); }
     .setor-restaurar { margin-top: .45rem; }
-    @media (max-width: 600px) { .batch-field-head, .batch-controls { align-items: stretch; flex-direction: column; } .batch-controls .input, .batch-controls .input:first-child { width: 100%; max-width: none; } .batch-times { display: none; } }
+    @media (max-width: 700px) { .identificacao-grid { grid-template-columns: 1fr; } }
+    @media (max-width: 600px) { .batch-field-head, .batch-controls { align-items: stretch; flex-direction: column; } .batch-times { display: none; } .batch-reference { white-space: normal; } }
   </style>
-<link rel="stylesheet" href="../assets/css/page-polish.css?v=2026.11.13.5"><link rel="stylesheet" href="../assets/css/form-imagem.css?v=2026.11.13.5"></head>
+<link rel="stylesheet" href="../assets/css/page-polish.css?v=2026.11.13.6"><link rel="stylesheet" href="../assets/css/form-imagem.css?v=2026.11.13.6"></head>
 <body data-pagina="equipamentos">
   <div class="app">
     <aside class="sidebar" id="sidebar"></aside>
@@ -48,7 +51,7 @@
         <div class="page-head">
           <div>
             <h1 id="titulo">Cadastrar equipamento</h1>
-            <p id="subtitulo">Preencha as características do equipamento. No cadastro em lote, cada unidade recebe um patrimônio próprio e mantém os mesmos dados.</p>
+            <p id="subtitulo">Informe a identificação e as características do equipamento. Os campos opcionais podem ser preenchidos depois.</p>
           </div>
           <a class="btn btn-ghost" href="equipamentos.html">Voltar para a lista</a>
         </div>
@@ -58,8 +61,8 @@
         <section class="panel form-panel">
           <form id="eq-form" novalidate>
             <h2 class="form-sec">Identificação</h2>
-            <div class="form-grid">
-              <div class="field col-2">
+            <div class="identificacao-grid">
+              <div class="field nome-field">
                 <label for="f-nome">Nome do equipamento</label>
                 <input class="input" id="f-nome" type="text" maxlength="120" autocomplete="off"
                        placeholder="Ex.: Projetor Epson X49" aria-describedby="e-nome" required>
@@ -70,27 +73,27 @@
                 <label for="f-patrimonio">Número de patrimônio</label>
                 <input class="input" id="f-patrimonio" type="text" maxlength="30" autocomplete="off"
                        placeholder="Ex.: PRJ-0017" aria-describedby="d-patrimonio e-patrimonio" required>
-                <span class="hint" id="d-patrimonio">Cada patrimônio só pode ser cadastrado uma vez. O QR Code usará este valor.</span>
+                <span class="hint" id="d-patrimonio">Informe o patrimônio inicial. Cada unidade terá um número próprio.</span>
                 <span class="field-erro" id="e-patrimonio"></span>
               </div>
 
-              <div class="field batch-field col-2" id="cadastro-lote" hidden>
-                <div class="batch-field-head"><div><label for="f-quantidade">Multiplicador <span class="muted">(opcional)</span></label><span class="hint">O patrimônio informado acima será usado como início da sequência.</span></div><span class="batch-badge">Cadastro em lote</span></div>
+              <div class="field batch-field" id="cadastro-lote" hidden>
+                <div class="batch-field-head"><label for="f-quantidade">Quantidade <span class="muted">(opcional)</span></label><span class="batch-badge">Lote</span></div>
                 <div class="batch-controls">
                   <input class="input" id="f-quantidade" type="number" min="1" max="500" placeholder="Ex.: 10" inputmode="numeric" aria-describedby="d-quantidade e-quantidade">
                   <span class="batch-times" aria-hidden="true">×</span>
                   <span class="batch-reference" id="patrimonio-referencia">patrimônio informado acima</span>
                 </div>
-                <span class="hint" id="d-quantidade">Ex.: 10 × patrimônio 0015 gera 0015 até 0024. Se ficar vazio, será cadastrada apenas a unidade do patrimônio informado acima.</span>
+                <span class="hint" id="d-quantidade">Opcional. Se ficar vazio, será cadastrada uma unidade.</span>
                 <span class="field-erro" id="e-quantidade"></span>
-                <div class="batch-preview" id="patrimonios-preview" aria-live="polite"></div>
+                <div class="batch-summary" id="patrimonios-preview" aria-live="polite">Informe o patrimônio para visualizar o resumo.</div>
               </div>
             </div>
 
             <h2 class="form-sec">Classificação</h2>
             <div class="form-grid">
               <div class="field">
-                <label for="f-categoria">Tipo ou categoria</label>
+                <label for="f-categoria">Categoria</label>
                 <div class="cat-row">
                   <select class="input" id="f-categoria" aria-describedby="d-categoria e-categoria" required>
                     <option value="">Carregando categorias…</option>
@@ -117,10 +120,6 @@
                 <span class="field-erro" id="e-setor"></span>
               </div>
 
-              <div class="field" id="qr-info">
-                <label>QR Code</label>
-                <span class="hint">O QR Code será gerado automaticamente usando somente o patrimônio de cada unidade.</span>
-              </div>
               <div class="field">
                 <label for="f-elegibilidade">Quem pode usar</label>
                 <select class="input" id="f-elegibilidade" aria-describedby="d-elegibilidade">
@@ -173,6 +172,11 @@
               </div>
             </div>
 
+            <aside class="form-note" aria-label="Informação sobre QR Code">
+              <strong>Identificação automática</strong>
+              <span>O QR Code será gerado automaticamente usando somente o patrimônio de cada unidade.</span>
+            </aside>
+
             <div class="form-actions">
               <button class="btn btn-primary" type="submit" id="salvar">Salvar equipamento</button>
               <a class="btn btn-ghost" href="equipamentos.html">Cancelar</a>
@@ -183,11 +187,11 @@
     </div>
   </div>
 
-  <script src="../assets/js/auth.js?v=2026.11.13.5"></script>
-  <script src="../assets/js/layout.js?v=2026.11.13.5"></script>
-  <script src="../assets/js/visuais.js?v=2026.11.13.5"></script>
-  <script src="../assets/js/runtime-config.js?v=2026.11.13.5"></script>
-  <script src="../assets/js/api.js?v=2026.11.13.5"></script>
-  <script src="../assets/js/equipamento-form.js?v=2026.11.13.5"></script>
+  <script src="../assets/js/auth.js?v=2026.11.13.6"></script>
+  <script src="../assets/js/layout.js?v=2026.11.13.6"></script>
+  <script src="../assets/js/visuais.js?v=2026.11.13.6"></script>
+  <script src="../assets/js/runtime-config.js?v=2026.11.13.6"></script>
+  <script src="../assets/js/api.js?v=2026.11.13.6"></script>
+  <script src="../assets/js/equipamento-form.js?v=2026.11.13.6"></script>
 </body>
 </html>

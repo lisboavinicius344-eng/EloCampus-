@@ -145,6 +145,39 @@ select.input {
 .form-panel {
   max-width: 880px;
 }
+.form-panel form {
+  display: grid;
+  gap: 0;
+}
+.form-panel .identificacao-grid {
+  margin-bottom: .2rem;
+}
+.form-panel .batch-field {
+  align-self: stretch;
+}
+.form-panel .batch-field label {
+  color: var(--text);
+  font-weight: 700;
+}
+.form-note {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: .45rem .75rem;
+  margin-top: 1.35rem;
+  padding: .75rem .9rem;
+  border-left: 3px solid rgba(34, 211, 238, .55);
+  border-radius: 0 10px 10px 0;
+  background: rgba(34, 211, 238, .055);
+  color: var(--muted);
+  font-size: .82rem;
+  line-height: 1.45;
+}
+.form-note strong {
+  color: #c9f8ff;
+  font-size: .8rem;
+  letter-spacing: .02em;
+}
 .form-sec {
   margin: 0 0 1rem;
   font-size: 1.1rem;
