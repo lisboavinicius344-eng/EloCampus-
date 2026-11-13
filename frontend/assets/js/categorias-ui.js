@@ -64,6 +64,22 @@
             }
           });
           actions.append(d);
+          const x = document.createElement("button");
+          x.className = "btn btn-ghost";
+          x.textContent = "Excluir";
+          x.addEventListener("click", async () => {
+            if (!confirm(`Excluir definitivamente a categoria “${c.nome}”? Esta ação não poderá ser desfeita.`)) return;
+            x.disabled = true;
+            try {
+              const resposta = await ELO.excluirCategoria(c.id);
+              aviso(resposta?.mensagem || "Categoria excluída.", "ok");
+              await carregar();
+            } catch (e) {
+              aviso(e.message || "Não foi possível excluir a categoria. Se ela estiver vinculada a equipamentos, desative-a.", "error");
+              x.disabled = false;
+            }
+          });
+          actions.append(x);
         } else {
           const r = document.createElement("button");
           r.className = "btn btn-primary";
@@ -81,6 +97,22 @@
             }
           });
           actions.append(r);
+          const x = document.createElement("button");
+          x.className = "btn btn-ghost";
+          x.textContent = "Excluir";
+          x.addEventListener("click", async () => {
+            if (!confirm(`Excluir definitivamente a categoria “${c.nome}”? Esta ação não poderá ser desfeita.`)) return;
+            x.disabled = true;
+            try {
+              const resposta = await ELO.excluirCategoria(c.id);
+              aviso(resposta?.mensagem || "Categoria excluída.", "ok");
+              await carregar();
+            } catch (e) {
+              aviso(e.message || "Não foi possível excluir a categoria. Se ela estiver vinculada a equipamentos, mantenha-a inativa.", "error");
+              x.disabled = false;
+            }
+          });
+          actions.append(x);
         }
         tb.append(tr);
       });

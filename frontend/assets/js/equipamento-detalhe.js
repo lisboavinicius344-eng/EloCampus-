@@ -27,7 +27,7 @@
       </div>
       <div class="qr-equipamento-info">
         <h3 id="qr-equipamento-titulo">QR Code de identificação</h3>
-        <p class="muted">Cole a etiqueta no equipamento. A leitura pela câmera abre este item dentro do sistema (a equipe vê esta página; alunos veem um resumo com a opção de reservar).</p>
+        <p class="muted">Cole a etiqueta no equipamento. A leitura pela câmera abre a consulta pública deste item.</p>
         ${destino ? `<p class="qr-equipamento-destino">Endereço gravado: <a href="${esc(destino)}" target="_blank" rel="noopener">${esc(destino)}</a></p>` : ""}
         <div class="qr-equipamento-acoes">
           <a class="btn btn-line" href="${esc(ELO_QR.download(e, "png"))}">Baixar PNG</a>

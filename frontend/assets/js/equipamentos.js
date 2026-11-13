@@ -27,6 +27,7 @@
     categoria: $("f-categoria"),
     setor: $("f-setor"),
     condicao: $("f-condicao"),
+    ordem: $("f-ordem"),
   };
 
   let todos = [];
@@ -56,7 +57,17 @@
   }
 
   function render() {
-    const lista = filtrar().sort((a, b) => a.nome.localeCompare(b.nome, "pt-BR"));
+    const ordem = campos.ordem.value || "patrimonio-asc";
+    const crescente = !ordem.endsWith("-desc");
+    const porPatrimonio = ordem.startsWith("patrimonio");
+    const comparar = (a, b) => {
+      const valorA = porPatrimonio ? String(a.patrimonio || "") : String(a.nome || "");
+      const valorB = porPatrimonio ? String(b.patrimonio || "") : String(b.nome || "");
+      const resultado = valorA.localeCompare(valorB, "pt-BR", { numeric: true, sensitivity: "base" });
+      if (resultado !== 0) return crescente ? resultado : -resultado;
+      return String(a.nome || "").localeCompare(String(b.nome || ""), "pt-BR", { sensitivity: "base" });
+    };
+    const lista = filtrar().sort(comparar);
     const filtrando = lista.length !== todos.length;
     $("contagem").textContent = lista.length === 1
       ? `1 equipamento${filtrando ? ` de ${todos.length}` : ""}`
@@ -119,13 +130,17 @@
   opcoes(campos.condicao, unicos(todos, "condicao"));
 
   // Permite abrir a página já filtrada, ex.: equipamentos.html?situacao=atrasado
-  const inicial = new URLSearchParams(window.location.search).get("situacao");
+  const params = new URLSearchParams(window.location.search);
+  const inicial = params.get("situacao");
   if (inicial && SITUACOES[inicial]) campos.situacao.value = inicial;
+  const ordemInicial = params.get("ordem");
+  if (ordemInicial && [...campos.ordem.options].some((option) => option.value === ordemInicial)) campos.ordem.value = ordemInicial;
 
   Object.values(campos).forEach((c) => c.addEventListener("input", render));
   $("filtros").addEventListener("submit", (e) => e.preventDefault());
   $("limpar").addEventListener("click", () => {
     Object.values(campos).forEach((c) => { c.value = ""; });
+    campos.ordem.value = "patrimonio-asc";
     campos.busca.focus();
     render();
   });

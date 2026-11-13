@@ -20,8 +20,7 @@
   const filtroStatus = $("solicitante-status");
   const filtroTipo = $("solicitante-filtro-tipo");
   const contagem = $("solicitante-contagem");
-  const mostrarIds = EloUtil.podeVerIdsInternos();
-  document.querySelectorAll("[data-id-column]").forEach((el) => { el.hidden = !mostrarIds; });
+  const mostrarIds = false;
   let solicitantes = [];
   let ocupada = false;
 
@@ -94,8 +93,6 @@
 
     filtrados.forEach((item) => {
       const linha = document.createElement("tr");
-      if (EloUtil.podeVerIdsInternos()) celula(linha, String(item.id ?? "—"), "solicitante-code");
-
       const pessoa = document.createElement("td");
       pessoa.appendChild(elemento("span", item.nome || "Nome não informado", "solicitante-primary"));
       pessoa.appendChild(elemento("span", item.setor || "Sem setor informado", "solicitante-secondary"));

@@ -434,6 +434,3 @@ html {
     flex-direction: column;
   }
 }
-
-/* Botão "Reservar este equipamento" no resumo do aluno. */
-.qr-reservar { margin: 1rem 0 0; }

@@ -155,9 +155,8 @@ const ELO = {
     if (!Array.isArray(resposta)) throw new Error("A resposta do histórico do equipamento está fora do contrato esperado. A API deve retornar uma lista direta.");
     return resposta;
   },
-  // porId: o código é o ID do equipamento (etiqueta /q/<id>), não um patrimônio.
-  consultaQr: async (codigo, { porId = false } = {}) => {
-    const caminho = `/consulta-qr/${encodeURIComponent(String(codigo || "").trim())}${porId ? "?por=id" : ""}`;
+  consultaQr: async (codigo) => {
+    const caminho = `/consulta-qr/${encodeURIComponent(String(codigo || "").trim())}`;
     const sessao = typeof obterSessao === "function" ? obterSessao() : null;
     const papel = String(sessao?.perfil || sessao?.usuario?.papel || "").toLowerCase();
     const equipe = Boolean(sessao?.token) && ["admin", "administrador", "operador"].includes(papel);
@@ -314,6 +313,7 @@ const ELO = {
   editarCategoria: (id, dados) => requisitar(`/categorias/${encodeURIComponent(id)}`, { metodo: "PUT", corpo: { nome: String(dados.nome || "").trim(), descricao: String(dados.descricao || "").trim() || null } }),
   desativarCategoria: (id) => requisitar(`/categorias/${encodeURIComponent(id)}/desativar`, { metodo: "PATCH" }),
   reativarCategoria: (id) => requisitar(`/categorias/${encodeURIComponent(id)}/reativar`, { metodo: "PATCH" }),
+  excluirCategoria: (id) => requisitar(`/categorias/${encodeURIComponent(id)}`, { metodo: "DELETE" }),
   solicitantes: async () => {
     const resposta = await requisitar("/solicitantes");
     if (!Array.isArray(resposta?.solicitantes)) {

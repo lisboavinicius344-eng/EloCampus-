@@ -82,12 +82,7 @@ const EloUtil = {
   let sessao = obterSessao();
   const publico = document.body.dataset.publico === "true";
   const perfisValidos = new Set(["administrador", "administrador_geral", "administrador-geral", "administrador_master", "master", "operador", "aluno", "professor"]);
-  if (!sessao && !publico) {
-    // Guarda a página pedida (ex.: item aberto pelo QR Code) para voltar a ela depois do login.
-    const voltar = window.location.pathname + window.location.search;
-    window.location.replace(`../index.html?voltar=${encodeURIComponent(voltar)}`);
-    return;
-  }
+  if (!sessao && !publico) { window.location.replace("../index.html"); return; }
   if (!sessao) sessao = { nome: "Consulta pública", perfil: "visitante" };
   const perfilAtual = String(sessao.perfil || "").toLowerCase();
   const equipe = ["administrador", "administrador_geral", "administrador-geral", "administrador_master", "master", "operador"].includes(perfilAtual);

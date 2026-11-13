@@ -29,17 +29,23 @@
   };
   const quantidade = $("f-quantidade");
   const patrimonioInicial = $("f-patrimonio-inicial");
+  const patrimonioFinal = $("f-patrimonio-final");
   const lote = $("cadastro-lote");
   const previewPatrimonios = $("patrimonios-preview");
   const campoMarca = $("f-marca");
   const campoCor = $("f-cor");
   const campoFoto = $("f-foto");
+  const listaSetores = $("lista-setores");
+  const setorSugestoes = $("setor-sugestoes");
+  const setorRestaurar = $("setor-restaurar");
   const previewWrap = $("foto-preview-wrap");
   const previewFoto = $("foto-preview");
   const erroFoto = $("e-foto");
   let fotoSelecionada = null;
   let urlPreviewFoto = "";
-  const cadastroEmLote = !id && Boolean(lote && quantidade && patrimonioInicial);
+  const cadastroEmLote = !id && Boolean(lote && quantidade && patrimonioInicial && patrimonioFinal);
+  const patrimonioUnitario = $("patrimonio-unitario-wrap");
+  if (patrimonioUnitario && cadastroEmLote) patrimonioUnitario.hidden = true;
   if (lote) lote.hidden = !cadastroEmLote;
   const valorInicial = (v) => String(v || "").trim().toUpperCase();
   function patrimonioSequencial(inicial, total) {
@@ -62,16 +68,29 @@
     if (!Number.isSafeInteger(numero) || !Number.isSafeInteger(total) || total < 1 || total > 500) return [];
     return Array.from({ length: total }, (_, i) => `${prefixo}${String(numero + i).padStart(largura, "0")}`);
   }
+  function patrimonioPorFaixa(inicial, final) {
+    const inicio = valorInicial(inicial).match(/^(.*?)(\d+)$/);
+    const fim = valorInicial(final).match(/^(.*?)(\d+)$/);
+    if (!inicio || !fim || inicio[1] !== fim[1]) return [];
+    const primeiro = Number(inicio[2]);
+    const ultimo = Number(fim[2]);
+    const largura = Math.max(inicio[2].length, fim[2].length);
+    if (!Number.isSafeInteger(primeiro) || !Number.isSafeInteger(ultimo) || ultimo < primeiro || ultimo - primeiro >= 500) return [];
+    return Array.from({ length: ultimo - primeiro + 1 }, (_, i) => `${inicio[1]}${String(primeiro + i).padStart(largura, "0")}`);
+  }
   function atualizarPreviewLote() {
     if (!cadastroEmLote || !previewPatrimonios) return;
     const total = Number(quantidade.value || 0);
-    const lista = patrimonioSequencial(patrimonioInicial.value, total);
-    if (!total || !patrimonioInicial.value.trim()) { previewPatrimonios.textContent = "Informe a quantidade e o patrimônio inicial para visualizar a faixa."; return; }
+    const lista = patrimonioFinal.value.trim()
+      ? patrimonioPorFaixa(patrimonioInicial.value, patrimonioFinal.value)
+      : (patrimonioInicial.value.trim() ? patrimonioSequencial(patrimonioInicial.value, total || 1) : []);
+    if (!patrimonioInicial.value.trim()) { previewPatrimonios.textContent = "Informe o patrimônio inicial."; return; }
     if (!lista.length) { previewPatrimonios.textContent = "O patrimônio inicial deve terminar com um número, como 0015 ou TECLADO-0015."; return; }
     previewPatrimonios.textContent = `${lista.length} patrimônios: ${lista[0]} até ${lista.at(-1)}.`;
   }
   quantidade?.addEventListener("input", atualizarPreviewLote);
   patrimonioInicial?.addEventListener("input", atualizarPreviewLote);
+  patrimonioFinal?.addEventListener("input", atualizarPreviewLote);
   campoFoto?.addEventListener("change", () => {
     erroFoto.textContent = "";
     const arquivo = campoFoto.files?.[0] || null;
@@ -179,12 +198,34 @@
   [campos.categoria, campos.condicao].forEach((campo) => campo.addEventListener("input", atualizarVisual));
   [campos.categoria, campos.condicao].forEach((campo) => campo.addEventListener("change", atualizarVisual));
   // Sugestões são auxiliares: falha numa listagem não deve bloquear o cadastro.
+  const setoresRemovidosKey = "elo.setores.sugestoes.removidos";
+  const lerSetoresRemovidos = () => { try { return new Set(JSON.parse(localStorage.getItem(setoresRemovidosKey) || "[]")); } catch { return new Set(); } };
+  const salvarSetoresRemovidos = (set) => { try { localStorage.setItem(setoresRemovidosKey, JSON.stringify([...set])); } catch { /* armazenamento opcional */ } };
+  let setoresDisponiveis = [];
+  const renderizarSetores = () => {
+    const removidos = lerSetoresRemovidos();
+    const ativos = setoresDisponiveis.filter((v) => !removidos.has(v));
+    listaSetores.replaceChildren(...ativos.map((v) => new Option(v, v)));
+    setorSugestoes.replaceChildren();
+    setorSugestoes.hidden = !ativos.length;
+    ativos.forEach((valor) => {
+      const chip = document.createElement("span"); chip.className = "setor-sugestao";
+      const escolher = document.createElement("button"); escolher.type = "button"; escolher.className = "setor-escolher"; escolher.textContent = valor; escolher.title = `Usar ${valor}`;
+      escolher.addEventListener("click", () => { campos.setor.value = valor; campos.setor.dispatchEvent(new Event("input", { bubbles: true })); });
+      const remover = document.createElement("button"); remover.type = "button"; remover.className = "setor-remover"; remover.textContent = "×"; remover.setAttribute("aria-label", `Remover sugestão ${valor}`);
+      remover.addEventListener("click", () => { const atual = lerSetoresRemovidos(); atual.add(valor); salvarSetoresRemovidos(atual); renderizarSetores(); });
+      chip.append(escolher, remover); setorSugestoes.append(chip);
+    });
+    setorRestaurar.hidden = !removidos.size;
+  };
+  setorRestaurar?.addEventListener("click", () => { salvarSetoresRemovidos(new Set()); renderizarSetores(); });
   const preencher = (idLista, valores) => {
     const lista = $(idLista);
     if (!lista) return;
-    lista.replaceChildren(...[...new Set(valores.filter(Boolean))]
+    const unicosSetores = [...new Set(valores.filter(Boolean))]
       .sort((a, b) => a.localeCompare(b, "pt-BR"))
-      .map((v) => new Option(v, v)));
+    setoresDisponiveis = unicosSetores;
+    renderizarSetores();
   };
 
   // Monta a lista de categorias ativas; "selecionar" mantém ou define a opção escolhida.
@@ -297,16 +338,18 @@
     ev.preventDefault();
     limparErros();
 
-    const faixaInformada = /^(.*?)(\d+)-(\d+)$/.test(valorInicial(patrimonioInicial?.value));
     const quantidadeInformada = Number(quantidade?.value || 0);
-    const patrimoniosPrevia = cadastroEmLote ? patrimonioSequencial(patrimonioInicial.value, faixaInformada ? 1 : quantidadeInformada) : [campos.patrimonio.value];
-    const total = cadastroEmLote ? (faixaInformada ? patrimoniosPrevia.length : quantidadeInformada) : 1;
-    const patrimonios = cadastroEmLote ? patrimonioSequencial(patrimonioInicial.value, total) : [campos.patrimonio.value];
+    const faixaInformada = Boolean(patrimonioFinal?.value.trim());
+    const patrimonios = cadastroEmLote
+      ? (faixaInformada ? patrimonioPorFaixa(patrimonioInicial.value, patrimonioFinal.value) : patrimonioSequencial(patrimonioInicial.value, quantidadeInformada || 1))
+      : [campos.patrimonio.value];
+    const total = patrimonios.length;
     const dadosBase = lerDados(patrimonios[0] || campos.patrimonio.value);
     const msgs = validar(dadosBase);
     if (cadastroEmLote) {
-      if (!Number.isInteger(total) || total < 1 || total > 500) msgs.quantidade = "Informe uma quantidade entre 1 e 500, ou uma faixa válida.";
-      if (!patrimonios.length || patrimonios.length !== total) msgs.quantidade = "Informe um patrimônio inicial terminado em número, como 0015, ou uma faixa como 0015-0030.";
+      if (!patrimonios.length || total > 500) msgs.quantidade = "Informe um início numérico válido e, se usar faixa, um fim maior ou igual ao início.";
+      if (quantidadeInformada && (!Number.isInteger(quantidadeInformada) || quantidadeInformada < 1 || quantidadeInformada > 500)) msgs.quantidade = "A quantidade deve estar entre 1 e 500.";
+      if (faixaInformada && !patrimonios.length) msgs.quantidade = "Confira os patrimônios inicial e final. Eles devem ter o mesmo prefixo e o final não pode ser menor.";
       if (new Set(patrimonios).size !== patrimonios.length) msgs.quantidade = "A faixa gerada contém patrimônios repetidos.";
       if (patrimonios.some((p) => !/^[A-Z0-9][A-Z0-9._-]*$/.test(p))) msgs.quantidade = "Use apenas letras, números, hífen, ponto ou sublinhado nos patrimônios.";
     }
