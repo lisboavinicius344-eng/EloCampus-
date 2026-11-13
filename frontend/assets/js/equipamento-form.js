@@ -59,8 +59,8 @@
     const total = Number(quantidade.value || 0);
     const patrimonio = campos.patrimonio.value.trim();
     const lista = patrimonio ? patrimonioSequencial(patrimonio, total || 1) : [];
-    if (!patrimonio || !lista.length) { previewPatrimonios.textContent = "ID final: —"; return; }
-    previewPatrimonios.textContent = `ID final: ${lista.at(-1)}`;
+    if (!patrimonio || !lista.length) { previewPatrimonios.textContent = "Patrimônio final: —"; return; }
+    previewPatrimonios.textContent = `Patrimônio final: ${lista.at(-1)}`;
   }
   quantidade?.addEventListener("input", atualizarPreviewLote);
   campos.patrimonio.addEventListener("input", atualizarPreviewLote);

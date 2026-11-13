@@ -5,6 +5,7 @@ const ELO_VISUAIS = (() => {
   return {categoria};
 })();
 /* QR Code de equipamentos. A imagem é pública (como a foto), então funciona direto em <img>.
+ * O conteúdo enviado pelo cadastro é somente o patrimônio, sem JSON ou dados extras.
  * O backend devolve qr_imagem_url relativo à base da API; sem o campo, usa a rota padrão. */
 const ELO_QR = (() => {
   const base = () => (typeof API_BASE_URL === "string" ? API_BASE_URL : String(window.ELO_API_BASE_URL || "").replace(/\/+$/, ""));

@@ -11,9 +11,9 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-  <link rel="stylesheet" href="../assets/css/style.css?v=2026.11.13.7">
-  <link rel="stylesheet" href="../assets/css/layout.css?v=2026.11.13.7">
-  <link rel="stylesheet" href="../assets/css/equipamentos.css?v=2026.11.13.7">
+  <link rel="stylesheet" href="../assets/css/style.css?v=2026.11.13.8">
+  <link rel="stylesheet" href="../assets/css/layout.css?v=2026.11.13.8">
+  <link rel="stylesheet" href="../assets/css/equipamentos.css?v=2026.11.13.8">
   <style>
     .cat-row { display: flex; gap: .5rem; align-items: stretch; }
     .cat-row .input { flex: 1; min-width: 0; }
@@ -22,11 +22,11 @@
     .identificacao-grid { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(180px, .6fr); gap: .9rem 1.25rem; align-items: start; }
     .identificacao-grid .nome-field { grid-column: 1 / -1; }
     .batch-field { min-width: 0; padding: .15rem 0 0; }
-    .batch-inline { display: grid; grid-template-columns: auto minmax(4.5rem, 6rem) minmax(0, 1fr); align-items: center; gap: .55rem; min-height: 52px; }
-    .batch-inline label { color: var(--text); font-weight: 600; white-space: nowrap; }
+    .batch-inline { display: grid; grid-template-columns: minmax(0, 1fr) minmax(4.5rem, 6rem); align-items: end; gap: .35rem .75rem; min-height: 88px; }
+    .batch-inline label { display: flex; flex-direction: column; gap: .1rem; color: var(--text); font-weight: 700; line-height: 1.15; }
     .batch-inline label .muted { color: var(--muted); font-size: .76rem; font-weight: 400; }
     .batch-inline .input { min-width: 0; min-height: 44px; padding: 0 .75rem; text-align: center; }
-    .batch-final { justify-self: end; color: var(--muted); font-size: .78rem; white-space: nowrap; }
+    .batch-final { grid-column: 1 / -1; color: var(--muted); font-size: .8rem; line-height: 1.25; }
     .setor-sugestoes { display: flex; flex-wrap: wrap; gap: .4rem; margin-top: .5rem; }
     .setor-sugestao { display: inline-flex; align-items: center; border: 1px solid var(--border); border-radius: 999px; overflow: hidden; background: rgba(139,92,246,.08); }
     .setor-escolher, .setor-remover { border: 0; background: transparent; color: var(--text); cursor: pointer; padding: .3rem .55rem; }
@@ -35,9 +35,9 @@
     .setor-remover:hover { color: var(--st-late, #fb7185); background: rgba(251,113,133,.12); }
     .setor-restaurar { margin-top: .45rem; }
     @media (max-width: 700px) { .identificacao-grid { grid-template-columns: 1fr; } }
-    @media (max-width: 600px) { .batch-inline { grid-template-columns: auto 5rem minmax(0, 1fr); } .batch-final { white-space: normal; text-align: right; } }
+    @media (max-width: 600px) { .batch-inline { grid-template-columns: minmax(0, 1fr) 5rem; } .batch-final { white-space: normal; text-align: left; } }
   </style>
-<link rel="stylesheet" href="../assets/css/page-polish.css?v=2026.11.13.7"><link rel="stylesheet" href="../assets/css/form-imagem.css?v=2026.11.13.7"></head>
+<link rel="stylesheet" href="../assets/css/page-polish.css?v=2026.11.13.8"><link rel="stylesheet" href="../assets/css/form-imagem.css?v=2026.11.13.8"></head>
 <body data-pagina="equipamentos">
   <div class="app">
     <aside class="sidebar" id="sidebar"></aside>
@@ -77,9 +77,9 @@
 
               <div class="field batch-field" id="cadastro-lote" hidden>
                 <div class="batch-inline">
-                  <label for="f-quantidade">Quantidade: <span class="muted">(opcional)</span></label>
-                  <input class="input" id="f-quantidade" type="number" min="1" max="500" value="1" inputmode="numeric" aria-describedby="e-quantidade">
-                  <span class="batch-final" id="patrimonios-preview" aria-live="polite">ID final: —</span>
+                  <label for="f-quantidade">Quantidade <span class="muted">(opcional)</span></label>
+                  <input class="input" id="f-quantidade" type="text" maxlength="3" value="01" inputmode="numeric" pattern="[0-9]{1,3}" aria-describedby="e-quantidade">
+                  <span class="batch-final" id="patrimonios-preview" aria-live="polite">Patrimônio final: —</span>
                 </div>
                 <span class="field-erro" id="e-quantidade"></span>
               </div>
@@ -181,11 +181,11 @@
     </div>
   </div>
 
-  <script src="../assets/js/auth.js?v=2026.11.13.7"></script>
-  <script src="../assets/js/layout.js?v=2026.11.13.7"></script>
-  <script src="../assets/js/visuais.js?v=2026.11.13.7"></script>
-  <script src="../assets/js/runtime-config.js?v=2026.11.13.7"></script>
-  <script src="../assets/js/api.js?v=2026.11.13.7"></script>
-  <script src="../assets/js/equipamento-form.js?v=2026.11.13.7"></script>
+  <script src="../assets/js/auth.js?v=2026.11.13.8"></script>
+  <script src="../assets/js/layout.js?v=2026.11.13.8"></script>
+  <script src="../assets/js/visuais.js?v=2026.11.13.8"></script>
+  <script src="../assets/js/runtime-config.js?v=2026.11.13.8"></script>
+  <script src="../assets/js/api.js?v=2026.11.13.8"></script>
+  <script src="../assets/js/equipamento-form.js?v=2026.11.13.8"></script>
 </body>
 </html>

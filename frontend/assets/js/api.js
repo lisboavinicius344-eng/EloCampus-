@@ -313,8 +313,8 @@ const ELO = {
   editarCategoria: (id, dados) => requisitar(`/categorias/${encodeURIComponent(id)}`, { metodo: "PUT", corpo: { nome: String(dados.nome || "").trim(), descricao: String(dados.descricao || "").trim() || null } }),
   desativarCategoria: (id) => requisitar(`/categorias/${encodeURIComponent(id)}/desativar`, { metodo: "PATCH" }),
   reativarCategoria: (id) => requisitar(`/categorias/${encodeURIComponent(id)}/reativar`, { metodo: "PATCH" }),
-  // A API publicada não implementa DELETE /categorias/<id>; exclusão é arquivamento reversível.
-  excluirCategoria: (id) => requisitar(`/categorias/${encodeURIComponent(id)}/desativar`, { metodo: "PATCH" }),
+  // Exclusão é distinta de desativação: remove a categoria definitivamente na API.
+  excluirCategoria: (id) => requisitar(`/categorias/${encodeURIComponent(id)}`, { metodo: "DELETE" }),
   solicitantes: async () => {
     const resposta = await requisitar("/solicitantes");
     if (!Array.isArray(resposta?.solicitantes)) {
