@@ -27,14 +27,51 @@
     condicao: $("e-condicao"),
     observacoes: $("e-obs"),
   };
-  const identificador = $("f-identificador");
+  const quantidade = $("f-quantidade");
+  const patrimonioInicial = $("f-patrimonio-inicial");
+  const lote = $("cadastro-lote");
+  const previewPatrimonios = $("patrimonios-preview");
+  const campoMarca = $("f-marca");
+  const campoCor = $("f-cor");
   const campoFoto = $("f-foto");
   const previewWrap = $("foto-preview-wrap");
   const previewFoto = $("foto-preview");
   const erroFoto = $("e-foto");
   let fotoSelecionada = null;
   let urlPreviewFoto = "";
-  let identificadorPersonalizado = false;
+  const cadastroEmLote = !id && Boolean(lote && quantidade && patrimonioInicial);
+  if (lote) lote.hidden = !cadastroEmLote;
+  const valorInicial = (v) => String(v || "").trim().toUpperCase();
+  function patrimonioSequencial(inicial, total) {
+    const bruto = valorInicial(inicial);
+    const faixa = bruto.match(/^(.*?)(\d+)-(\d+)$/);
+    if (faixa) {
+      const prefixo = faixa[1];
+      const inicio = Number(faixa[2]);
+      const fim = Number(faixa[3]);
+      const largura = Math.max(faixa[2].length, faixa[3].length);
+      if (Number.isSafeInteger(inicio) && Number.isSafeInteger(fim) && fim >= inicio && fim - inicio < 500) {
+        return Array.from({ length: fim - inicio + 1 }, (_, i) => `${prefixo}${String(inicio + i).padStart(largura, "0")}`);
+      }
+    }
+    const encontrado = bruto.match(/^(.*?)(\d+)$/);
+    if (!encontrado) return total === 1 && bruto ? [bruto] : [];
+    const prefixo = encontrado[1];
+    const numero = Number(encontrado[2]);
+    const largura = encontrado[2].length;
+    if (!Number.isSafeInteger(numero) || !Number.isSafeInteger(total) || total < 1 || total > 500) return [];
+    return Array.from({ length: total }, (_, i) => `${prefixo}${String(numero + i).padStart(largura, "0")}`);
+  }
+  function atualizarPreviewLote() {
+    if (!cadastroEmLote || !previewPatrimonios) return;
+    const total = Number(quantidade.value || 0);
+    const lista = patrimonioSequencial(patrimonioInicial.value, total);
+    if (!total || !patrimonioInicial.value.trim()) { previewPatrimonios.textContent = "Informe a quantidade e o patrimônio inicial para visualizar a faixa."; return; }
+    if (!lista.length) { previewPatrimonios.textContent = "O patrimônio inicial deve terminar com um número, como 0015 ou TECLADO-0015."; return; }
+    previewPatrimonios.textContent = `${lista.length} patrimônios: ${lista[0]} até ${lista.at(-1)}.`;
+  }
+  quantidade?.addEventListener("input", atualizarPreviewLote);
+  patrimonioInicial?.addEventListener("input", atualizarPreviewLote);
   campoFoto?.addEventListener("change", () => {
     erroFoto.textContent = "";
     const arquivo = campoFoto.files?.[0] || null;
@@ -60,33 +97,21 @@
   const textoCategoria = () => campos.categoria.selectedOptions[0]?.textContent.trim() || "";
 
   const normalizarPatrimonio = (v) => v.trim().toUpperCase();
-  const atualizarIdentificador = () => {
-    if (!identificadorPersonalizado) {
-      identificador.value = normalizarPatrimonio(campos.patrimonio.value);
-    }
-  };
-  identificador.addEventListener("input", () => {
-    identificadorPersonalizado = identificador.value.trim() !== "" &&
-      identificador.value.trim() !== normalizarPatrimonio(campos.patrimonio.value);
-  });
-  identificador.addEventListener("blur", () => {
-    if (!identificador.value.trim()) {
-      identificadorPersonalizado = false;
-      atualizarIdentificador();
-    }
-  });
 
-  function lerDados() {
+  function lerDados(patrimonio = campos.patrimonio.value) {
+    const patrimonioFinal = normalizarPatrimonio(patrimonio);
     return {
       nome: campos.nome.value.trim(),
-      patrimonio: normalizarPatrimonio(campos.patrimonio.value),
+      patrimonio: patrimonioFinal,
       categoria: campos.categoria.value ? textoCategoria() : "",
       categoria_id: campos.categoria.value,
       elegibilidade: $("f-elegibilidade")?.value || "todos",
       setor: campos.setor.value.trim(),
+      marca: campoMarca?.value.trim() || "",
+      cor: campoCor?.value.trim() || "",
       condicao: campos.condicao.value,
       observacoes: campos.observacoes.value.trim(),
-      qr_code: identificador.value.trim() || normalizarPatrimonio(campos.patrimonio.value),
+      qr_code: patrimonioFinal,
       foto: fotoSelecionada,
     };
   }
@@ -114,6 +139,7 @@
   function mostrarErros(msgs) {
     let primeiro = null;
     Object.entries(msgs).forEach(([campo, texto]) => {
+      if (campo === "quantidade") { $("e-quantidade").textContent = texto; return; }
       if (!campos[campo]) return;
       spansErro[campo].textContent = texto;
       campos[campo].setAttribute("aria-invalid", "true");
@@ -134,8 +160,6 @@
       campos[k].removeAttribute("aria-invalid");
     });
   });
-  campos.patrimonio.addEventListener("input", atualizarIdentificador);
-
   const atualizarVisual = () => {
     const categoria = campos.categoria.value ? textoCategoria().toLowerCase() : "";
     const condicao = campos.condicao.value;
@@ -246,19 +270,12 @@
       const idCat = e.categoria_id ?? categoriasApi.find((c) => c.nome === e.categoria)?.id ?? "";
       // Categoria já desativada continua aparecendo para não perder o vínculo ao editar.
       montarCategorias(idCat, idCat !== "" ? { id: idCat, nome: e.categoria || `Categoria #${idCat}` } : null);
-      const qrExistente = String(e.qr_code || e.codigo_qr || "").trim();
-      if (qrExistente && qrExistente !== normalizarPatrimonio(e.patrimonio || "")) {
-        identificador.value = qrExistente;
-        identificadorPersonalizado = true;
-      } else {
-        identificadorPersonalizado = false;
-        atualizarIdentificador();
-      }
       if ($("f-elegibilidade")) $("f-elegibilidade").value = e.elegibilidade || "todos";
+      if (campoMarca) campoMarca.value = e.marca ?? e.fabricante ?? "";
+      if (campoCor) campoCor.value = e.cor ?? "";
       campos.setor.value = e.setor ?? "";
       campos.condicao.value = e.condicao ?? "";
       campos.observacoes.value = e.observacoes ?? "";
-      atualizarIdentificador();
       atualizarVisual();
       botao.disabled = false;
     } catch (err) {
@@ -280,21 +297,34 @@
     ev.preventDefault();
     limparErros();
 
-    const dados = lerDados();
-    const msgs = validar(dados);
-    if (Object.keys(msgs).length) { mostrarErros(msgs); return; }
+    const faixaInformada = /^(.*?)(\d+)-(\d+)$/.test(valorInicial(patrimonioInicial?.value));
+    const quantidadeInformada = Number(quantidade?.value || 0);
+    const patrimoniosPrevia = cadastroEmLote ? patrimonioSequencial(patrimonioInicial.value, faixaInformada ? 1 : quantidadeInformada) : [campos.patrimonio.value];
+    const total = cadastroEmLote ? (faixaInformada ? patrimoniosPrevia.length : quantidadeInformada) : 1;
+    const patrimonios = cadastroEmLote ? patrimonioSequencial(patrimonioInicial.value, total) : [campos.patrimonio.value];
+    const dadosBase = lerDados(patrimonios[0] || campos.patrimonio.value);
+    const msgs = validar(dadosBase);
+    if (cadastroEmLote) {
+      if (!Number.isInteger(total) || total < 1 || total > 500) msgs.quantidade = "Informe uma quantidade entre 1 e 500, ou uma faixa válida.";
+      if (!patrimonios.length || patrimonios.length !== total) msgs.quantidade = "Informe um patrimônio inicial terminado em número, como 0015, ou uma faixa como 0015-0030.";
+      if (new Set(patrimonios).size !== patrimonios.length) msgs.quantidade = "A faixa gerada contém patrimônios repetidos.";
+      if (patrimonios.some((p) => !/^[A-Z0-9][A-Z0-9._-]*$/.test(p))) msgs.quantidade = "Use apenas letras, números, hífen, ponto ou sublinhado nos patrimônios.";
+    }
+    if (Object.keys(msgs).length) { mostrarErros(msgs); if (msgs.quantidade) $("e-quantidade").textContent = msgs.quantidade; return; }
 
     botao.disabled = true;
-    botao.textContent = "Salvando…";
+    botao.textContent = cadastroEmLote ? `Salvando 0/${patrimonios.length}…` : "Salvando…";
 
     try {
-      if (dados.foto instanceof File) {
-        dados.foto = await arquivoParaDataUrl(dados.foto);
+      let foto = dadosBase.foto;
+      if (foto instanceof File) foto = await arquivoParaDataUrl(foto);
+      for (let i = 0; i < patrimonios.length; i += 1) {
+        const dados = { ...dadosBase, patrimonio: patrimonios[i], qr_code: patrimonios[i], foto };
+        await ELO.salvarEquipamento(dados, id);
+        if (cadastroEmLote) botao.textContent = `Salvando ${i + 1}/${patrimonios.length}…`;
       }
-      await ELO.salvarEquipamento(dados, id);
-      window.location.href = `equipamentos.html?salvo=${id ? "editado" : "criado"}`;
+      window.location.href = `equipamentos.html?salvo=${id ? "editado" : "criado"}${cadastroEmLote ? `&quantidade=${patrimonios.length}` : ""}`;
     } catch (err) {
-      // Erros 409/422 do servidor trazem o campo (ex.: patrimônio duplicado)
       if (err.campo && campos[err.campo]) mostrarErros({ [err.campo]: err.message });
       else mostrarErroGeral(err.message);
       botao.disabled = false;

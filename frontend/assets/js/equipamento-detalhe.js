@@ -56,6 +56,8 @@
         <div><dt>Tipo ou categoria</dt><dd>${esc(e.categoria)}</dd></div>
         <div><dt>Setor responsável</dt><dd>${esc(e.setor)}</dd></div>
         <div><dt>Condição física</dt><dd>${esc(e.condicao)}</dd></div>
+        ${e.marca ? `<div><dt>Marca</dt><dd>${esc(e.marca)}</dd></div>` : ""}
+        ${e.cor ? `<div><dt>Cor</dt><dd>${esc(e.cor)}</dd></div>` : ""}
         <div><dt>Situação</dt><dd>${esc(e.situacao || "Não informada")}</dd></div>
         ${e.observacoes ? `<div class="col-2"><dt>Observações</dt><dd>${esc(e.observacoes)}</dd></div>` : ""}
       </dl>

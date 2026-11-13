@@ -288,6 +288,8 @@ const ELO = {
       numero_patrimonio: d.patrimonio || d.numero_patrimonio,
       setor: d.setor,
       localizacao: d.localizacao || "",
+      marca: d.marca || null,
+      cor: d.cor || null,
       estado_conservacao: estadoApi(d.condicao || d.estado_conservacao),
       qr_code: d.qr_code || d.patrimonio || d.numero_patrimonio,
       observacoes: d.observacoes || null,

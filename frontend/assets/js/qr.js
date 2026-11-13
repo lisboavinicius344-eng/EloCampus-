@@ -144,7 +144,7 @@
       status.textContent = e.message || "Não foi possível consultar este equipamento.";
     } finally { botao.disabled = false; botao.textContent = "Consultar"; }
   });
-  const p = new URLSearchParams(location.search), inicial = (p.get("codigo") || p.get("patrimonio") || p.get("qr") || p.get("id") || "").trim();
+  const p = new URLSearchParams(location.search), inicial = (p.get("patrimonio") || p.get("codigo") || p.get("qr") || p.get("id") || "").trim();
   if (inicial) { campo.value = inicial; form.requestSubmit(); }
   window.addEventListener("pagehide", stop);
 })();
