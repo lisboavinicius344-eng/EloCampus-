@@ -538,3 +538,14 @@ body[data-pagina="solicitacoes-acesso"] .access-fields textarea {
   body[data-pagina="solicitacoes-acesso"] .access-audit-wrap { overflow-x: auto; }
   body[data-pagina="solicitacoes-acesso"] .access-audit-table { min-width: 1050px; }
 }
+
+
+/* Não dividir nomes de perfis/status no meio de palavras em telas estreitas. */
+body[data-pagina="usuarios"] .table-wrap td.team-name,
+body[data-pagina="usuarios"] .table-wrap td.team-email,
+body[data-pagina="usuarios"] .table-wrap td.team-profile,
+body[data-pagina="usuarios"] .table-wrap td:nth-child(4),
+body[data-pagina="usuarios"] .table-wrap td:nth-child(5) { overflow-wrap: normal; word-break: normal; }
+body[data-pagina="usuarios"] .table-wrap .pill { width: max-content; max-width: 100%; word-break: keep-all; overflow-wrap: normal; }
+body[data-pagina="usuarios"] .table-wrap td.team-profile { white-space: nowrap; }
+body[data-pagina="usuarios"] .table-wrap td:nth-child(4) .pill { white-space: normal; text-align: center; }

@@ -6,9 +6,9 @@
     <meta name="robots" content="noindex,nofollow" />
     <title>Categorias — ELO Campus</title>
     <link rel="icon" href="../assets/img/logo.png" />
-    <link rel="stylesheet" href="../assets/css/style.css?v=2026.11.13.4" />
-    <link rel="stylesheet" href="../assets/css/layout.css?v=2026.11.13.4" />
-    <link rel="stylesheet" href="../assets/css/salz-bridge.css?v=2026.11.13.4" />
+    <link rel="stylesheet" href="../assets/css/style.css?v=2026.11.13.5" />
+    <link rel="stylesheet" href="../assets/css/layout.css?v=2026.11.13.5" />
+    <link rel="stylesheet" href="../assets/css/salz-bridge.css?v=2026.11.13.5" />
     <style>
       .api-grid {
         display: grid;
@@ -48,7 +48,7 @@
         }
       }
     </style>
-    <link rel="stylesheet" href="../assets/css/page-polish.css?v=2026.11.13.4">
+    <link rel="stylesheet" href="../assets/css/page-polish.css?v=2026.11.13.5">
 </head>
   <body data-pagina="categorias">
     <div class="app">
@@ -86,10 +86,19 @@
               </div>
             </form>
           </section>
+          <section class="card stack" aria-labelledby="setores-titulo">
+            <div><h2 id="setores-titulo">Setores responsáveis</h2><p class="api-note">Crie e organize as sugestões usadas no cadastro de equipamentos. Remover uma sugestão não altera equipamentos já cadastrados.</p></div>
+            <form id="setor-form" class="api-grid">
+              <input type="hidden" id="setor-id" />
+              <div class="field"><label for="setor-nome">Nome do setor</label><input class="input input-block" id="setor-nome" maxlength="80" required placeholder="Ex.: Laboratório de informática" /></div>
+              <div class="api-actions" style="align-items:end"><button class="btn btn-primary" type="submit" id="setor-save">Adicionar setor</button><button class="btn btn-ghost" type="button" id="setor-cancel" hidden>Cancelar edição</button></div>
+            </form>
+            <div class="table-wrap"><table class="api-table"><thead><tr><th>Setor</th><th>Ações</th></tr></thead><tbody id="setor-tbody"><tr><td colspan="2">Nenhum setor cadastrado.</td></tr></tbody></table></div>
+          </section>
           <section class="card stack">
             <div class="row" style="align-items: center; justify-content: space-between">
               <h2>Categorias cadastradas</h2>
-              <button class="btn btn-line" id="cat-refresh" type="button">Atualizar</button>
+              <div class="api-actions"><label class="sr-only" for="cat-ordem">Organizar categorias</label><select class="input" id="cat-ordem"><option value="nome-asc">Nome — A a Z</option><option value="nome-desc">Nome — Z a A</option><option value="recentes">Criação/edição recentes</option><option value="antigas">Criação/edição antigas</option></select><button class="btn btn-line" id="cat-refresh" type="button">Atualizar</button></div>
             </div>
             <div class="table-wrap">
               <table class="api-table">
@@ -113,10 +122,10 @@
         </main>
       </div>
     </div>
-    <script src="../assets/js/runtime-config.js?v=2026.11.13.4"></script>
-    <script src="../assets/js/api.js?v=2026.11.13.4"></script>
-    <script src="../assets/js/auth.js?v=2026.11.13.4"></script>
-    <script src="../assets/js/layout.js?v=2026.11.13.4"></script>
-    <script src="../assets/js/categorias-ui.js?v=2026.11.13.4"></script>
+    <script src="../assets/js/runtime-config.js?v=2026.11.13.5"></script>
+    <script src="../assets/js/api.js?v=2026.11.13.5"></script>
+    <script src="../assets/js/auth.js?v=2026.11.13.5"></script>
+    <script src="../assets/js/layout.js?v=2026.11.13.5"></script>
+    <script src="../assets/js/categorias-ui.js?v=2026.11.13.5"></script>
   </body>
 </html>

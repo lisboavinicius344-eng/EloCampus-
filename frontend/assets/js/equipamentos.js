@@ -57,10 +57,16 @@
   }
 
   function render() {
-    const ordem = campos.ordem.value || "patrimonio-asc";
+    const ordem = campos.ordem.value || "recentes";
     const crescente = !ordem.endsWith("-desc");
     const porPatrimonio = ordem.startsWith("patrimonio");
+    const porRecentes = ordem === "recentes";
     const comparar = (a, b) => {
+      if (porRecentes) {
+        const dataA = new Date(a.updated_at || a.atualizado_em || a.created_at || a.criado_em || 0).getTime() || 0;
+        const dataB = new Date(b.updated_at || b.atualizado_em || b.created_at || b.criado_em || 0).getTime() || 0;
+        if (dataA !== dataB) return dataB - dataA;
+      }
       const valorA = porPatrimonio ? String(a.patrimonio || "") : String(a.nome || "");
       const valorB = porPatrimonio ? String(b.patrimonio || "") : String(b.nome || "");
       const resultado = valorA.localeCompare(valorB, "pt-BR", { numeric: true, sensitivity: "base" });
@@ -85,7 +91,7 @@
       <table class="table table-eq">
         <thead><tr>
           <th scope="col" class="col-selecao"><input type="checkbox" data-selecionar-visiveis aria-label="Selecionar todos os equipamentos exibidos para etiquetas"${todosVisiveisMarcados ? " checked" : ""}></th>
-          <th scope="col">Equipamento</th><th scope="col">Patrimônio</th><th scope="col">Tipo</th>
+          <th scope="col">Equipamento</th><th scope="col">Patrimônio</th><th scope="col">Categoria</th>
           <th scope="col">Setor</th><th scope="col">Condição</th><th scope="col">Situação</th>
           <th scope="col"><span class="sr-only">Ações</span></th>
         </tr></thead>
@@ -99,7 +105,7 @@
               <td class="col-selecao"><input type="checkbox" data-selecionar="${esc(e.id)}" aria-label="Selecionar ${esc(e.nome)} para etiqueta"${selecionados.has(String(e.id)) ? " checked" : ""}></td>
               <td class="cell-nome"><span class="eq-mini eq-cond-${esc(cond)}" title="${esc(visual[1])}">${visual[0]}</span><a class="link-item" href="${href}">${esc(e.nome)}</a></td>
               <td data-label="Patrimônio">${esc(e.patrimonio)}</td>
-              <td data-label="Tipo">${esc(e.categoria)}</td>
+              <td data-label="Categoria">${esc(e.categoria)}</td>
               <td data-label="Setor">${esc(e.setor)}</td>
               <td data-label="Condição"><span class="cond cond-${esc(cond)}">${esc(e.condicao)}</span></td>
               <td data-label="Situação"><span class="badge badge-${s.cls}">${s.rotulo}</span></td>
@@ -140,7 +146,7 @@
   $("filtros").addEventListener("submit", (e) => e.preventDefault());
   $("limpar").addEventListener("click", () => {
     Object.values(campos).forEach((c) => { c.value = ""; });
-    campos.ordem.value = "patrimonio-asc";
+    campos.ordem.value = "recentes";
     campos.busca.focus();
     render();
   });

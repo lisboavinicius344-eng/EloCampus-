@@ -1,20 +1,20 @@
 # Revisão do frontend — ELO Campus
 
-**Versão do frontend:** `2026.11.13.4`
+**Versão do frontend:** `2026.11.13.5`
 
 ## Correções realizadas
 
 - Dashboard administrativo com ações rápidas operacionais: novo empréstimo, devolução, equipamentos, reservas e acompanhamento de atrasos.
 - Alerta de destaque para empréstimos vencidos, com quantidade e acesso direto à lista filtrada.
 - Ação direta de registro de devolução nos empréstimos exibidos no painel.
-- ~~Remoção do botão de lembrete por e-mail~~ — revertido em `2026.11.13.4`: a cobrança tem endpoint ativo (ver abaixo).
+- ~~Remoção do botão de lembrete por e-mail~~ — revertido em `2026.11.13.5`: a cobrança tem endpoint ativo (ver abaixo).
 - Fluxo de novo empréstimo com opção de vínculo `Outro`, campo obrigatório de explicação e inclusão da informação em `observacoes`.
 - Tradução dos tipos de movimentação no histórico individual do equipamento e uso das observações quando disponíveis.
 - Ocultação de identificadores internos nas interfaces comuns de QR público, categorias, reservas e solicitantes. A visualização permanece disponível somente para perfis master/administrador geral reconhecidos pelo frontend.
 - Perfis `master`, `administrador_geral`, `administrador-geral` e `administrador_master` reconhecidos para navegação administrativa e auditoria.
 - Cache-busting atualizado para `2026.11.11.1` em HTML, CSS e JavaScript.
 
-## Recuperado em `2026.11.13.4` (removido por engano no commit `608d23b`, Teste-V6-(JC))
+## Recuperado em `2026.11.13.5` (removido por engano no commit `608d23b`, Teste-V6-(JC))
 
 Restaurado a partir do commit `0168f22` (Teste-V4). O backend já oferece tudo isto:
 
@@ -30,7 +30,7 @@ Restaurado a partir do commit `0168f22` (Teste-V4). O backend já oferece tudo i
 - `node tests/api-contract-smoke.cjs`: **PASS**.
 - Verificação residual de `ID do sistema`, `senha_provisoria` e botão de lembrete no frontend: **sem ocorrências**.
 
-A versão `2026.11.13.4` não passou por `node --check` nem pelos testes automatizados (Node indisponível no ambiente usado); validar no navegador após o deploy.
+A versão `2026.11.13.5` não passou por `node --check` nem pelos testes automatizados (Node indisponível no ambiente usado); validar no navegador após o deploy.
 
 ## Pendências que dependem do backend
 

@@ -1156,3 +1156,13 @@ a.acao:hover {
   .admin-actions { grid-template-columns: 1fr; }
   .admin-action { min-height: 72px; }
 }
+
+/* Ações rápidas: texto completo e área de toque confortável. */
+.admin-actions { gap: 1rem; }
+.admin-action { min-height: 96px; padding: 1rem 3.2rem 1rem 1.1rem; gap: 1rem; }
+.admin-action .self-action-icon { width: 48px; height: 48px; flex-basis: 48px; }
+.admin-action .self-action-icon svg { width: 24px; height: 24px; }
+.admin-action .self-action-copy { gap: .35rem; }
+.admin-action .self-action-copy strong { font-size: 1rem; }
+.admin-action .self-action-copy small { overflow: visible; white-space: normal; text-overflow: clip; font-size: .84rem; line-height: 1.4; }
+@media (max-width: 760px) { .admin-action { min-height: 88px; } }

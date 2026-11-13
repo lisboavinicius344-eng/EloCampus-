@@ -10,6 +10,22 @@
     av.className = `alert alert-${tipo}`;
     av.textContent = t;
   }
+  const setoresKey = "elo.setores.cadastrados";
+  const lerSetores = () => { try { const v = JSON.parse(localStorage.getItem(setoresKey) || "[]"); return Array.isArray(v) ? [...new Set(v.filter(Boolean))].sort((a, b) => a.localeCompare(b, "pt-BR")) : []; } catch { return []; } };
+  const salvarSetores = (v) => { try { localStorage.setItem(setoresKey, JSON.stringify(v)); } catch { /* armazenamento opcional */ } };
+  function limparSetor() { $("setor-id").value = ""; $("setor-nome").value = ""; $("setor-save").textContent = "Adicionar setor"; $("setor-cancel").hidden = true; }
+  function carregarSetores() {
+    const body = $("setor-tbody"); if (!body) return;
+    const setores = lerSetores(); body.replaceChildren();
+    if (!setores.length) { body.innerHTML = '<tr><td colspan="2">Nenhum setor cadastrado.</td></tr>'; return; }
+    setores.forEach((nome) => {
+      const tr = document.createElement("tr"); const td = document.createElement("td"); td.textContent = nome; tr.append(td);
+      const acoes = document.createElement("td"); acoes.className = "api-actions";
+      const editar = document.createElement("button"); editar.className = "btn btn-line"; editar.type = "button"; editar.textContent = "Editar"; editar.addEventListener("click", () => { $("setor-id").value = nome; $("setor-nome").value = nome; $("setor-save").textContent = "Salvar alterações"; $("setor-cancel").hidden = false; $("setor-nome").focus(); });
+      const excluir = document.createElement("button"); excluir.className = "btn btn-ghost"; excluir.type = "button"; excluir.textContent = "Excluir"; excluir.addEventListener("click", () => { if (!confirm(`Remover a sugestão de setor “${nome}”?`)) return; salvarSetores(lerSetores().filter((v) => v !== nome)); carregarSetores(); });
+      acoes.append(editar, excluir); tr.append(acoes); body.append(tr);
+    });
+  }
   function limpar() {
     form.reset();
     $("cat-id").value = "";
@@ -19,7 +35,10 @@
   }
   async function carregar() {
     try {
-      const list = await ELO.categorias();
+      const list = [...await ELO.categorias()];
+      const ordem = $("cat-ordem")?.value || "nome-asc";
+      const dataCategoria = (c) => new Date(c.updated_at || c.atualizado_em || c.created_at || c.criado_em || 0).getTime() || 0;
+      list.sort((a, b) => ordem === "recentes" ? dataCategoria(b) - dataCategoria(a) : ordem === "antigas" ? dataCategoria(a) - dataCategoria(b) : String(a.nome || "").localeCompare(String(b.nome || ""), "pt-BR", { sensitivity: "base" }) * (ordem === "nome-desc" ? -1 : 1));
       const mostrarIds = EloUtil.podeVerIdsInternos();
       document.querySelectorAll("[data-id-column]").forEach((el) => { el.hidden = !mostrarIds; });
       tb.replaceChildren();
@@ -136,5 +155,14 @@
   });
   $("cat-cancel").addEventListener("click", limpar);
   $("cat-refresh").addEventListener("click", carregar);
+  $("cat-ordem")?.addEventListener("change", carregar);
+  $("setor-form")?.addEventListener("submit", (event) => {
+    event.preventDefault(); const nome = $("setor-nome").value.trim(); if (!nome) return aviso("Informe o nome do setor.", "error");
+    const anterior = $("setor-id").value; const setores = lerSetores().filter((v) => v !== anterior);
+    if (setores.some((v) => v.toLocaleLowerCase("pt-BR") === nome.toLocaleLowerCase("pt-BR"))) return aviso("Esse setor já está cadastrado.", "error");
+    setores.push(nome); salvarSetores(setores); limparSetor(); carregarSetores(); aviso("Setor salvo.", "ok");
+  });
+  $("setor-cancel")?.addEventListener("click", limparSetor);
   carregar();
+  carregarSetores();
 })();

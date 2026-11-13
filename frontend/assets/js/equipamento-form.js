@@ -28,8 +28,6 @@
     observacoes: $("e-obs"),
   };
   const quantidade = $("f-quantidade");
-  const patrimonioInicial = $("f-patrimonio-inicial");
-  const patrimonioFinal = $("f-patrimonio-final");
   const lote = $("cadastro-lote");
   const previewPatrimonios = $("patrimonios-preview");
   const campoMarca = $("f-marca");
@@ -43,23 +41,11 @@
   const erroFoto = $("e-foto");
   let fotoSelecionada = null;
   let urlPreviewFoto = "";
-  const cadastroEmLote = !id && Boolean(lote && quantidade && patrimonioInicial && patrimonioFinal);
-  const patrimonioUnitario = $("patrimonio-unitario-wrap");
-  if (patrimonioUnitario && cadastroEmLote) patrimonioUnitario.hidden = true;
+  const cadastroEmLote = !id && Boolean(lote && quantidade);
   if (lote) lote.hidden = !cadastroEmLote;
   const valorInicial = (v) => String(v || "").trim().toUpperCase();
   function patrimonioSequencial(inicial, total) {
     const bruto = valorInicial(inicial);
-    const faixa = bruto.match(/^(.*?)(\d+)-(\d+)$/);
-    if (faixa) {
-      const prefixo = faixa[1];
-      const inicio = Number(faixa[2]);
-      const fim = Number(faixa[3]);
-      const largura = Math.max(faixa[2].length, faixa[3].length);
-      if (Number.isSafeInteger(inicio) && Number.isSafeInteger(fim) && fim >= inicio && fim - inicio < 500) {
-        return Array.from({ length: fim - inicio + 1 }, (_, i) => `${prefixo}${String(inicio + i).padStart(largura, "0")}`);
-      }
-    }
     const encontrado = bruto.match(/^(.*?)(\d+)$/);
     if (!encontrado) return total === 1 && bruto ? [bruto] : [];
     const prefixo = encontrado[1];
@@ -68,29 +54,17 @@
     if (!Number.isSafeInteger(numero) || !Number.isSafeInteger(total) || total < 1 || total > 500) return [];
     return Array.from({ length: total }, (_, i) => `${prefixo}${String(numero + i).padStart(largura, "0")}`);
   }
-  function patrimonioPorFaixa(inicial, final) {
-    const inicio = valorInicial(inicial).match(/^(.*?)(\d+)$/);
-    const fim = valorInicial(final).match(/^(.*?)(\d+)$/);
-    if (!inicio || !fim || inicio[1] !== fim[1]) return [];
-    const primeiro = Number(inicio[2]);
-    const ultimo = Number(fim[2]);
-    const largura = Math.max(inicio[2].length, fim[2].length);
-    if (!Number.isSafeInteger(primeiro) || !Number.isSafeInteger(ultimo) || ultimo < primeiro || ultimo - primeiro >= 500) return [];
-    return Array.from({ length: ultimo - primeiro + 1 }, (_, i) => `${inicio[1]}${String(primeiro + i).padStart(largura, "0")}`);
-  }
   function atualizarPreviewLote() {
     if (!cadastroEmLote || !previewPatrimonios) return;
     const total = Number(quantidade.value || 0);
-    const lista = patrimonioFinal.value.trim()
-      ? patrimonioPorFaixa(patrimonioInicial.value, patrimonioFinal.value)
-      : (patrimonioInicial.value.trim() ? patrimonioSequencial(patrimonioInicial.value, total || 1) : []);
-    if (!patrimonioInicial.value.trim()) { previewPatrimonios.textContent = "Informe o patrimônio inicial."; return; }
+    const patrimonio = campos.patrimonio.value.trim();
+    const lista = patrimonio ? patrimonioSequencial(patrimonio, total || 1) : [];
+    if (!patrimonio) { previewPatrimonios.textContent = "Informe primeiro o número de patrimônio acima."; return; }
     if (!lista.length) { previewPatrimonios.textContent = "O patrimônio inicial deve terminar com um número, como 0015 ou TECLADO-0015."; return; }
     previewPatrimonios.textContent = `${lista.length} patrimônios: ${lista[0]} até ${lista.at(-1)}.`;
   }
   quantidade?.addEventListener("input", atualizarPreviewLote);
-  patrimonioInicial?.addEventListener("input", atualizarPreviewLote);
-  patrimonioFinal?.addEventListener("input", atualizarPreviewLote);
+  campos.patrimonio.addEventListener("input", atualizarPreviewLote);
   campoFoto?.addEventListener("change", () => {
     erroFoto.textContent = "";
     const arquivo = campoFoto.files?.[0] || null;
@@ -199,12 +173,14 @@
   [campos.categoria, campos.condicao].forEach((campo) => campo.addEventListener("change", atualizarVisual));
   // Sugestões são auxiliares: falha numa listagem não deve bloquear o cadastro.
   const setoresRemovidosKey = "elo.setores.sugestoes.removidos";
+  const setoresCadastradosKey = "elo.setores.cadastrados";
   const lerSetoresRemovidos = () => { try { return new Set(JSON.parse(localStorage.getItem(setoresRemovidosKey) || "[]")); } catch { return new Set(); } };
+  const lerSetoresCadastrados = () => { try { const v = JSON.parse(localStorage.getItem(setoresCadastradosKey) || "[]"); return Array.isArray(v) ? v : []; } catch { return []; } };
   const salvarSetoresRemovidos = (set) => { try { localStorage.setItem(setoresRemovidosKey, JSON.stringify([...set])); } catch { /* armazenamento opcional */ } };
   let setoresDisponiveis = [];
   const renderizarSetores = () => {
     const removidos = lerSetoresRemovidos();
-    const ativos = setoresDisponiveis.filter((v) => !removidos.has(v));
+    const ativos = [...new Set([...lerSetoresCadastrados(), ...setoresDisponiveis])].filter((v) => !removidos.has(v)).sort((a, b) => a.localeCompare(b, "pt-BR"));
     listaSetores.replaceChildren(...ativos.map((v) => new Option(v, v)));
     setorSugestoes.replaceChildren();
     setorSugestoes.hidden = !ativos.length;
@@ -339,17 +315,15 @@
     limparErros();
 
     const quantidadeInformada = Number(quantidade?.value || 0);
-    const faixaInformada = Boolean(patrimonioFinal?.value.trim());
     const patrimonios = cadastroEmLote
-      ? (faixaInformada ? patrimonioPorFaixa(patrimonioInicial.value, patrimonioFinal.value) : patrimonioSequencial(patrimonioInicial.value, quantidadeInformada || 1))
+      ? patrimonioSequencial(campos.patrimonio.value, quantidadeInformada || 1)
       : [campos.patrimonio.value];
     const total = patrimonios.length;
     const dadosBase = lerDados(patrimonios[0] || campos.patrimonio.value);
     const msgs = validar(dadosBase);
     if (cadastroEmLote) {
-      if (!patrimonios.length || total > 500) msgs.quantidade = "Informe um início numérico válido e, se usar faixa, um fim maior ou igual ao início.";
+      if (!patrimonios.length || total > 500) msgs.quantidade = "O patrimônio deve terminar com um número para gerar a sequência.";
       if (quantidadeInformada && (!Number.isInteger(quantidadeInformada) || quantidadeInformada < 1 || quantidadeInformada > 500)) msgs.quantidade = "A quantidade deve estar entre 1 e 500.";
-      if (faixaInformada && !patrimonios.length) msgs.quantidade = "Confira os patrimônios inicial e final. Eles devem ter o mesmo prefixo e o final não pode ser menor.";
       if (new Set(patrimonios).size !== patrimonios.length) msgs.quantidade = "A faixa gerada contém patrimônios repetidos.";
       if (patrimonios.some((p) => !/^[A-Z0-9][A-Z0-9._-]*$/.test(p))) msgs.quantidade = "Use apenas letras, números, hífen, ponto ou sublinhado nos patrimônios.";
     }
