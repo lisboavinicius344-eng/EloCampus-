@@ -16,6 +16,7 @@
     patrimonio: $("f-patrimonio"),
     categoria: $("f-categoria"),
     setor: $("f-setor"),
+    localizacao: $("f-localizacao"),
     condicao: $("f-condicao"),
     observacoes: $("f-obs"),
   };
@@ -99,6 +100,7 @@
       categoria_id: campos.categoria.value,
       elegibilidade: $("f-elegibilidade")?.value || "todos",
       setor: campos.setor.value.trim(),
+      localizacao: campos.localizacao?.value.trim() || "",
       marca: campoMarca?.value.trim() || "",
       cor: campoCor?.value.trim() || "",
       condicao: campos.condicao.value,
@@ -290,6 +292,7 @@
       if (campoMarca) campoMarca.value = e.marca ?? e.fabricante ?? "";
       if (campoCor) campoCor.value = e.cor ?? "";
       campos.setor.value = e.setor ?? "";
+      if (campos.localizacao) campos.localizacao.value = e.localizacao ?? "";
       campos.condicao.value = e.condicao ?? "";
       campos.observacoes.value = e.observacoes ?? "";
       atualizarVisual();

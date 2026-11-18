@@ -117,7 +117,7 @@
     if (!selecionados.length) {
       listaEquipamentos.innerHTML = '<p class="muted" id="nenhum-equipamento">Nenhum equipamento selecionado.</p>';
     } else {
-      listaEquipamentos.innerHTML = selecionados.map((e) => `<div class="picked" data-item-id="${esc(e.id)}"><div class="picked-icon" aria-hidden="true">${ELO_VISUAIS.categoria(e.categoria)[0]}</div><div class="picked-info"><strong>${esc(e.nome)}</strong><small>${esc(e.patrimonio)} · ${esc(e.categoria)} · ${esc(e.setor)}</small></div><button class="icon-btn" type="button" data-remover-item="${esc(e.id)}" aria-label="Remover ${esc(e.nome)}">×</button></div>`).join("");
+      listaEquipamentos.innerHTML = selecionados.map((e) => `<div class="picked" data-item-id="${esc(e.id)}"><div class="picked-icon" aria-hidden="true">${ELO_VISUAIS.categoria(e.categoria)[0]}</div><div class="picked-info"><strong>${esc(e.nome)}</strong><small>${esc(e.patrimonio)} · ${esc(e.categoria)} · ${esc(e.setor)}${e.localizacao ? ` · ${esc(e.localizacao)}` : ""}</small></div><button class="icon-btn" type="button" data-remover-item="${esc(e.id)}" aria-label="Remover ${esc(e.nome)}">×</button></div>`).join("");
     }
     $("resumo-itens").textContent = `${selecionados.length} equipamento${selecionados.length === 1 ? "" : "s"}`;
     atualizarResumo();

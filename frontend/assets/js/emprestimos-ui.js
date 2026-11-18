@@ -65,7 +65,7 @@
         row.setAttribute("aria-selected", String(ativo));
       });
       $("detalhe-nome").textContent = l ? l.equipamento.nome : "Selecione um empréstimo";
-      $("detalhe-sub").textContent = l ? `${l.equipamento.patrimonio} · ${l.solicitante.nome}` : "Os detalhes aparecerão aqui.";
+      $("detalhe-sub").textContent = l ? `${l.equipamento.patrimonio} · ${l.solicitante.nome}${l.equipamento.localizacao ? ` · ${l.equipamento.localizacao}` : ""}` : "Os detalhes aparecerão aqui.";
       const estado = l ? statusEmprestimo(l) : { texto: "—", classe: "pill-ok" };
       const pill = $("detalhe-status"); pill.textContent = estado.texto; pill.className = `pill ${estado.classe}`;
       const timeline = $("detalhe-timeline");

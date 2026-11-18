@@ -92,7 +92,7 @@
         <thead><tr>
           <th scope="col" class="col-selecao"><input type="checkbox" data-selecionar-visiveis aria-label="Selecionar todos os equipamentos exibidos para etiquetas"${todosVisiveisMarcados ? " checked" : ""}></th>
           <th scope="col">Equipamento</th><th scope="col">Patrimônio</th><th scope="col">Categoria</th>
-          <th scope="col">Setor</th><th scope="col">Condição</th><th scope="col">Situação</th>
+          <th scope="col">Setor</th><th scope="col">Localização</th><th scope="col">Condição</th><th scope="col">Situação</th>
           <th scope="col"><span class="sr-only">Ações</span></th>
         </tr></thead>
         <tbody>
@@ -107,6 +107,7 @@
               <td data-label="Patrimônio">${esc(e.patrimonio)}</td>
               <td data-label="Categoria">${esc(e.categoria)}</td>
               <td data-label="Setor">${esc(e.setor)}</td>
+              <td data-label="Localização">${esc(e.localizacao || "—")}</td>
               <td data-label="Condição"><span class="cond cond-${esc(cond)}">${esc(e.condicao)}</span></td>
               <td data-label="Situação"><span class="badge badge-${s.cls}">${s.rotulo}</span></td>
               <td class="col-acao"><a class="btn btn-ghost btn-sm" href="${href}">Ver detalhes</a>${

@@ -6,15 +6,27 @@ const MODO_DADOS = "api";
 
 const estadoFrontend = (valor) => ({ novo: "Novo", bom: "Bom", regular: "Regular", danificado: "Danificado" }[String(valor || "").toLowerCase()] || valor || "");
 const estadoApi = (valor) => String(valor || "bom").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+const textoEquipamentoFrontend = (valor) => String(valor ?? "")
+  .replace(/\bRing Hight\b/gi, "Ring Light")
+  .replace(/\bMUTILASER\b/gi, "MULTILASER")
+  .replace(/\bprocessar\b/gi, "processador")
+  .replace(/\bAdaptador_tomada\b/gi, "Adaptador de tomada")
+  .replace(/\bCaixa de pilha_20 pilhas\b/gi, "Caixa de pilhas (20)")
+  .replace(/\bbateria_recarregavel\b/gi, "bateria recarregável")
+  .replace(/\s{2,}/g, " ")
+  .trim();
+const setorEquipamentoFrontend = (valor) => String(valor ?? "").trim().replace(/^Datacenter$/i, "Data Center");
 
 const normalizarEquipamento = (equipamento = {}) => ({
   ...equipamento,
+  nome: textoEquipamentoFrontend(equipamento.nome),
   patrimonio: equipamento.numero_patrimonio ?? equipamento.patrimonio ?? "",
   categoria: typeof equipamento.categoria === "string" ? equipamento.categoria : (equipamento.categoria?.nome ?? equipamento.categoria_nome ?? ""),
   condicao: estadoFrontend(equipamento.estado_conservacao ?? equipamento.condicao),
   situacao: equipamento.situacao || ({ disponivel: "disponivel", emprestado: "emprestado", manutencao: "manutencao", baixado: "inativo" }[equipamento.status] || "disponivel"),
   base: equipamento.status === "baixado" ? "inativo" : equipamento.status,
-  localizacao: equipamento.localizacao || "",
+  setor: setorEquipamentoFrontend(equipamento.setor),
+  localizacao: textoEquipamentoFrontend(equipamento.localizacao),
   imagem: equipamento.imagem_url
     ? (/^https?:\/\//i.test(equipamento.imagem_url) ? equipamento.imagem_url : `${API_BASE_URL}${equipamento.imagem_url}`)
     : (equipamento.imagem || ""),
@@ -60,6 +72,7 @@ const normalizarEmprestimo = (emprestimo = {}) => {
         patrimonio: item.numero_patrimonio ?? item.patrimonio ?? emprestimo.numero_patrimonio ?? "",
         categoria: item.categoria ?? item.categoria_nome ?? emprestimo.categoria ?? "",
         setor: item.setor ?? emprestimo.setor ?? "",
+        localizacao: item.localizacao ?? emprestimo.localizacao ?? "",
         condicao: estadoFrontend(item.estado_na_retirada ?? emprestimo.estado_na_retirada),
       },
       solicitante: {
@@ -284,10 +297,10 @@ const ELO = {
   removerEquipamento: (id, dados = {}) => requisitar(`/equipamentos/${encodeURIComponent(id)}/inativar`, { metodo: "PATCH", corpo: dados }),
   salvarEquipamento: async (d, id) => {
     const corpo = {
-      nome: d.nome,
+      nome: textoEquipamentoFrontend(d.nome),
       numero_patrimonio: d.patrimonio || d.numero_patrimonio,
-      setor: d.setor,
-      localizacao: d.localizacao || "",
+      setor: setorEquipamentoFrontend(d.setor),
+      localizacao: textoEquipamentoFrontend(d.localizacao),
       marca: d.marca || null,
       cor: d.cor || null,
       estado_conservacao: estadoApi(d.condicao || d.estado_conservacao),
