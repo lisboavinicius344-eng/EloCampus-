@@ -29,11 +29,12 @@
     return Promise.race([Promise.all(pendentes), new Promise((ok) => setTimeout(ok, timeoutMs))]);
   }
 
+  // Só o QR Code sai na impressão; a legenda aparece apenas na tela, para conferir a folha.
   function etiquetaHtml(e) {
-    return `<div class="etiqueta">
+    const patrimonio = e.patrimonio || e.numero_patrimonio || "";
+    return `<div class="etiqueta" title="${esc(e.nome)}${patrimonio ? ` · ${esc(patrimonio)}` : ""}">
       <img src="${esc(ELO_QR.svg(e))}" alt="QR Code de ${esc(e.nome)}">
-      <strong>${esc(e.nome)}</strong>
-      <span>${esc(e.patrimonio || e.numero_patrimonio || "")}</span>
+      <span class="etiqueta-legenda no-print">${esc(e.nome)}${patrimonio ? ` · ${esc(patrimonio)}` : ""}</span>
     </div>`;
   }
 

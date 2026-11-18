@@ -1,12 +1,14 @@
 /* ELO Campus — etiquetas com QR Code para folha A4 de adesivo.
- * Na tela a folha aparece como prévia em papel branco; na impressão só a grade sai. */
+ * Só o QR Code (2,5 cm) é impresso: 5 colunas × 8 linhas = 40 por folha.
+ * Na tela a folha aparece como prévia em papel branco, com o nome do item
+ * embaixo de cada QR para conferência (a legenda não sai na impressão). */
 
 .etiquetas-dica { margin: 0 0 1rem; }
 
 .folha-etiquetas {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-  gap: 12px;
+  grid-template-columns: repeat(auto-fill, minmax(38mm, 1fr));
+  gap: 8px;
   padding: 16px;
   border-radius: var(--radius-m, 16px);
   background: #fff;
@@ -19,9 +21,8 @@
   align-items: center;
   justify-content: center;
   gap: 4px;
-  padding: 10px 8px;
-  border: 1px dashed #c7c7c7; /* guia de corte */
-  border-radius: 6px;
+  padding: 6px 4px;
+  border: 1px dashed #d4d4d4; /* guia de corte */
   background: #fff;
   color: #111;
   text-align: center;
@@ -29,43 +30,39 @@
   page-break-inside: avoid;
 }
 
-/* O SVG já vem com 37 mm; o fundo branco garante a margem de silêncio em volta. */
+/* O SVG já traz a margem branca de 2 módulos exigida pela leitura. */
 .etiqueta img {
-  width: 37mm;
-  height: 37mm;
-  min-width: 25mm;
-  min-height: 25mm;
-  padding: 1.5mm;
+  display: block;
+  width: 25mm;
+  height: 25mm;
   background: #fff;
   object-fit: contain;
 }
 
-.etiqueta strong {
-  font-size: 11pt;
+.etiqueta-legenda {
+  max-width: 36mm;
+  font-size: 8pt;
   line-height: 1.2;
-  max-width: 100%;
-  overflow-wrap: anywhere;
-}
-
-.etiqueta span {
-  font-size: 10pt;
-  font-family: ui-monospace, "Cascadia Mono", Consolas, monospace;
-  letter-spacing: .02em;
+  color: #555;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .etiqueta-falha {
   display: grid;
   place-items: center;
-  width: 37mm;
-  height: 37mm;
+  width: 25mm;
+  height: 25mm;
   border: 1px solid #e11d48;
   color: #be123c;
-  font-size: 9pt;
+  font-size: 7pt;
 }
 
 .folha-etiquetas .estado-vazio { color: #444; grid-column: 1 / -1; }
 
 @media print {
+  /* Área útil da A4 com margem de 10 mm: 190 × 277 mm → células de 38 × 34 mm. */
   @page { size: A4; margin: 10mm; }
   html, body { background: #fff !important; }
   html::before, html::after, body::before, body::after, .app::before, .app::after { display: none !important; }
@@ -86,16 +83,18 @@
   }
 
   .folha-etiquetas {
-    grid-template-columns: repeat(3, 1fr);
-    gap: 4mm;
+    grid-template-columns: repeat(5, 38mm);
+    grid-auto-rows: 34mm;
+    gap: 0;
     padding: 0;
     border-radius: 0;
   }
 
   .etiqueta {
-    min-height: 56mm;
-    padding: 3mm;
-    border-color: #bbb;
-    border-radius: 0;
+    width: 38mm;
+    height: 34mm;
+    padding: 0;
+    gap: 0;
+    border: .2mm dashed #c8c8c8;
   }
 }

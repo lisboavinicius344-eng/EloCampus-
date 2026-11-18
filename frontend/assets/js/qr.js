@@ -35,12 +35,31 @@
     const perfil = String(s?.perfil || s?.usuario?.papel || "").toLowerCase();
     return Boolean(s?.token) && ["admin", "administrador", "operador"].includes(perfil);
   };
+  const sessaoUsuarioFinal = () => {
+    const s = typeof obterSessao === "function" ? obterSessao() : null;
+    return Boolean(s?.token) && ["aluno", "professor"].includes(String(s?.perfil || "").toLowerCase());
+  };
+  // Equipe logada: o item abre direto na página do equipamento dentro do sistema.
+  const abrirItemNoSistema = (id, substituir = false) => {
+    if (!sessaoEquipe() || id === undefined || id === null || String(id).trim() === "") return false;
+    const destino = `equipamento-detalhe.html?id=${encodeURIComponent(id)}`;
+    if (substituir) location.replace(destino); else location.assign(destino);
+    return true;
+  };
+  let consultaPorId = false;
   const stop = () => {
     if (timer) { clearTimeout(timer); timer = null; }
     if (stream) { stream.getTracks().forEach(t => t.stop()); stream = null; }
     video.srcObject = null; reader.classList.remove("is-active"); abrirCamera.textContent = "Abrir câmera"; lendo = false;
   };
-  const entregarCodigo = (codigo) => { stop(); campo.value = codigo; form.requestSubmit(); };
+  // Etiqueta nova: https://<site>/q/<id>. A consulta vai pelo ID e o campo mostra o patrimônio, não o link.
+  const idDaEtiqueta = (texto) => (String(texto || "").trim().match(/\/q\/(\d+)\/?(?:[?#].*)?$/) || [])[1] || "";
+  const entregarCodigo = (codigo) => {
+    stop();
+    const id = idDaEtiqueta(codigo);
+    campo.value = id ? "" : codigo;
+    consultar(id || codigo, Boolean(id));
+  };
   const lerVideo = async () => {
     if (!lendo || video.readyState < 2) { if (lendo) timer = setTimeout(lerVideo, 250); return; }
     try {
@@ -69,19 +88,42 @@
       stop(); msg(e.name === "NotAllowedError" ? "Permissão para a câmera negada. Autorize o acesso ou use a galeria." : "Não foi possível abrir a câmera. Use a galeria ou informe o identificador.", "error");
     }
   };
+  // Fotos de celular têm 12 MP ou mais: ler no tamanho original é lento e costuma falhar com etiqueta
+  // pequena. Tenta o leitor nativo do navegador e depois o jsQR em algumas escalas.
+  const decodificarImagem = async (img) => {
+    if ("BarcodeDetector" in window) {
+      try {
+        const encontrados = await new BarcodeDetector({ formats: ["qr_code"] }).detect(img);
+        if (encontrados[0]?.rawValue) return encontrados[0].rawValue;
+      } catch { /* segue para o jsQR */ }
+    }
+    if (!window.jsQR) return null;
+    const lado = Math.max(img.naturalWidth, img.naturalHeight) || 1;
+    const canvas = document.createElement("canvas"), ctx = canvas.getContext("2d", { willReadFrequently: true });
+    for (const maximo of [1000, 1600, 700, 2400, 450]) {
+      const escala = Math.min(1, maximo / lado);
+      canvas.width = Math.max(1, Math.round(img.naturalWidth * escala)); canvas.height = Math.max(1, Math.round(img.naturalHeight * escala));
+      ctx.fillStyle = "#fff"; ctx.fillRect(0, 0, canvas.width, canvas.height); ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      const code = window.jsQR(ctx.getImageData(0, 0, canvas.width, canvas.height).data, canvas.width, canvas.height, { inversionAttempts: "attemptBoth" });
+      if (code?.data) return code.data;
+      if (escala === 1 && maximo >= lado) break;
+      await new Promise((ok) => setTimeout(ok, 0)); // deixa a tela responder entre as tentativas
+    }
+    return null;
+  };
   const lerImagem = (file) => {
     if (!file) return;
+    if (!("BarcodeDetector" in window) && !window.jsQR) { msg("A leitura da galeria não está disponível neste navegador. Use a câmera ou informe o identificador.", "error"); return; }
+    msg("Lendo a imagem…");
     const url = URL.createObjectURL(file), img = new Image();
-    img.onload = () => {
-      const canvas = document.createElement("canvas"); canvas.width = img.naturalWidth; canvas.height = img.naturalHeight;
-      const ctx = canvas.getContext("2d", { willReadFrequently: true }); ctx.drawImage(img, 0, 0);
-      if (window.jsQR) {
-        const code = window.jsQR(ctx.getImageData(0, 0, canvas.width, canvas.height).data, canvas.width, canvas.height);
-        if (code?.data) entregarCodigo(code.data); else msg("Não encontrei um QR Code nessa imagem. Escolha outra imagem ou use a câmera.", "error");
-      } else msg("A leitura da galeria não está disponível neste navegador. Use a câmera ou informe o identificador.", "error");
-      URL.revokeObjectURL(url);
+    img.onload = async () => {
+      try {
+        const codigo = await decodificarImagem(img);
+        if (codigo) { msg("QR Code encontrado na imagem.", "info"); entregarCodigo(codigo); }
+        else msg("Não encontrei um QR Code nessa imagem. Tire a foto mais perto, com a etiqueta inteira e nítida, ou use a câmera.", "error");
+      } finally { URL.revokeObjectURL(url); }
     };
-    img.onerror = () => { URL.revokeObjectURL(url); msg("Não foi possível abrir essa imagem. Tente outra imagem.", "error"); };
+    img.onerror = () => { URL.revokeObjectURL(url); msg("Não foi possível abrir essa imagem. Tente outra imagem (JPG ou PNG).", "error"); };
     img.src = url;
   };
 
@@ -119,9 +161,14 @@
     const situacao = String(rawState || "").toLowerCase();
     const emprestado = ["emprestado", "atrasado"].includes(situacao) || Boolean(emprestimo);
     const condicao = situacaoTexto(valor(e, ["estado_conservacao", "condicao"]));
+    if (patrimonio) campo.value = patrimonio; // o campo mostra o patrimônio, nunca o link da etiqueta
+    consultaPorId = false;
+    if (abrirItemNoSistema(e.id)) return;
+    const reservavel = sessaoUsuarioFinal() && ["disponivel", "emprestado"].includes(situacao) && e.id !== undefined && e.id !== null;
+    const reservarMarkup = reservavel ? `<p class="qr-reservar"><a class="btn btn-primary" href="reservas.html?equipamentos=${encodeURIComponent(e.id)}">Reservar este equipamento</a></p>` : "";
     const historicoMarkup = sessaoEquipe() ? '<section class="qr-history"><h3>Movimentações recentes</h3><div data-qr-history><p class="qr-muted-note">Carregando histórico…</p></div></section>' : "";
     const emprestimoMarkup = emprestimo ? `<section class="qr-loan-info"><div class="qr-section-title"><h3>Empréstimo atual</h3><span class="qr-state ${emprestimo.atrasado ? "is-late" : "is-loaned"}">${emprestimo.atrasado ? "Em atraso" : "Em andamento"}</span></div><dl>${campoDetalhe("Solicitante", emprestimo.solicitante)}${campoDetalhe("Retirada", formatarData(emprestimo.data_emprestimo))}${campoDetalhe("Devolução prevista", formatarData(emprestimo.data_prevista_devolucao))}</dl></section>` : (emprestado ? '<p class="qr-privacy-note">O equipamento está emprestado. Por privacidade, os detalhes do empréstimo só são exibidos para a equipe autorizada.</p>' : '<p class="qr-muted-note">A consulta não indica um empréstimo ativo neste momento. Para confirmar movimentações anteriores, consulte o histórico da equipe.</p>');
-    resultado.innerHTML = `<div class="qr-result-title"><div><span class="qr-result-eyebrow">Consulta concluída</span><h2>${esc(nome)}</h2>${patrimonio ? `<p class="qr-result-patrimonio">Patrimônio ${esc(patrimonio)}</p>` : ""}</div><span class="qr-state state-${esc(stateKey)}">${esc(stateText)}</span></div><section class="qr-equipment-info"><h3>Informações do equipamento</h3><dl>${campoDetalhe("Categoria", e.categoria || e.categoria_nome)}${campoDetalhe("Setor", e.setor)}${campoDetalhe("Localização", e.localizacao)}${campoDetalhe("Conservação", condicao)}${campoDetalhe("Código QR", e.qr_code)}${campoDetalhe("Elegibilidade", e.elegibilidade === "somente_funcionarios" ? "Somente funcionários" : e.elegibilidade === "todos" ? "Todos os perfis elegíveis" : e.elegibilidade)}${campoDetalhe("Observações", e.observacoes)}${campoDetalhe("Cadastrado em", formatarData(e.criado_em))}</dl></section>${emprestimoMarkup}${historicoMarkup}`;
+    resultado.innerHTML = `<div class="qr-result-title"><div><span class="qr-result-eyebrow">Consulta concluída</span><h2>${esc(nome)}</h2>${patrimonio ? `<p class="qr-result-patrimonio">Patrimônio ${esc(patrimonio)}</p>` : ""}</div><span class="qr-state state-${esc(stateKey)}">${esc(stateText)}</span></div><section class="qr-equipment-info"><h3>Informações do equipamento</h3><dl>${campoDetalhe("Categoria", e.categoria || e.categoria_nome)}${campoDetalhe("Setor", e.setor)}${campoDetalhe("Localização", e.localizacao)}${campoDetalhe("Conservação", condicao)}${campoDetalhe("Código QR", e.qr_code)}${campoDetalhe("Elegibilidade", e.elegibilidade === "somente_funcionarios" ? "Somente funcionários" : e.elegibilidade === "todos" ? "Todos os perfis elegíveis" : e.elegibilidade)}${campoDetalhe("Observações", e.observacoes)}${campoDetalhe("Cadastrado em", formatarData(e.criado_em))}</dl></section>${reservarMarkup}${emprestimoMarkup}${historicoMarkup}`;
     resultado.hidden = false;
     if (sessaoEquipe() && !historicoMarkup) return;
     if (sessaoEquipe()) carregarHistoricoEquipe(e, resultado);
@@ -130,21 +177,31 @@
 
   abrirCamera.addEventListener("click", iniciarCamera);
   arquivo.addEventListener("change", () => { stop(); lerImagem(arquivo.files[0]); arquivo.value = ""; });
-  form.addEventListener("submit", async (ev) => {
-    ev.preventDefault(); limpar();
-    const codigo = campo.value.trim();
+  form.addEventListener("submit", (ev) => {
+    ev.preventDefault();
+    const digitado = campo.value.trim(), id = idDaEtiqueta(digitado);
+    if (id) campo.value = "";
+    consultar(id || digitado, consultaPorId || Boolean(id));
+  });
+  async function consultar(codigo, porId = false) {
+    limpar();
     if (!codigo) { msg("Informe o identificador ou leia um QR Code.", "error"); campo.focus(); return; }
     botao.disabled = true; botao.textContent = "Consultando…"; status.className = "qr-status is-info"; status.textContent = "Consultando equipamento…";
     try {
-      const dados = await ELO.consultaQr(codigo);
+      const dados = await ELO.consultaQr(codigo, { porId });
       if (!dados || (typeof dados === "object" && !Object.keys(dados).length)) throw new Error("O servidor não retornou os dados do equipamento.");
       status.className = "qr-status"; status.textContent = ""; mostrarResultado(dados);
     } catch (e) {
       status.className = "qr-status is-error";
       status.textContent = e.message || "Não foi possível consultar este equipamento.";
     } finally { botao.disabled = false; botao.textContent = "Consultar"; }
-  });
-  const p = new URLSearchParams(location.search), inicial = (p.get("patrimonio") || p.get("codigo") || p.get("qr") || p.get("id") || "").trim();
-  if (inicial) { campo.value = inicial; form.requestSubmit(); }
+  }
+  campo.addEventListener("input", () => { consultaPorId = false; });
+  // ?id=36 vem da etiqueta nova (/q/36): a equipe vai direto ao item; os demais veem o resumo.
+  const p = new URLSearchParams(location.search), idInicial = (p.get("id") || "").trim();
+  const inicial = (p.get("patrimonio") || p.get("codigo") || p.get("qr") || "").trim();
+  if (/^\d+$/.test(idInicial)) {
+    if (!abrirItemNoSistema(idInicial, true)) consultar(idInicial, true);
+  } else if (inicial) { campo.value = inicial; consultar(inicial); }
   window.addEventListener("pagehide", stop);
 })();
