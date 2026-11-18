@@ -10,6 +10,11 @@
   const botao = $("salvar");
   const erroGeral = $("erro");
   const textoBotao = id ? "Salvar alterações" : "Salvar equipamento";
+  // O envio nativo recarrega a página e apaga o que foi digitado. Bloqueia desde já;
+  // o tratamento real é registrado no fim do script, depois das chamadas à API.
+  let pronto = false;
+  form.addEventListener("submit", (ev) => { if (!pronto) ev.preventDefault(); });
+  if (id) { botao.disabled = true; botao.textContent = "Carregando…"; }
 
   const campos = {
     nome: $("f-nome"),
@@ -143,9 +148,12 @@
     if (primeiro) primeiro.focus();
   }
 
-  function mostrarErroGeral(texto) {
-    erroGeral.textContent = texto;
+  function mostrarErroGeral(texto, err) {
+    // O alerta fica no topo da página; sem rolar até ele, uma falha da API parece "não fazer nada".
+    const detalhe = err && (err.status || err.codigo) ? ` (${[err.status && `HTTP ${err.status}`, err.codigo].filter(Boolean).join(" · ")})` : "";
+    erroGeral.textContent = `${texto}${detalhe}`;
     erroGeral.hidden = false;
+    erroGeral.scrollIntoView({ behavior: "smooth", block: "center" });
   }
 
   // Limpa o erro de um campo assim que a pessoa volta a digitar nele
@@ -261,12 +269,10 @@
       salvar.disabled = false;
     }
   });
-  try {
-    const listaEquipamentos = await ELO.equipamentos();
-    preencher("lista-setores", listaEquipamentos.map(e => e.setor));
-  } catch {
-    // Sugestões de setor não são obrigatórias para salvar.
-  }
+  // Sugestões de setor são opcionais: carregam em segundo plano, sem travar o formulário.
+  ELO.equipamentos()
+    .then((lista) => preencher("lista-setores", lista.map((e) => e.setor)))
+    .catch(() => { /* sugestões não são obrigatórias para salvar */ });
 
   // Modo edição
   if (id) {
@@ -313,6 +319,7 @@
     });
   }
 
+  pronto = true;
   form.addEventListener("submit", async (ev) => {
     ev.preventDefault();
     limparErros();
@@ -346,7 +353,8 @@
       window.location.href = `equipamentos.html?salvo=${id ? "editado" : "criado"}${cadastroEmLote ? `&quantidade=${patrimonios.length}` : ""}`;
     } catch (err) {
       if (err.campo && campos[err.campo]) mostrarErros({ [err.campo]: err.message });
-      else mostrarErroGeral(err.message);
+      else mostrarErroGeral(err.message, err);
+      console.error("Falha ao salvar equipamento:", err);
       botao.disabled = false;
       botao.textContent = textoBotao;
     }
