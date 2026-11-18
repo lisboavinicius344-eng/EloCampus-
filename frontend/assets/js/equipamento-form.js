@@ -25,6 +25,7 @@
     patrimonio: $("e-patrimonio"),
     categoria: $("e-categoria"),
     setor: $("e-setor"),
+    localizacao: $("e-localizacao"),
     condicao: $("e-condicao"),
     observacoes: $("e-obs"),
   };
@@ -125,8 +126,8 @@
   function limparErros() {
     erroGeral.hidden = true;
     Object.keys(campos).forEach((k) => {
-      spansErro[k].textContent = "";
-      campos[k].removeAttribute("aria-invalid");
+      if (spansErro[k]) spansErro[k].textContent = ""; // campo sem mensagem de erro não pode travar o formulário
+      campos[k]?.removeAttribute("aria-invalid");
     });
   }
 
@@ -135,7 +136,7 @@
     Object.entries(msgs).forEach(([campo, texto]) => {
       if (campo === "quantidade") { $("e-quantidade").textContent = texto; return; }
       if (!campos[campo]) return;
-      spansErro[campo].textContent = texto;
+      if (spansErro[campo]) spansErro[campo].textContent = texto;
       campos[campo].setAttribute("aria-invalid", "true");
       if (!primeiro) primeiro = campos[campo];
     });
@@ -150,8 +151,8 @@
   // Limpa o erro de um campo assim que a pessoa volta a digitar nele
   Object.keys(campos).forEach((k) => {
     campos[k].addEventListener("input", () => {
-      spansErro[k].textContent = "";
-      campos[k].removeAttribute("aria-invalid");
+      if (spansErro[k]) spansErro[k].textContent = ""; // campo sem mensagem de erro não pode travar o formulário
+      campos[k]?.removeAttribute("aria-invalid");
     });
   });
   const atualizarVisual = () => {
