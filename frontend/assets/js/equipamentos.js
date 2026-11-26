@@ -30,7 +30,10 @@
     ordem: $("f-ordem"),
   };
 
+  const TAMANHO_PAGINA = 10;
   let todos = [];
+  let quantidadeVisivel = TAMANHO_PAGINA;
+  let observadorCarregamento = null;
   // IDs marcados para impressão de etiquetas; a seleção sobrevive a filtros e buscas.
   const selecionados = new Set();
 
@@ -56,7 +59,39 @@
     );
   }
 
+  function linhaEquipamento(e) {
+    const s = SITUACOES[e.situacao] || { rotulo: e.situacao, cls: "off" };
+    const cond = norm(e.condicao);
+    const visual = ELO_VISUAIS.categoria(e.categoria);
+    const href = `equipamento-detalhe.html?id=${encodeURIComponent(e.id)}`;
+    return `<tr>
+      <td class="col-selecao"><input type="checkbox" data-selecionar="${esc(e.id)}" aria-label="Selecionar ${esc(e.nome)} para etiqueta"${selecionados.has(String(e.id)) ? " checked" : ""}></td>
+      <td class="cell-nome"><span class="eq-mini eq-cond-${esc(cond)}" title="${esc(visual[1])}">${visual[0]}</span><a class="link-item" href="${href}">${esc(e.nome)}</a></td>
+      <td data-label="Patrimônio">${esc(e.patrimonio)}</td>
+      <td data-label="Categoria">${esc(e.categoria)}</td>
+      <td data-label="Setor">${esc(e.setor)}</td>
+      <td data-label="Localização">${esc(e.localizacao || "—")}</td>
+      <td data-label="Condição"><span class="cond cond-${esc(cond)}">${esc(e.condicao)}</span></td>
+      <td data-label="Situação"><span class="badge badge-${s.cls}">${s.rotulo}</span></td>
+      <td class="col-acao"><a class="btn btn-ghost btn-sm" href="${href}">Ver detalhes</a>${e.situacao === "inativo" ? "" : ` <button class="btn btn-ghost btn-sm" type="button" data-retirar="${esc(e.id)}">Retirar de uso</button>`}</td>
+    </tr>`;
+  }
+
+  function observarMais() {
+    observadorCarregamento?.disconnect();
+    const gatilho = $("carregar-mais");
+    if (!gatilho || gatilho.hidden || !window.IntersectionObserver) return;
+    observadorCarregamento = new IntersectionObserver((entradas) => {
+      if (entradas.some((entrada) => entrada.isIntersecting)) {
+        quantidadeVisivel += TAMANHO_PAGINA;
+        render();
+      }
+    }, { rootMargin: "0px 0px 280px" });
+    observadorCarregamento.observe(gatilho);
+  }
+
   function render() {
+    observadorCarregamento?.disconnect();
     const ordem = campos.ordem.value || "recentes";
     const crescente = !ordem.endsWith("-desc");
     const porPatrimonio = ordem.startsWith("patrimonio");
@@ -75,9 +110,13 @@
     };
     const lista = filtrar().sort(comparar);
     const filtrando = lista.length !== todos.length;
+    const visiveis = lista.slice(0, quantidadeVisivel);
+    const restante = lista.length - visiveis.length;
     $("contagem").textContent = lista.length === 1
       ? `1 equipamento${filtrando ? ` de ${todos.length}` : ""}`
-      : `${lista.length} equipamentos${filtrando ? ` de ${todos.length}` : ""}`;
+      : restante > 0
+        ? `Exibindo ${visiveis.length} de ${lista.length} equipamentos${filtrando ? ` (${todos.length} no total)` : ""}`
+        : `${lista.length} equipamentos${filtrando ? ` de ${todos.length}` : ""}`;
 
     if (!lista.length) {
       $("lista").innerHTML = `<p class="estado-vazio">${todos.length
@@ -86,7 +125,7 @@
       return;
     }
 
-    const todosVisiveisMarcados = lista.every((e) => selecionados.has(String(e.id)));
+    const todosVisiveisMarcados = visiveis.every((e) => selecionados.has(String(e.id)));
     $("lista").innerHTML = `
       <table class="table table-eq">
         <thead><tr>
@@ -96,27 +135,14 @@
           <th scope="col"><span class="sr-only">Ações</span></th>
         </tr></thead>
         <tbody>
-          ${lista.map((e) => {
-            const s = SITUACOES[e.situacao] || { rotulo: e.situacao, cls: "off" };
-            const cond = norm(e.condicao);
-            const visual = ELO_VISUAIS.categoria(e.categoria);
-            const href = `equipamento-detalhe.html?id=${encodeURIComponent(e.id)}`;
-            return `<tr>
-              <td class="col-selecao"><input type="checkbox" data-selecionar="${esc(e.id)}" aria-label="Selecionar ${esc(e.nome)} para etiqueta"${selecionados.has(String(e.id)) ? " checked" : ""}></td>
-              <td class="cell-nome"><span class="eq-mini eq-cond-${esc(cond)}" title="${esc(visual[1])}">${visual[0]}</span><a class="link-item" href="${href}">${esc(e.nome)}</a></td>
-              <td data-label="Patrimônio">${esc(e.patrimonio)}</td>
-              <td data-label="Categoria">${esc(e.categoria)}</td>
-              <td data-label="Setor">${esc(e.setor)}</td>
-              <td data-label="Localização">${esc(e.localizacao || "—")}</td>
-              <td data-label="Condição"><span class="cond cond-${esc(cond)}">${esc(e.condicao)}</span></td>
-              <td data-label="Situação"><span class="badge badge-${s.cls}">${s.rotulo}</span></td>
-              <td class="col-acao"><a class="btn btn-ghost btn-sm" href="${href}">Ver detalhes</a>${
-                e.situacao === "inativo" ? "" : ` <button class="btn btn-ghost btn-sm" type="button" data-retirar="${esc(e.id)}">Retirar de uso</button>`
-              }</td>
-            </tr>`;
-          }).join("")}
+          ${visiveis.map(linhaEquipamento).join("")}
         </tbody>
-      </table>`;
+      </table>
+      <div class="lista-carregamento"${restante > 0 ? "" : " hidden"}>
+        <span aria-live="polite">${restante > 0 ? `${restante} equipamento${restante === 1 ? " restante" : "s restantes"}` : "Todos os equipamentos foram exibidos."}</span>
+        <button class="btn btn-line btn-sm" type="button" id="carregar-mais">Carregar mais</button>
+      </div>`;
+    observarMais();
   }
 
   try {
@@ -143,12 +169,22 @@
   const ordemInicial = params.get("ordem");
   if (ordemInicial && [...campos.ordem.options].some((option) => option.value === ordemInicial)) campos.ordem.value = ordemInicial;
 
-  Object.values(campos).forEach((c) => c.addEventListener("input", render));
+  Object.values(campos).forEach((c) => c.addEventListener("input", () => {
+    quantidadeVisivel = TAMANHO_PAGINA;
+    render();
+  }));
   $("filtros").addEventListener("submit", (e) => e.preventDefault());
   $("limpar").addEventListener("click", () => {
     Object.values(campos).forEach((c) => { c.value = ""; });
     campos.ordem.value = "recentes";
     campos.busca.focus();
+    quantidadeVisivel = TAMANHO_PAGINA;
+    render();
+  });
+
+  $("lista").addEventListener("click", (ev) => {
+    if (!ev.target.closest("#carregar-mais")) return;
+    quantidadeVisivel += TAMANHO_PAGINA;
     render();
   });
 
@@ -191,6 +227,7 @@
     try {
       await ELO.removerEquipamento(eq.id, { observacoes: observacoes.trim() });
       todos = await ELO.equipamentos();
+      quantidadeVisivel = TAMANHO_PAGINA;
       render();
       avisar("Equipamento retirado de uso; histórico preservado.");
     } catch (err) {

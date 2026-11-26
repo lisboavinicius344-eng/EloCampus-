@@ -31,6 +31,20 @@ select.input {
   color: var(--muted);
 }
 
+.lista-carregamento {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  padding: 1.25rem 0 0.25rem;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+.lista-carregamento[hidden] {
+  display: none;
+}
+
 .table-eq .link-item {
   color: var(--text);
   font-weight: 600;
