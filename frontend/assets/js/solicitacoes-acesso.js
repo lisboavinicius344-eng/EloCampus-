@@ -225,6 +225,7 @@
   function renderizar() {
     const termo = String(busca?.value || "").trim().toLocaleLowerCase("pt-BR");
     const filtrados = pedidosAtuais.filter((pedido) => !termo || [pedido.nome, pedido.email, pedido.tipo, pedido.matricula, pedido.setor, pedido.analisado_por_nome, pedido.justificativa, pedido.motivo_recusa].join(" ").toLocaleLowerCase("pt-BR").includes(termo));
+    lista.classList.toggle("is-audit", visaoAtual === "auditoria");
     lista.replaceChildren();
     if (!filtrados.length) {
       const vazio = document.createElement("div");

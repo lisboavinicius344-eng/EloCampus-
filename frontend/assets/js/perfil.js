@@ -6,6 +6,22 @@
   const msg = $("perfil-mensagem");
   const avisar = (texto, ok) => { msg.textContent = texto; msg.className = `alert ${ok ? "alert-ok" : "alert-error"}`; msg.hidden = false; };
   const iniciais = (nome) => nome.split(/\s+/).filter(Boolean).slice(0, 2).map((p) => p[0]).join("").toLocaleUpperCase("pt-BR") || "?";
+  let fotoSelecionada = "";
+  const fotoCampo = $("profile-photo");
+  const fotoPreview = $("profile-photo-preview");
+
+  function fotoAtual(p) { return p?.foto || p?.avatar || p?.foto_url || p?.avatar_url || ""; }
+  function mostrarFoto(valor, nome = "") {
+    const avatar = $("profile-avatar");
+    if (!avatar) return;
+    if (valor) {
+      avatar.innerHTML = `<img src="${EloUtil.esc(valor)}" alt="Foto de ${EloUtil.esc(nome || "usuário")}">`;
+      avatar.classList.add("has-photo");
+    } else {
+      avatar.textContent = iniciais(nome);
+      avatar.classList.remove("has-photo");
+    }
+  }
 
   function preencher(p) {
     $("nome").value = p.nome || "";
@@ -16,10 +32,22 @@
     $("telefone").value = p.telefone || "";
     $("campo-matricula").hidden = !p.matricula;
     $("matricula").value = p.matricula || "";
-    if ($("profile-avatar")) $("profile-avatar").textContent = iniciais(p.nome || "");
+    const foto = fotoAtual(p);
+    mostrarFoto(foto, p.nome || "");
+    if (fotoPreview && foto) { fotoPreview.src = foto; fotoPreview.hidden = false; }
   }
 
   let atual = null;
+  fotoCampo?.addEventListener("change", () => {
+    const arquivo = fotoCampo.files?.[0];
+    if (!arquivo) return;
+    if (!/^image\/(jpeg|png|webp|gif)$/.test(arquivo.type) || arquivo.size > 5 * 1024 * 1024) {
+      fotoCampo.value = ""; fotoSelecionada = ""; avisar("Selecione uma imagem JPG, PNG, WEBP ou GIF de até 5 MB.", false); return;
+    }
+    const leitor = new FileReader();
+    leitor.onload = () => { fotoSelecionada = String(leitor.result || ""); if (fotoPreview) { fotoPreview.src = fotoSelecionada; fotoPreview.hidden = false; } mostrarFoto(fotoSelecionada, $("nome").value); };
+    leitor.readAsDataURL(arquivo);
+  });
   ELO.perfil().then((p) => {
     atual = p;
     preencher(p);
@@ -36,15 +64,16 @@
     const nome = $("nome").value.trim();
     if (!nome) { avisar("Informe o nome.", false); $("nome").focus(); return; }
     if (nome !== atual.nome) dados.nome = nome;
-    if (!$("campo-telefone").hidden && $("telefone").value.trim() !== (atual.telefone || "")) dados.telefone = $("telefone").value.trim();
+    if (!$('campo-telefone').hidden && $("telefone").value.trim() !== (atual.telefone || "")) dados.telefone = $("telefone").value.trim();
+    if (fotoSelecionada) dados.foto = fotoSelecionada;
     if (!Object.keys(dados).length) { avisar("Nenhuma alteração para salvar.", true); return; }
     const botao = $("perfil-salvar"); botao.disabled = true; botao.textContent = "Salvando…";
     try {
       atual = await ELO.salvarPerfil(dados);
       preencher(atual);
-      salvarSessao({ ...obterSessao(), nome: atual.nome, master: atual.master === true });  // mantém nome e permissão atualizados
+      salvarSessao({ ...obterSessao(), nome: atual.nome, foto: fotoAtual(atual) || obterSessao()?.foto, master: atual.master === true });  // mantém nome, foto e permissão atualizados
       avisar("Perfil atualizado com sucesso.", true);
-    } catch (e) { avisar(e.message || "Não foi possível salvar.", false); }
+    } catch (e) { avisar(e.message || "Não foi possível salvar. A API pode ainda não aceitar foto de perfil.", false); }
     finally { botao.disabled = false; botao.textContent = "Salvar alterações"; }
   });
 
