@@ -2,6 +2,7 @@
   "use strict";
   const $ = id => document.getElementById(id);
   const avisoEl = $("man-aviso"), tbody = $("man-tbody"), esc = EloUtil.esc;
+  const buscaEquipamento = $("man-equip-busca"), opcoesEquipamento = $("man-equip-opcoes"), idEquipamento = $("man-equip");
   let equipamentosAtuais = [];
 
   function aviso(texto, tipo = "info") {
@@ -10,15 +11,69 @@
     avisoEl.textContent = texto;
   }
 
+  function equipamentoAtivo(e) {
+    return e.status !== "baixado" && e.situacao !== "inativo" && e.status !== "inativo";
+  }
+
+  function rotuloEquipamento(e) {
+    return `${e.nome} — ${e.patrimonio || e.id}`;
+  }
+
+  function fecharOpcoes() {
+    opcoesEquipamento.hidden = true;
+    buscaEquipamento.setAttribute("aria-expanded", "false");
+  }
+
+  function selecionarEquipamento(id) {
+    const equipamento = equipamentosAtuais.find(e => String(e.id) === String(id));
+    if (!equipamento) return;
+    idEquipamento.value = String(equipamento.id);
+    buscaEquipamento.value = rotuloEquipamento(equipamento);
+    fecharOpcoes();
+  }
+
+  function renderizarOpcoes(termo = "") {
+    const normalizado = String(termo).trim().toLocaleLowerCase("pt-BR");
+    const encontrados = equipamentosAtuais
+      .filter(equipamentoAtivo)
+      .filter(e => !normalizado || [e.nome, e.patrimonio, e.id].some(valor => String(valor ?? "").toLocaleLowerCase("pt-BR").includes(normalizado)))
+      .slice(0, 40);
+
+    opcoesEquipamento.innerHTML = encontrados.length
+      ? encontrados.map(e => `<button type="button" class="man-equip-opcao" role="option" data-equipamento-id="${esc(e.id)}"><strong>${esc(e.nome)}</strong><span>${esc(e.patrimonio || `ID ${e.id}`)}</span></button>`).join("")
+      : `<p class="man-equip-vazio">Nenhum equipamento encontrado.</p>`;
+    opcoesEquipamento.hidden = false;
+    buscaEquipamento.setAttribute("aria-expanded", "true");
+  }
+
+  function prepararBuscaEquipamento() {
+    buscaEquipamento.addEventListener("focus", () => renderizarOpcoes(buscaEquipamento.value));
+    buscaEquipamento.addEventListener("input", () => {
+      idEquipamento.value = "";
+      renderizarOpcoes(buscaEquipamento.value);
+    });
+    buscaEquipamento.addEventListener("keydown", event => {
+      if (event.key === "Escape") fecharOpcoes();
+      if (event.key === "Enter" && !opcoesEquipamento.hidden) {
+        const primeira = opcoesEquipamento.querySelector("[data-equipamento-id]");
+        if (primeira) { event.preventDefault(); selecionarEquipamento(primeira.dataset.equipamentoId); }
+      }
+    });
+    opcoesEquipamento.addEventListener("mousedown", event => {
+      const opcao = event.target.closest("[data-equipamento-id]");
+      if (opcao) { event.preventDefault(); selecionarEquipamento(opcao.dataset.equipamentoId); }
+    });
+    document.addEventListener("click", event => {
+      if (!$("man-equip-picker").contains(event.target)) fecharOpcoes();
+    });
+  }
+
   async function carregar() {
     try {
       const [manutencoes, equipamentos] = await Promise.all([ELO.manutencoes(), ELO.equipamentos()]);
       equipamentosAtuais = Array.isArray(equipamentos) ? equipamentos : [];
-      const seletor = $("man-equip");
-      seletor.replaceChildren();
-      equipamentosAtuais
-        .filter(e => e.status !== "baixado" && e.situacao !== "inativo" && e.status !== "inativo")
-        .forEach(e => seletor.add(new Option(`${e.nome} — ${e.patrimonio || e.id}`, String(e.id))));
+      idEquipamento.value = "";
+      buscaEquipamento.value = "";
 
       let rows = Array.isArray(manutencoes) ? manutencoes : [];
       const filtro = $("man-status").value;
@@ -37,7 +92,6 @@
           (nomeEquipamento && String(e.nome).trim().toLocaleLowerCase("pt-BR") === String(nomeEquipamento).trim().toLocaleLowerCase("pt-BR")) ||
           (m.numero_patrimonio && String(e.patrimonio) === String(m.numero_patrimonio))
         );
-        const equipamentoId = m.equipamento_id ?? m.equipamento?.id ?? equipamento?.id ?? null;
         const tr = document.createElement("tr");
         tr.innerHTML = `<td>${esc(m.equipamento?.nome || m.equipamento || equipamento?.nome || "—")}</td>
           <td>${esc(m.numero_patrimonio || equipamento?.patrimonio || "—")}</td>
@@ -77,9 +131,10 @@
     }
   }
 
+  prepararBuscaEquipamento();
   $("man-form").addEventListener("submit", async event => {
     event.preventDefault();
-    const equipamento = equipamentosAtuais.find(e => String(e.id) === String($("man-equip").value));
+    const equipamento = equipamentosAtuais.find(e => String(e.id) === String(idEquipamento.value));
     const descricao = $("man-desc").value.trim();
     if (!equipamento || !descricao) return aviso("Selecione o equipamento e descreva o problema.", "error");
     const inativar = $("man-inativar")?.checked === true;
@@ -99,7 +154,7 @@
     const submit = $("man-form").querySelector('[type="submit"]');
     submit.disabled = true;
     try {
-      const r = await ELO.abrirManutencao({ equipamento_id: Number(equipamento.id), descricao_problema: descricao })
+      const r = await ELO.abrirManutencao({ equipamento_id: Number(equipamento.id), descricao_problema: descricao });
       if (inativar) {
         try {
           await ELO.removerEquipamento(String(equipamento.id), { observacoes: motivoInativacao });
@@ -110,6 +165,8 @@
       } else {
         aviso(r?.mensagem || "Equipamento enviado para manutenção.", "ok");
       }
+      idEquipamento.value = "";
+      buscaEquipamento.value = "";
       $("man-desc").value = "";
       if ($("man-inativar")) $("man-inativar").checked = false;
       if ($("man-motivo-inativacao")) $("man-motivo-inativacao").value = "";
