@@ -19,7 +19,7 @@
     @media(max-width:650px){.api-table{min-width:700px}}
   </style>
   <link rel="stylesheet" href="../assets/css/page-polish.css?v=2026.11.18.3">
-  <link rel="stylesheet" href="../assets/css/manutencoes.css?v=2026.11.26.1">
+  <link rel="stylesheet" href="../assets/css/manutencoes.css?v=2026.11.26.2">
 </head>
 <body class="manutencoes-page" data-pagina="manutencoes">
   <div class="app">
@@ -66,6 +66,7 @@
         <section class="card stack">
           <div class="lista-toolbar">
             <h2>Manutenções</h2>
+            <div class="field man-tabela-busca"><label for="man-busca">Pesquisar equipamento</label><input class="input" id="man-busca" type="search" placeholder="Nome ou patrimônio" autocomplete="off"></div>
             <div class="field"><label for="man-status">Situação</label><select class="input" id="man-status"><option value="">Todas</option><option>aberta</option><option>em_andamento</option><option>concluida</option><option>cancelada</option></select></div>
             <button class="btn btn-line" id="man-refresh" type="button">Atualizar</button>
           </div>
@@ -78,6 +79,6 @@
   <script src="../assets/js/api.js?v=2026.11.18.3"></script>
   <script src="../assets/js/auth.js?v=2026.11.18.3"></script>
   <script src="../assets/js/layout.js?v=2026.11.18.3"></script>
-  <script src="../assets/js/manutencoes-ui.js?v=2026.11.26.1"></script>
+  <script src="../assets/js/manutencoes-ui.js?v=2026.11.26.2"></script>
 </body>
 </html>

@@ -58,6 +58,12 @@ select.input {
   text-align: right;
   white-space: nowrap;
 }
+.table-eq .badge-maint {
+  min-width: 8.5rem;
+  justify-content: center;
+  text-align: center;
+  white-space: nowrap;
+}
 .btn-sm {
   min-height: 38px;
   padding: 0 1.1rem;

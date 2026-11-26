@@ -4,6 +4,8 @@
   const avisoEl = $("man-aviso"), tbody = $("man-tbody"), esc = EloUtil.esc;
   const buscaEquipamento = $("man-equip-busca"), opcoesEquipamento = $("man-equip-opcoes"), idEquipamento = $("man-equip");
   let equipamentosAtuais = [];
+  let manutencoesAtuais = [];
+  let dadosCarregados = false;
 
   function aviso(texto, tipo = "info") {
     avisoEl.hidden = false;
@@ -68,15 +70,23 @@
     });
   }
 
-  async function carregar() {
+  async function carregar(recarregar = false) {
     try {
-      const [manutencoes, equipamentos] = await Promise.all([ELO.manutencoes(), ELO.equipamentos()]);
-      equipamentosAtuais = Array.isArray(equipamentos) ? equipamentos : [];
-      idEquipamento.value = "";
-      buscaEquipamento.value = "";
+      if (recarregar || !dadosCarregados) {
+        const [manutencoes, equipamentos] = await Promise.all([ELO.manutencoes(), ELO.equipamentos()]);
+        manutencoesAtuais = Array.isArray(manutencoes) ? manutencoes : [];
+        equipamentosAtuais = Array.isArray(equipamentos) ? equipamentos : [];
+        dadosCarregados = true;
+      }
 
-      let rows = Array.isArray(manutencoes) ? manutencoes : [];
+      let rows = [...manutencoesAtuais];
+      const busca = String($("man-busca")?.value || "").trim().toLocaleLowerCase("pt-BR");
       const filtro = $("man-status").value;
+      if (busca) rows = rows.filter(x => {
+        const nome = typeof x.equipamento === "object" ? x.equipamento?.nome : x.equipamento;
+        const patrimonio = x.numero_patrimonio || x.equipamento?.patrimonio || equipamentosAtuais.find(e => String(e.id) === String(x.equipamento_id))?.patrimonio;
+        return [nome, patrimonio].some(valor => String(valor ?? "").toLocaleLowerCase("pt-BR").includes(busca));
+      });
       if (filtro) rows = rows.filter(x => x.status === filtro);
       tbody.replaceChildren();
       if (!rows.length) {
@@ -101,15 +111,20 @@
         const actions = tr.querySelector(".api-actions");
 
         if (["aberta", "em_andamento"].includes(m.status)) {
+          const details = document.createElement("details");
+          details.className = "maintenance-actions";
+          const summary = document.createElement("summary");
+          summary.className = "btn btn-line maintenance-actions-toggle";
+          summary.textContent = "Abrir ações";
           const wrap = document.createElement("div");
-          wrap.className = "stack-sm maintenance-finish";
+          wrap.className = "maintenance-finish";
           const solucao = document.createElement("textarea");
           solucao.className = "input input-block"; solucao.rows = 2; solucao.maxLength = 1000;
           solucao.placeholder = "Solução aplicada (obrigatório)";
           solucao.setAttribute("aria-label", "Solução aplicada");
           const label = document.createElement("label"); label.textContent = "Estado após a manutenção";
           const estado = document.createElement("select"); estado.className = "input input-block";
-          [["bom", "Bom"], ["novo", "Novo"], ["regular", "Regular"]].forEach(([v, t]) => estado.add(new Option(t, v)));
+          [["bom", "Bom"], ["novo", "Novo"], ["regular", "Regular"], ["inativado", "Inativado"]].forEach(([v, t]) => estado.add(new Option(t, v)));
           const finalizar = document.createElement("button");
           finalizar.className = "btn btn-line"; finalizar.type = "button"; finalizar.textContent = "Finalizar";
           finalizar.addEventListener("click", async () => {
@@ -117,11 +132,12 @@
             finalizar.disabled = true;
             try {
               const r = await ELO.finalizarManutencao(m.id, { solucao: solucao.value.trim(), estado_conservacao: estado.value });
-              aviso(r?.mensagem || "Manutenção finalizada.", "ok"); await carregar();
+              aviso(r?.mensagem || "Manutenção finalizada.", "ok"); await carregar(true);
             } catch (e) { aviso(e.message || "Não foi possível finalizar a manutenção.", "error"); finalizar.disabled = false; }
           });
           wrap.append(solucao, label, estado, finalizar);
-          actions.append(wrap);
+          details.append(summary, wrap);
+          actions.append(details);
         }
 
         tbody.append(tr);
@@ -171,7 +187,7 @@
       if ($("man-inativar")) $("man-inativar").checked = false;
       if ($("man-motivo-inativacao")) $("man-motivo-inativacao").value = "";
       if ($("man-inativacao-wrap")) $("man-inativacao-wrap").hidden = true;
-      await carregar();
+      await carregar(true);
     } catch (e) { aviso(e.message || "Não foi possível enviar o equipamento para manutenção.", "error"); }
     finally { submit.disabled = false; }
   });
@@ -181,7 +197,8 @@
     if (wrap) wrap.hidden = !$("man-inativar").checked;
     if (motivo) motivo.required = $("man-inativar").checked;
   });
+  $("man-busca")?.addEventListener("input", () => carregar());
   $("man-status").addEventListener("change", carregar);
-  $("man-refresh").addEventListener("click", carregar);
+  $("man-refresh").addEventListener("click", () => carregar(true));
   carregar();
 })();

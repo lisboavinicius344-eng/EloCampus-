@@ -266,4 +266,31 @@ const EloUtil = {
   scrim.addEventListener("click", () => alternar(false));
   document.addEventListener("keydown", (e) => { if (e.key === "Escape") alternar(false); });
   document.getElementById("btn-sair").addEventListener("click", sair);
+
+  // Replica a rolagem horizontal no topo, para que tabelas largas não exijam
+  // descer até o rodapé da lista para acessar as últimas colunas.
+  const prepararRolagemSuperior = () => {
+    document.querySelectorAll(".table-wrap:not([data-scroll-top-ready])").forEach((wrap) => {
+      const tabela = wrap.querySelector("table");
+      if (!tabela) return;
+      wrap.dataset.scrollTopReady = "true";
+      const topo = document.createElement("div");
+      topo.className = "table-scroll-top";
+      topo.setAttribute("aria-label", "Arrastar tabela horizontalmente");
+      const trilho = document.createElement("div");
+      topo.appendChild(trilho);
+      wrap.parentNode.insertBefore(topo, wrap);
+      const ajustar = () => {
+        const largura = Math.max(tabela.scrollWidth, wrap.clientWidth);
+        trilho.style.width = `${largura}px`;
+        topo.hidden = tabela.scrollWidth <= wrap.clientWidth + 1;
+      };
+      topo.addEventListener("scroll", () => { wrap.scrollLeft = topo.scrollLeft; });
+      wrap.addEventListener("scroll", () => { topo.scrollLeft = wrap.scrollLeft; });
+      ajustar();
+      if (window.ResizeObserver) new ResizeObserver(ajustar).observe(tabela);
+    });
+  };
+  prepararRolagemSuperior();
+  new MutationObserver(prepararRolagemSuperior).observe(document.body, { childList: true, subtree: true });
 })();
