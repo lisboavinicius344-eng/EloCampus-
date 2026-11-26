@@ -4,8 +4,7 @@
 .manutencoes-page main > .card { padding: clamp(1rem, 2vw, 1.5rem); gap: 1.15rem; }
 .manutencoes-page main > .card h2 { margin: 0; }
 .manutencoes-page #man-form { display: grid; gap: 1.1rem; }
-.manutencoes-page .api-grid { display: grid; grid-template-columns: minmax(260px, .85fr) minmax(0, 1.15fr); gap: 1rem; }
-.manutencoes-page .man-desc-field { min-width: 0; }
+.manutencoes-page .api-grid { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1.4fr); gap: 1rem; }
 .manutencoes-page .field { min-width: 0; }
 .manutencoes-page .input { min-height: 44px; }
 .manutencoes-page #man-desc { width: 100%; }
@@ -19,7 +18,7 @@
 .manutencoes-page .man-equip-opcao span { color: var(--muted); font-size: .82rem; }
 .manutencoes-page .man-equip-vazio { margin: 0; padding: .8rem; color: var(--muted); font-size: .88rem; }
 .manutencoes-page #man-form > .btn { justify-self: start; min-width: 12rem; }
-.manutencoes-page .lista-toolbar { display: grid; grid-template-columns: minmax(0, 1fr) minmax(230px, 1.35fr) minmax(150px, .7fr) auto; align-items: end; gap: 1rem; }
+.manutencoes-page .lista-toolbar { display: flex; align-items: end; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
 .manutencoes-page .lista-toolbar h2 { margin-right: auto; }
 .manutencoes-page .lista-toolbar .field { min-width: min(100%,220px); margin: 0; }
 .manutencoes-page .table-wrap { width: 100%; overflow-x: auto; border: 1px solid var(--border); border-radius: 14px; }
@@ -28,22 +27,7 @@
 .manutencoes-page .api-table td { padding: .95rem 1rem; vertical-align: middle; line-height: 1.5; }
 .manutencoes-page .api-actions { display: flex; align-items: center; gap: .5rem; flex-wrap: wrap; }
 .manutencoes-page .api-actions .btn { min-height: 36px; }
-.manutencoes-page .man-acoes-cell { min-width: 245px; }
-.manutencoes-page .man-acao-card { display: grid; gap: .55rem; min-width: 220px; padding: .8rem; border: 1px solid rgba(139,92,246,.25); border-radius: 16px; background: linear-gradient(145deg, rgba(139,92,246,.1), rgba(17,24,43,.78)); }
-.manutencoes-page .man-acao-titulo { color: var(--text); font-size: .9rem; }
-.manutencoes-page .man-acao-card textarea { min-height: 82px; resize: vertical; border-radius: 12px; padding: .7rem .8rem; }
-.manutencoes-page .man-acao-card select { min-height: 42px; border-radius: 12px; }
-.manutencoes-page .man-finalizar { width: 100%; min-height: 42px; padding-inline: .8rem; font-size: .9rem; }
-.manutencoes-page .man-acao-concluida { color: var(--muted); font-size: .85rem; }
-.manutencoes-page .man-status { display: inline-flex; padding: .3rem .6rem; border-radius: 999px; background: rgba(139,92,246,.12); color: #c4b5fd; font-size: .78rem; font-weight: 700; white-space: nowrap; }
-.manutencoes-page .man-problema-cell { min-width: 180px; overflow-wrap: anywhere; }
-@media (min-width: 901px) {
-  .manutencoes-page .table-wrap { overflow-x: visible; }
-  .manutencoes-page .api-table { min-width: 0 !important; table-layout: fixed; }
-  .manutencoes-page .man-acoes-cell { min-width: 0; width: 24%; }
-  .manutencoes-page .man-acao-card { min-width: 0; }
-}
-@media(max-width:760px) { .manutencoes-page .api-grid { grid-template-columns: 1fr; } .manutencoes-page #man-form > .btn { width: 100%; } .manutencoes-page .lista-toolbar { grid-template-columns: 1fr; align-items: stretch; } .manutencoes-page .lista-toolbar .field, .manutencoes-page .lista-toolbar > .btn { width: 100%; } }
+@media(max-width:760px) { .manutencoes-page .api-grid { grid-template-columns: 1fr; } .manutencoes-page #man-form > .btn { width: 100%; } .manutencoes-page .lista-toolbar { align-items: stretch; flex-direction: column; } .manutencoes-page .lista-toolbar .field, .manutencoes-page .lista-toolbar > .btn { width: 100%; } }
 
 
 /* Cabeçalho e controles de situação/atualização com hierarquia clara. */
