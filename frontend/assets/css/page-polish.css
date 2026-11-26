@@ -34,6 +34,26 @@
   border-collapse: collapse;
 }
 
+@media (min-width: 901px) {
+  .table-wrap { overflow-x: visible; }
+  .table-wrap table { min-width: 0 !important; table-layout: fixed; }
+  .table-wrap th, .table-wrap td { overflow-wrap: anywhere; word-break: break-word; }
+  .table-wrap td .btn, .table-wrap td .badge, .table-wrap td .pill { max-width: 100%; white-space: normal; }
+  .solicitantes-table th:last-child, .solicitantes-table td:last-child { width: 15%; min-width: 0; }
+  .solicitantes-table td:nth-child(1) { width: 16%; }
+  .solicitantes-table td:nth-child(2) { width: 15%; }
+  .solicitantes-table td:nth-child(3) { width: 14%; }
+  .solicitantes-table td:nth-child(4) { width: 22%; white-space: normal; }
+  .solicitantes-table td:nth-child(5) { width: 12%; min-width: 0; }
+  .solicitantes-table td:nth-child(6) { width: 10%; }
+  [data-pagina="manutencoes"] .api-table { min-width: 0 !important; table-layout: fixed; }
+}
+
+@media (max-width: 900px) {
+  .table-wrap { overflow-x: auto; overscroll-behavior-x: contain; -webkit-overflow-scrolling: touch; touch-action: pan-x; scrollbar-width: auto; }
+  .table-wrap table { min-width: max-content; table-layout: auto; }
+}
+
 .table-wrap th,
 .table-wrap td {
   vertical-align: middle;
@@ -472,11 +492,11 @@ form.split .summary button[type="submit"]:focus-visible,
 
 .nav a[data-fluxo="emprestimo"]:hover,
 .nav a[data-fluxo="emprestimo"].is-active {
-  background:linear-gradient(115deg,rgba(75,15,240,.28),rgba(139,44,245,.2));
+  background:linear-gradient(120deg, #4b0ff0 0%, #8c2cf5 58%, #d23be0 100%);
 }
 .nav a[data-fluxo="devolucao"]:hover,
 .nav a[data-fluxo="devolucao"].is-active {
-  background:linear-gradient(115deg,rgba(47,107,255,.27),rgba(0,209,255,.17));
+  background:linear-gradient(120deg, #4b0ff0 0%, #8c2cf5 58%, #d23be0 100%);
 }
 .nav a[data-fluxo="emprestimo"].is-active,
 .nav a[data-fluxo="devolucao"].is-active {
