@@ -73,7 +73,6 @@
         timeline.innerHTML = '<li><div class="muted">Selecione um empréstimo para ver as datas e movimentações.</div></li>';
         $("detalhe-devolver").href = "devolucoes.html";
         $("detalhe-devolver").setAttribute("aria-disabled", "true");
-        if ($("detalhe-cobrar")) $("detalhe-cobrar").hidden = true;
         return;
       }
       const eventos = [
@@ -94,23 +93,6 @@
         link.href = l.devolvida ? "devolucoes.html" : `devolucoes.html?itemId=${encodeURIComponent(l.id)}&emprestimoId=${encodeURIComponent(l.emprestimoId)}`;
         link.setAttribute("aria-disabled", String(Boolean(l.devolvida)));
         link.classList.toggle("is-disabled", Boolean(l.devolvida));
-      }
-      const cobrar = $("detalhe-cobrar");
-      if (cobrar) { cobrar.hidden = usuarioFinal || Boolean(l.devolvida); cobrar.disabled = false; cobrar.dataset.cobrar = l.chave; }
-    }
-    // Envia a cobrança por e-mail; a API recusa (400) se a pessoa foi cobrada há menos de 10 minutos ou não tem e-mail.
-    async function cobrar(l, botao) {
-      if (!l || l.devolvida || !window.confirm(`Enviar cobrança por e-mail para ${l.solicitante.nome}?`)) return;
-      const alvo = $("emprestimos-aviso");
-      botao.disabled = true;
-      try {
-        const resposta = await ELO.cobrarEmprestimo(l.emprestimoId);
-        aviso(alvo, resposta?.mensagem || `Cobrança enviada para ${l.solicitante.nome}.`, "ok");
-      } catch (error) {
-        aviso(alvo, error.message || "Não foi possível enviar a cobrança.", "error");
-      } finally {
-        botao.disabled = false;
-        alvo?.scrollIntoView?.({ block: "nearest" });
       }
     }
     function renderizar() {
@@ -143,7 +125,7 @@
           <td>${esc(l.solicitante.nome)}<small>por ${esc(l.registradoPor || "—")}</small></td>
           <td>${dataHora(l.devolvida || l.prevista)}</td>
           <td><span class="pill ${status.classe}">${esc(status.texto)}</span></td>
-          <td>${l.devolvida ? '<span class="muted small">Concluído</span>' : `<div class="loan-actions"><button class="btn btn-sm" type="button" data-devolver="${esc(l.chave)}">Devolver</button><button class="btn btn-sm btn-line" type="button" data-cobrar="${esc(l.chave)}">Cobrar</button></div>`}</td>
+          <td>${l.devolvida ? '<span class="muted small">Concluído</span>' : `<button class="btn btn-sm" type="button" data-devolver="${esc(l.chave)}">Devolver</button>`}</td>
         </tr>`;
       }).join("");
       const activeSelection = filtrados.find((l) => l.chave === selecionado?.chave) || filtrados[0];
@@ -152,12 +134,7 @@
 
     abas.forEach((aba) => aba.addEventListener("click", () => { filtro = aba.dataset.filtro; renderizar(); }));
     busca?.addEventListener("input", renderizar);
-    $("detalhe-cobrar")?.addEventListener("click", (event) => {
-      cobrar(registros.find((x) => x.chave === event.currentTarget.dataset.cobrar), event.currentTarget);
-    });
     corpo.addEventListener("click", (event) => {
-      const botaoCobrar = event.target.closest("[data-cobrar]");
-      if (botaoCobrar) { cobrar(registros.find((x) => x.chave === botaoCobrar.dataset.cobrar), botaoCobrar); return; }
       const devolver = event.target.closest("[data-devolver]");
       const row = event.target.closest("tr[data-item-id]");
       if (devolver) {
@@ -206,7 +183,6 @@
     const abas = [...document.querySelectorAll("[data-periodo]")];
     const corpoRecentes = $("lista-devolucoes-recentes");
     const fila = $("fila-devolucao");
-    const listaAtivos = $("lista-emprestimos-ativos");
     const inputPatrimonio = $("patrimonio");
     const itensContainer = $("itens-devolucao");
     const mensagem = $("mensagem-devolucao");
@@ -270,26 +246,6 @@
         return `<tr><td><strong>${esc(l.equipamento.nome)}</strong><small>${esc(l.equipamento.patrimonio)}</small></td>${pessoa}<td>${dataHora(l.devolvida)}</td><td><span class="pill ${pill}">${esc(cond)}</span></td></tr>`;
       }).join("") : `<tr><td colspan="4" class="muted">${registros.some((l) => l.devolvida) ? "Nenhuma devolução corresponde ao período ou à pesquisa." : "Nenhuma devolução registrada no sistema."}</td></tr>`;
     }
-    function desenharAtivos() {
-      if (!listaAtivos) return;
-      const termo = norm(busca?.value.trim());
-      const ativos = registros.filter((l) => !l.devolvida && (!termo || norm([l.equipamento.nome, l.equipamento.patrimonio, l.solicitante.nome, l.solicitante.matricula].join(" ")).includes(termo)))
-        .sort((a, b) => {
-          const grupoA = mesmoDia(a.prevista, new Date()) ? 0 : EloUtil.vencido(a.prevista) ? 1 : 2;
-          const grupoB = mesmoDia(b.prevista, new Date()) ? 0 : EloUtil.vencido(b.prevista) ? 1 : 2;
-          return grupoA - grupoB || new Date(a.prevista) - new Date(b.prevista);
-        });
-      if (!ativos.length) {
-        listaAtivos.innerHTML = '<p class="muted">Nenhum empréstimo em andamento corresponde à pesquisa.</p>';
-        return;
-      }
-      listaAtivos.innerHTML = `<div class="active-loans-table-wrap"><table class="active-loans-table"><thead><tr><th>Equipamento</th><th>Patrimônio</th><th>Solicitante</th><th>Empréstimo</th><th>Devolução prevista</th><th>Situação</th><th>Ação</th></tr></thead><tbody>${ativos.map((l) => {
-        const hoje = mesmoDia(l.prevista, new Date());
-        const prazo = EloUtil.prazo(l.prevista);
-        const situacao = hoje ? { texto: "Aguardando hoje", classe: "pill-warn" } : prazo.classe === "late" ? { texto: prazo.texto, classe: "pill-late" } : { texto: "Em andamento", classe: "pill-ok" };
-        return `<tr class="${hoje ? "is-due-today" : prazo.classe === "late" ? "is-overdue" : ""}"><td data-label="Equipamento"><strong>${esc(l.equipamento.nome)}</strong></td><td data-label="Patrimônio">${esc(l.equipamento.patrimonio || "—")}</td><td data-label="Solicitante"><strong>${esc(l.solicitante.nome)}</strong><small>${esc(l.solicitante.matricula || l.solicitante.vinculo || "")}</small></td><td data-label="Empréstimo">${dataHora(l.retirada)}</td><td data-label="Devolução prevista">${dataHora(l.prevista)}</td><td data-label="Situação"><span class="pill ${situacao.classe}">${esc(situacao.texto)}</span></td><td data-label="Ação"><button class="btn btn-sm active-return-btn" type="button" data-receber="${esc(l.chave)}">Registrar devolução</button></td></tr>`;
-      }).join("")}</tbody></table></div>`;
-    }
     function desenharFila() {
       const hoje = new Date();
       const aguardando = registros.filter((l) => !l.devolvida && mesmoDia(l.prevista, hoje)).sort((a,b) => new Date(a.prevista) - new Date(b.prevista));
@@ -333,7 +289,7 @@
       $("confirmar-devolucao").textContent = "Revisar devolução";
     });
     abas.forEach((a) => a.addEventListener("click", () => { periodo = a.dataset.periodo; desenharRecentes(); }));
-    busca?.addEventListener("input", () => { desenharRecentes(); desenharAtivos(); });
+    busca?.addEventListener("input", desenharRecentes);
     const selecionarParaDevolucao = (event) => {
       const button = event.target.closest("[data-receber]"); if (!button) return;
       const l = registros.find((x) => x.chave === button.dataset.receber);
@@ -344,7 +300,6 @@
       }
     };
     fila.addEventListener("click", selecionarParaDevolucao);
-    listaAtivos?.addEventListener("click", selecionarParaDevolucao);
 
     form.addEventListener("submit", async (event) => {
       event.preventDefault();
@@ -379,7 +334,7 @@
           assinaturaRecebida: $("assinatura-recebida").checked,
         });
         registros = (await ELO.emprestimos()).filter(pertenceAoUsuario);
-        desenharRecentes(); desenharFila(); desenharAtivos();
+        desenharRecentes(); desenharFila();
         history.replaceState(null, "", location.pathname);
         revisar = false;
         form.reset();
@@ -400,7 +355,7 @@
 
     try {
       registros = (await ELO.emprestimos()).filter(pertenceAoUsuario);
-      desenharRecentes(); desenharFila(); desenharAtivos();
+      desenharRecentes(); desenharFila();
       let prefill = [];
       if (itemInicial) {
         const item = registros.find((l) => String(l.id) === String(itemInicial) && !l.devolvida && (!emprestimoInicial || String(l.emprestimoId) === String(emprestimoInicial)));

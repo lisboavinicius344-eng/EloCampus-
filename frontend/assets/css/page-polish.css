@@ -203,7 +203,7 @@ button.btn, a.btn { min-height: 44px; line-height: 1.25; white-space: normal; }
   .main { gap: 1rem; padding: 1rem; }
   .card, .panel { padding: 1rem; border-radius: 1rem; }
   .table-wrap { border-radius: .8rem; }
-  .table-wrap table { min-width: 620px; }
+  .table-wrap table:not(.table-eq) { min-width: 620px; }
 }
 
 
@@ -560,12 +560,12 @@ form.split .summary button[type="submit"]:focus-visible,
   .novo-emprestimo-page #adicionar-equip { width:100%; }
 }
 
-/* Ações em linha (empréstimos e painel): Devolver / Cobrar */
-.table-actions, .loan-actions { display: inline-flex; flex-wrap: wrap; gap: .45rem; align-items: center; }
+/* Ações em linha do painel: Devolver / Cobrar */
+.table-actions { display: inline-flex; flex-wrap: wrap; gap: .45rem; align-items: center; }
 .table-actions { margin-left: .5rem; }
 @media (max-width: 760px) {
-  .loan-actions, .table-actions { display: flex; justify-content: flex-end; margin-left: 0; margin-top: .35rem; }
-  .loan-actions .btn, .table-actions .btn { flex: 1 1 auto; }
+  .table-actions { display: flex; justify-content: flex-end; margin-left: 0; margin-top: .35rem; }
+  .table-actions .btn { flex: 1 1 auto; }
 }
 
 /* Zona master do perfil */

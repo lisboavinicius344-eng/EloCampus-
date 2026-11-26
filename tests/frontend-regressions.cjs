@@ -31,6 +31,13 @@ const loans = read('frontend/assets/js/emprestimos-ui.js');
 const loanCss = read('frontend/assets/css/emprestimos.css');
 assert.match(loans, /classList\.toggle\("is-selected"/);
 assert.match(loanCss, /#lista-emprestimos tr\[data-item-id\]\.is-selected/);
+assert.doesNotMatch(read('frontend/pages/emprestimos.html'), /detalhe-cobrar/);
+assert.doesNotMatch(loans, /data-cobrar/);
+assert.doesNotMatch(read('frontend/pages/devolucoes.html'), /lista-emprestimos-ativos|active-loans/);
+assert.doesNotMatch(read('frontend/assets/js/perfil.js'), /fotoSelecionada|profile-photo/);
+assert.doesNotMatch(read('frontend/pages/perfil.html'), /profile-photo|profile-avatar/);
+assert.match(read('frontend/assets/css/equipamentos.css'), /table-scroll-top.*display: none/);
+assert.match(read('frontend/assets/css/page-polish.css'), /table:not\(\.table-eq\)/);
 
 const maintenanceHtml = read('frontend/pages/manutencoes.html');
 const maintenanceJs = read('frontend/assets/js/manutencoes-ui.js');

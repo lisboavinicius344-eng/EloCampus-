@@ -221,7 +221,7 @@ const EloUtil = {
     </a>
     <nav aria-label="Principal"><ul class="nav">${itens}</ul></nav>
     <div class="user">
-      <a class="avatar avatar-link${sessao.foto ? " has-photo" : ""}" href="perfil.html" aria-label="Abrir configuração do perfil">${sessao.foto ? `<img src="${EloUtil.esc(sessao.foto)}" alt="Foto de ${nome}">` : EloUtil.esc(iniciais)}</a>
+      <a class="avatar avatar-link" href="perfil.html" aria-label="Abrir configuração do perfil">${EloUtil.esc(iniciais)}</a>
       <div class="user-info"><strong>${nome}</strong><small>${EloUtil.esc(perfil)}</small></div>
       <button class="user-out" type="button" id="btn-sair" aria-label="Sair do sistema" title="Sair">${svg("out")}</button>
     </div>`;

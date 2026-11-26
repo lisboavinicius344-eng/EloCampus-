@@ -4,18 +4,6 @@
 .profile-panel form {
   gap: 1.5rem;
 }
-.profile-avatar {
-  width: 82px;
-  height: 82px;
-  display: grid;
-  place-items: center;
-  border-radius: 28px;
-  color: #fff;
-  font-size: 1.6rem;
-  font-weight: 800;
-  background: linear-gradient(135deg, var(--purple-light), var(--blue));
-  box-shadow: 0 14px 30px -12px rgba(139, 92, 246, 0.8);
-}
 .profile-panel .form-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -49,34 +37,6 @@
   }
 }
 
-.profile-panel {
-  max-width: 900px;
-}
-.profile-avatar {
-  width: 88px;
-  height: 88px;
-  display: grid;
-  place-items: center;
-  margin-bottom: 0.75rem;
-  border-radius: 50%;
-  background: linear-gradient(135deg, var(--purple-light), var(--blue));
-  background-size: cover;
-  background-position: center;
-  font-size: 1.7rem;
-  font-weight: 800;
-}
-.profile-photo-label {
-  display: grid;
-  gap: 0.4rem;
-  width: max-content;
-  margin-bottom: 1.4rem;
-  color: var(--muted);
-  font-size: 0.9rem;
-}
-.profile-photo-label input {
-  font: inherit;
-  color: var(--text);
-}
 .check-row {
   display: flex;
   gap: 0.6rem;
@@ -117,20 +77,6 @@
 .profile-panel [hidden] {
   display: none !important;
 }
-.profile-photo-editor {
-  display: grid;
-  gap: .45rem;
-  max-width: 34rem;
-  margin: .25rem 0 1.1rem;
-  padding: .9rem 1rem;
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  background: rgba(139,92,246,.06);
-}
-.profile-photo-editor label { color: var(--text); font-weight: 700; }
-.profile-photo-preview { width: 92px; height: 92px; object-fit: cover; border-radius: 50%; border: 2px solid var(--purple-light); }
-.profile-avatar.has-photo { overflow: hidden; padding: 0; }
-.profile-avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
 @media (max-width: 640px) {
   .profile-panel #perfil-salvar {
     width: 100%;
