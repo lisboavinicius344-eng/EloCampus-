@@ -59,6 +59,15 @@
     );
   }
 
+  function atualizarEstadoSelecaoCabecalho() {
+    const cabecalho = $("lista").querySelector("[data-selecionar-todos]");
+    if (!cabecalho) return;
+    const resultado = filtrar();
+    const marcados = resultado.filter((e) => selecionados.has(String(e.id))).length;
+    cabecalho.checked = resultado.length > 0 && marcados === resultado.length;
+    cabecalho.indeterminate = marcados > 0 && marcados < resultado.length;
+  }
+
   function linhaEquipamento(e) {
     const s = SITUACOES[e.situacao] || { rotulo: e.situacao, cls: "off" };
     const cond = norm(e.condicao);
@@ -125,11 +134,12 @@
       return;
     }
 
-    const todosVisiveisMarcados = visiveis.every((e) => selecionados.has(String(e.id)));
+    const todosResultadosMarcados = lista.length > 0 && lista.every((e) => selecionados.has(String(e.id)));
+    const algumResultadoMarcado = lista.some((e) => selecionados.has(String(e.id)));
     $("lista").innerHTML = `
       <table class="table table-eq">
         <thead><tr>
-          <th scope="col" class="col-selecao"><input type="checkbox" data-selecionar-visiveis aria-label="Selecionar todos os equipamentos exibidos para etiquetas"${todosVisiveisMarcados ? " checked" : ""}></th>
+          <th scope="col" class="col-selecao"><input type="checkbox" data-selecionar-todos aria-label="Selecionar todos os equipamentos do resultado para etiquetas"${todosResultadosMarcados ? " checked" : ""}></th>
           <th scope="col">Equipamento</th><th scope="col">Patrimônio</th><th scope="col">Categoria</th>
           <th scope="col">Setor</th><th scope="col">Localização</th><th scope="col">Condição</th><th scope="col">Situação</th>
           <th scope="col"><span class="sr-only">Ações</span></th>
@@ -142,6 +152,8 @@
         <span aria-live="polite">${restante > 0 ? `${restante} equipamento${restante === 1 ? " restante" : "s restantes"}` : "Todos os equipamentos foram exibidos."}</span>
         <button class="btn btn-line btn-sm" type="button" id="carregar-mais">Carregar mais</button>
       </div>`;
+    const cabecalho = $("lista").querySelector("[data-selecionar-todos]");
+    if (cabecalho) cabecalho.indeterminate = algumResultadoMarcado && !todosResultadosMarcados;
     observarMais();
   }
 
@@ -198,18 +210,18 @@
     const item = ev.target.closest("[data-selecionar]");
     if (item) {
       if (item.checked) selecionados.add(item.dataset.selecionar); else selecionados.delete(item.dataset.selecionar);
-      const cabecalho = $("lista").querySelector("[data-selecionar-visiveis]");
-      if (cabecalho) cabecalho.checked = [...$("lista").querySelectorAll("[data-selecionar]")].every((c) => c.checked);
+      atualizarEstadoSelecaoCabecalho();
       atualizarBotaoEtiquetas();
       return;
     }
-    const todosVisiveis = ev.target.closest("[data-selecionar-visiveis]");
-    if (todosVisiveis) {
-      $("lista").querySelectorAll("[data-selecionar]").forEach((c) => {
-        c.checked = todosVisiveis.checked;
-        if (c.checked) selecionados.add(c.dataset.selecionar); else selecionados.delete(c.dataset.selecionar);
+    const todosResultados = ev.target.closest("[data-selecionar-todos]");
+    if (todosResultados) {
+      filtrar().forEach((equipamento) => {
+        const id = String(equipamento.id);
+        if (todosResultados.checked) selecionados.add(id); else selecionados.delete(id);
       });
       atualizarBotaoEtiquetas();
+      render();
     }
   });
 

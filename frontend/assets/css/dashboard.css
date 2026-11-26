@@ -1188,3 +1188,16 @@ a.acao:hover {
 .admin-action .self-action-copy strong { font-size: 1rem; }
 .admin-action .self-action-copy small { overflow: visible; white-space: normal; text-overflow: clip; font-size: .84rem; line-height: 1.4; }
 @media (max-width: 760px) { .admin-action { min-height: 88px; } }
+
+/* Os dois atalhos operacionais destacados não devem parecer maiores que os demais. */
+.admin-actions .admin-action-loan,
+.admin-actions .admin-action-return {
+  min-height: 88px;
+  padding-block: .82rem;
+}
+@media (max-width: 760px) {
+  .admin-actions .admin-action-loan,
+  .admin-actions .admin-action-return {
+    min-height: 82px;
+  }
+}

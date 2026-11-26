@@ -76,6 +76,20 @@ const EloUtil = {
   podeVerIdsInternos() {
     return obterSessao()?.master === true;
   },
+
+  avatarStorageKey(sessao = {}) {
+    const identificador = sessao.id ?? sessao.usuario_id ?? sessao.email ?? sessao.nome ?? "usuario";
+    return `elo.avatar.${encodeURIComponent(String(identificador).trim().toLocaleLowerCase("pt-BR"))}`;
+  },
+
+  avatarLocal(sessao = {}) {
+    try {
+      const valor = localStorage.getItem(EloUtil.avatarStorageKey(sessao));
+      return /^(data:image\/(?:jpeg|png|webp);base64,|https:\/\/)/i.test(valor || "") ? valor : "";
+    } catch (_) {
+      return "";
+    }
+  },
 };
 
 (function () {
@@ -210,6 +224,10 @@ const EloUtil = {
 
   const nome = EloUtil.esc(sessao.nome || "Usuário");
   const iniciais = (sessao.nome || "U").split(" ").slice(0, 2).map((p) => p[0]).join("").toUpperCase();
+  const avatarImagem = EloUtil.avatarLocal(sessao);
+  const avatarMarkup = avatarImagem
+    ? `<img src="${EloUtil.esc(avatarImagem)}" alt="" class="avatar-image">`
+    : EloUtil.esc(iniciais);
   const ROTULOS_PERFIL = { administrador: "Administrador · TI", operador: "Equipe operacional", aluno: "Discente", professor: "Docente" };
   const perfil = usuarioFinal ? "Minha conta" : (ROTULOS_PERFIL[perfilAtual] || (sessao.perfil ? sessao.perfil[0].toUpperCase() + sessao.perfil.slice(1) : ""));
   const subtituloMarca = usuarioFinal ? "" : "<small>Instituição - Campus Lapa</small>";
@@ -221,7 +239,7 @@ const EloUtil = {
     </a>
     <nav aria-label="Principal"><ul class="nav">${itens}</ul></nav>
     <div class="user">
-      <a class="avatar avatar-link" href="perfil.html" aria-label="Abrir configuração do perfil">${EloUtil.esc(iniciais)}</a>
+      <a class="avatar avatar-link" href="perfil.html" aria-label="Abrir configuração do perfil">${avatarMarkup}</a>
       <div class="user-info"><strong>${nome}</strong><small>${EloUtil.esc(perfil)}</small></div>
       <button class="user-out" type="button" id="btn-sair" aria-label="Sair do sistema" title="Sair">${svg("out")}</button>
     </div>`;
@@ -270,6 +288,7 @@ const EloUtil = {
   // Replica a rolagem horizontal no topo, para que tabelas largas não exijam
   // descer até o rodapé da lista para acessar as últimas colunas.
   const prepararRolagemSuperior = () => {
+    if (document.body.dataset.pagina === "equipamentos") return;
     document.querySelectorAll(".table-wrap:not([data-scroll-top-ready])").forEach((wrap) => {
       const tabela = wrap.querySelector("table");
       if (!tabela) return;
