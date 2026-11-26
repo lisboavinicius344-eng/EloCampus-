@@ -603,7 +603,6 @@ body[data-pagina="equipamentos"] .table-scroll-top { display: none !important; }
 @media (min-width: 761px) {
   body[data-pagina="equipamentos"] .table-eq {
     table-layout: fixed;
-    font-size: .84rem;
   }
   body[data-pagina="equipamentos"] .table-eq th,
   body[data-pagina="equipamentos"] .table-eq td {
@@ -623,7 +622,7 @@ body[data-pagina="equipamentos"] .table-scroll-top { display: none !important; }
     min-height: 32px;
     margin: .12rem 0;
     padding: .35rem .5rem;
-    font-size: .76rem;
+    font-size: .9rem;
   }
 }
 
