@@ -59,11 +59,13 @@ select.input {
   white-space: nowrap;
 }
 .table-eq .badge-maint {
-  min-width: 8.5rem;
+  min-width: 9.25rem;
+  min-height: 2rem;
   justify-content: center;
   text-align: center;
   white-space: nowrap;
 }
+.table-eq td[data-label="Situação"] { text-align: center; }
 .btn-sm {
   min-height: 38px;
   padding: 0 1.1rem;

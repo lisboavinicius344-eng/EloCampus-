@@ -949,6 +949,28 @@ a.acao:hover {
 .admin-action-inventory .self-action-icon { color: #67e8f9; }
 .admin-action-reserve .self-action-icon { color: #93c5fd; }
 .admin-action-history .self-action-icon { color: #fcd34d; }
+.admin-actions .admin-action-loan,
+.admin-actions .admin-action-return {
+  --action-glow: rgba(139, 92, 246, .24);
+  border-color: rgba(139, 92, 246, .42);
+  background: linear-gradient(110deg, rgba(139, 92, 246, .18), rgba(17, 24, 43, .97) 72%);
+}
+.admin-actions .admin-action-loan:hover,
+.admin-actions .admin-action-return:hover,
+.admin-actions .admin-action-loan:focus-visible,
+.admin-actions .admin-action-return:focus-visible,
+.admin-actions .admin-action-loan:active,
+.admin-actions .admin-action-return:active {
+  color: var(--text);
+  border-color: rgba(168, 85, 247, .82);
+  background: linear-gradient(110deg, rgba(75, 15, 240, .46), rgba(139, 44, 245, .25) 72%);
+  box-shadow: 0 12px 28px -22px rgba(139, 92, 246, .9);
+}
+.admin-actions .admin-action-loan .self-action-icon,
+.admin-actions .admin-action-return .self-action-icon {
+  background: linear-gradient(145deg, #9333ea, #6d28d9);
+  color: #fff;
+}
 .panel-heading-row {
   align-items: center;
   margin-bottom: 1rem;

@@ -26,6 +26,14 @@
       acoes.append(editar, excluir); tr.append(acoes); body.append(tr);
     });
   }
+  async function incorporarSetoresDoAcervo() {
+    try {
+      const equipamentos = await ELO.equipamentos();
+      const setoresDoAcervo = equipamentos.map((e) => e.setor).filter(Boolean);
+      salvarSetores([...new Set([...lerSetores(), ...setoresDoAcervo])]);
+      carregarSetores();
+    } catch { /* mantém as sugestões locais quando a listagem não estiver disponível */ }
+  }
   function limpar() {
     form.reset();
     $("cat-id").value = "";
@@ -165,4 +173,5 @@
   $("setor-cancel")?.addEventListener("click", limparSetor);
   carregar();
   carregarSetores();
+  incorporarSetoresDoAcervo();
 })();

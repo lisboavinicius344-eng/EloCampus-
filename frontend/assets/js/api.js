@@ -15,17 +15,20 @@ const textoEquipamentoFrontend = (valor) => String(valor ?? "")
   .replace(/\bbateria_recarregavel\b/gi, "bateria recarregável")
   .replace(/\s{2,}/g, " ")
   .trim();
-const setorEquipamentoFrontend = (valor) => String(valor ?? "").trim().replace(/^Datacenter$/i, "Data Center");
+const setorEquipamentoFrontend = (valor) => {
+  const nome = valor && typeof valor === "object" ? (valor.nome ?? valor.name ?? valor.descricao ?? "") : valor;
+  return String(nome ?? "").trim().replace(/^Datacenter$/i, "Data Center");
+};
 
 const normalizarEquipamento = (equipamento = {}) => ({
   ...equipamento,
   nome: textoEquipamentoFrontend(equipamento.nome),
   patrimonio: equipamento.numero_patrimonio ?? equipamento.patrimonio ?? "",
-  categoria: typeof equipamento.categoria === "string" ? equipamento.categoria : (equipamento.categoria?.nome ?? equipamento.categoria_nome ?? ""),
+  categoria: typeof equipamento.categoria === "string" ? equipamento.categoria : (equipamento.categoria?.nome ?? equipamento.categoria_nome ?? equipamento.categoria_descricao ?? ""),
   condicao: estadoFrontend(equipamento.estado_conservacao ?? equipamento.condicao),
   situacao: equipamento.situacao || ({ disponivel: "disponivel", emprestado: "emprestado", manutencao: "manutencao", baixado: "inativo" }[equipamento.status] || "disponivel"),
   base: equipamento.status === "baixado" ? "inativo" : equipamento.status,
-  setor: setorEquipamentoFrontend(equipamento.setor),
+  setor: setorEquipamentoFrontend(equipamento.setor ?? equipamento.setor_nome ?? equipamento.departamento),
   localizacao: textoEquipamentoFrontend(equipamento.localizacao),
   imagem: equipamento.imagem_url
     ? (/^https?:\/\//i.test(equipamento.imagem_url) ? equipamento.imagem_url : `${API_BASE_URL}${equipamento.imagem_url}`)
@@ -197,7 +200,12 @@ const ELO = {
   movimentacoes: async () => (await requisitar("/historico")).map((movimento) => ({
     id: movimento.id, quando: movimento.data_movimentacao, tipo: movimento.tipo_movimentacao,
     classe: movimento.tipo_movimentacao,
-    equipamento: { id: movimento.equipamento_id, nome: movimento.equipamento_nome, patrimonio: "", categoria: "" },
+    equipamento: {
+      id: movimento.equipamento_id ?? movimento.equipamento?.id,
+      nome: movimento.equipamento_nome ?? movimento.equipamento?.nome ?? movimento.nome_equipamento,
+      patrimonio: movimento.equipamento_patrimonio ?? movimento.numero_patrimonio ?? movimento.patrimonio ?? movimento.equipamento?.patrimonio ?? "",
+      categoria: movimento.categoria ?? movimento.categoria_nome ?? movimento.equipamento?.categoria ?? "",
+    },
     detalhe: movimento.descricao, por: movimento.usuario_nome, emprestimoId: movimento.emprestimo_id,
   })),
   // Cobrança por e-mail. A API responde 400 (cobrado há menos de 10 min ou sem e-mail) e 503 (falha no envio).
@@ -321,7 +329,11 @@ const ELO = {
       corpo: payload,
     })).equipamento;
   },
-  categorias: async () => (await requisitar("/categorias")).categorias,
+  categorias: async () => {
+    const resposta = await requisitar("/categorias");
+    if (Array.isArray(resposta)) return resposta;
+    return Array.isArray(resposta?.categorias) ? resposta.categorias : Array.isArray(resposta?.data) ? resposta.data : [];
+  },
   categoria: async (id) => (await requisitar(`/categorias/${encodeURIComponent(id)}`)).categoria,
   criarCategoria: (dados) => requisitar("/categorias", { metodo: "POST", corpo: { nome: String(dados.nome || "").trim(), descricao: String(dados.descricao || "").trim() || null } }),
   editarCategoria: (id, dados) => requisitar(`/categorias/${encodeURIComponent(id)}`, { metodo: "PUT", corpo: { nome: String(dados.nome || "").trim(), descricao: String(dados.descricao || "").trim() || null } }),

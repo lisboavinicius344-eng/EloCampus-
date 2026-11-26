@@ -39,8 +39,12 @@
     try {
       const catalogo = new Map((await ELO.equipamentos()).map((e) => [String(e.id), e]));
       eventos = eventos.map((m) => {
-        const e = catalogo.get(String(m.equipamento?.id ?? ""));
-        return e ? { ...m, equipamento: { ...m.equipamento, nome: m.equipamento?.nome || e.nome, patrimonio: e.patrimonio, categoria: e.categoria } } : m;
+        const nome = String(m.equipamento?.nome || "").trim().toLocaleLowerCase("pt-BR");
+        const e = catalogo.get(String(m.equipamento?.id ?? "")) || [...catalogo.values()].find((item) =>
+          (nome && String(item.nome || "").trim().toLocaleLowerCase("pt-BR") === nome) ||
+          (m.equipamento?.patrimonio && String(item.patrimonio) === String(m.equipamento.patrimonio))
+        );
+        return e ? { ...m, equipamento: { ...m.equipamento, nome: m.equipamento?.nome || e.nome, patrimonio: m.equipamento?.patrimonio || e.patrimonio, categoria: m.equipamento?.categoria || e.categoria } } : m;
       });
     } catch { /* o histórico continua legível sem o catálogo */ }
     eventos = [...eventos].sort((a, b) => new Date(b.quando) - new Date(a.quando));
