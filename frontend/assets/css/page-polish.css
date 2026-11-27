@@ -243,44 +243,57 @@ button.btn, a.btn { min-height: 44px; line-height: 1.25; white-space: normal; }
 }
 @media (max-width: 760px) {
   body[data-pagina="categorias"] .categorias-table {
-    min-width: 0 !important;
+    display: block;
     width: 100%;
+    min-width: 0 !important;
   }
   body[data-pagina="categorias"] .categorias-table thead {
     display: none;
   }
-  body[data-pagina="categorias"] .categorias-table,
   body[data-pagina="categorias"] .categorias-table tbody,
-  body[data-pagina="categorias"] .categorias-table tr,
-  body[data-pagina="categorias"] .categorias-table td {
+  body[data-pagina="categorias"] .categorias-table tr {
     display: block;
+    width: 100%;
   }
   body[data-pagina="categorias"] .categorias-table tr {
-    margin-bottom: .75rem;
-    padding: .8rem .9rem;
-    border: 1px solid var(--border);
-    border-radius: .8rem;
-    background: rgba(17, 24, 43, .38);
+    box-sizing: border-box;
+    margin: 0 0 .8rem;
+    padding: .85rem 1rem;
+    border: 1px solid rgba(91, 108, 145, .55);
+    border-radius: 1rem;
+    background: linear-gradient(145deg, rgba(19, 29, 52, .96), rgba(14, 21, 40, .96));
+    box-shadow: 0 8px 20px rgba(4, 8, 30, .16);
   }
   body[data-pagina="categorias"] .categorias-table tr:last-child {
     margin-bottom: 0;
   }
   body[data-pagina="categorias"] .categorias-table td {
     display: grid;
-    grid-template-columns: minmax(5.5rem, .7fr) minmax(0, 1.3fr);
+    grid-template-columns: 6.25rem minmax(0, 1fr);
     gap: .75rem;
     align-items: start;
-    padding: .45rem 0;
+    width: 100%;
+    box-sizing: border-box;
+    padding: .52rem 0;
     border: 0;
-    text-align: right;
+    text-align: left;
     overflow-wrap: anywhere;
   }
   body[data-pagina="categorias"] .categorias-table td::before {
     content: attr(data-label);
     color: var(--muted);
-    font-size: .8rem;
-    font-weight: 600;
+    font-size: .78rem;
+    font-weight: 700;
+    line-height: 1.45;
     text-align: left;
+  }
+  body[data-pagina="categorias"] .categorias-table td > *,
+  body[data-pagina="categorias"] .categorias-table td:not([colspan]) {
+    min-width: 0;
+  }
+  body[data-pagina="categorias"] .categorias-table .api-code,
+  body[data-pagina="categorias"] .categorias-table .categoria-status {
+    justify-self: start;
   }
   body[data-pagina="categorias"] .categorias-table td[colspan] {
     display: block;
@@ -291,20 +304,35 @@ button.btn, a.btn { min-height: 44px; line-height: 1.25; white-space: normal; }
   }
   body[data-pagina="categorias"] .categorias-table td:last-child {
     display: block;
-    padding-top: .7rem;
-    border-top: 1px solid rgba(41, 52, 77, .7);
-    text-align: left;
+    margin-top: .35rem;
+    padding-top: .8rem;
+    border-top: 1px solid rgba(91, 108, 145, .35);
   }
   body[data-pagina="categorias"] .categorias-table td:last-child::before {
     display: block;
-    margin-bottom: .45rem;
+    margin-bottom: .55rem;
   }
   body[data-pagina="categorias"] .categorias-table td:last-child .api-actions {
-    justify-content: flex-start;
-    gap: .5rem;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    width: 100%;
+    gap: .55rem;
+    align-items: stretch;
   }
-  body[data-pagina="categorias"] .categorias-table td:last-child .btn {
-    flex: 1 1 8rem;
+  body[data-pagina="categorias"] .categorias-table td:last-child .api-actions .btn {
+    width: 100%;
+    min-width: 0 !important;
+    min-height: 44px;
+    padding-inline: .6rem;
+    white-space: normal;
+  }
+  body[data-pagina="categorias"] .categorias-table td:last-child .api-actions .btn.btn-ghost {
+    background: rgba(91, 108, 145, .16);
+    border-color: rgba(144, 158, 190, .45);
+    color: var(--text);
+  }
+  body[data-pagina="categorias"] .categorias-table td:last-child .api-actions .btn:nth-child(3):last-child {
+    grid-column: 1 / -1;
   }
 }
 
