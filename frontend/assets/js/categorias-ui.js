@@ -11,6 +11,7 @@
     av.textContent = t;
   }
   const setoresKey = "elo.setores.cadastrados";
+  const categoriaColspan = () => EloUtil.podeVerIdsInternos() ? 5 : 4;
   const lerSetores = () => { try { const v = JSON.parse(localStorage.getItem(setoresKey) || "[]"); return Array.isArray(v) ? [...new Set(v.filter(Boolean))].sort((a, b) => a.localeCompare(b, "pt-BR")) : []; } catch { return []; } };
   const salvarSetores = (v) => { try { localStorage.setItem(setoresKey, JSON.stringify(v)); } catch { /* armazenamento opcional */ } };
   function limparSetor() { $("setor-id").value = ""; $("setor-nome").value = ""; $("setor-save").textContent = "Adicionar setor"; $("setor-cancel").hidden = true; }
@@ -51,12 +52,12 @@
       document.querySelectorAll("[data-id-column]").forEach((el) => { el.hidden = !mostrarIds; });
       tb.replaceChildren();
       if (!list.length) {
-        tb.innerHTML = '<tr><td colspan="5">Nenhuma categoria cadastrada.</td></tr>';
+        tb.innerHTML = `<tr><td colspan="${categoriaColspan()}">Nenhuma categoria cadastrada.</td></tr>`;
         return;
       }
       list.forEach((c) => {
         const tr = document.createElement("tr");
-        tr.innerHTML = `${mostrarIds ? `<td><span class="api-code">#${esc(c.id)}</span></td>` : ""}<td>${esc(c.nome)}</td><td>${esc(c.descricao || "—")}</td><td>${c.ativo === false ? "Inativa" : "Ativa"}</td><td><div class="api-actions"></div></td>`;
+        tr.innerHTML = `${mostrarIds ? `<td data-label="Código"><span class="api-code">#${esc(c.id)}</span></td>` : ""}<td data-label="Categoria">${esc(c.nome)}</td><td data-label="Descrição">${esc(c.descricao || "—")}</td><td data-label="Situação"><span class="categoria-status ${c.ativo === false ? "is-inativa" : "is-ativa"}">${c.ativo === false ? "Inativa" : "Ativa"}</span></td><td data-label="Ações"><div class="api-actions"></div></td>`;
         const actions = tr.querySelector(".api-actions"),
           b = document.createElement("button");
         b.className = "btn btn-line";
@@ -144,7 +145,7 @@
         tb.append(tr);
       });
     } catch (e) {
-      tb.innerHTML = `<tr><td colspan="5">${esc(e.message || "Não foi possível carregar categorias.")}</td></tr>`;
+      tb.innerHTML = `<tr><td colspan="${categoriaColspan()}">${esc(e.message || "Não foi possível carregar categorias.")}</td></tr>`;
     }
   }
   form.addEventListener("submit", async (e) => {

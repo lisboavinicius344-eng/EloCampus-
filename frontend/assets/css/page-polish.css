@@ -206,6 +206,108 @@ button.btn, a.btn { min-height: 44px; line-height: 1.25; white-space: normal; }
   .table-wrap table:not(.table-eq) { min-width: 620px; }
 }
 
+/* Equipamentos: os dois atalhos principais precisam permanecer fáceis de tocar no celular. */
+@media (max-width: 760px) {
+  body[data-pagina="equipamentos"] .page-head > .toolbar {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    width: 100%;
+    gap: .65rem;
+  }
+  body[data-pagina="equipamentos"] .page-head > .toolbar .equipamento-cta {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    min-height: 48px;
+    margin: 0;
+    text-align: center;
+  }
+}
+
+/* Categorias: no celular, cada linha vira um cartão legível em vez de uma tabela esmagada. */
+.categorias-table .categoria-status {
+  display: inline-flex;
+  align-items: center;
+  min-height: 1.8rem;
+  padding: .2rem .6rem;
+  border-radius: 999px;
+  background: rgba(52, 211, 153, .12);
+  color: #86efac;
+  font-size: .82rem;
+  font-weight: 700;
+}
+.categorias-table .categoria-status.is-inativa {
+  background: rgba(251, 113, 133, .12);
+  color: #fda4af;
+}
+@media (max-width: 760px) {
+  body[data-pagina="categorias"] .categorias-table {
+    min-width: 0 !important;
+    width: 100%;
+  }
+  body[data-pagina="categorias"] .categorias-table thead {
+    display: none;
+  }
+  body[data-pagina="categorias"] .categorias-table,
+  body[data-pagina="categorias"] .categorias-table tbody,
+  body[data-pagina="categorias"] .categorias-table tr,
+  body[data-pagina="categorias"] .categorias-table td {
+    display: block;
+  }
+  body[data-pagina="categorias"] .categorias-table tr {
+    margin-bottom: .75rem;
+    padding: .8rem .9rem;
+    border: 1px solid var(--border);
+    border-radius: .8rem;
+    background: rgba(17, 24, 43, .38);
+  }
+  body[data-pagina="categorias"] .categorias-table tr:last-child {
+    margin-bottom: 0;
+  }
+  body[data-pagina="categorias"] .categorias-table td {
+    display: grid;
+    grid-template-columns: minmax(5.5rem, .7fr) minmax(0, 1.3fr);
+    gap: .75rem;
+    align-items: start;
+    padding: .45rem 0;
+    border: 0;
+    text-align: right;
+    overflow-wrap: anywhere;
+  }
+  body[data-pagina="categorias"] .categorias-table td::before {
+    content: attr(data-label);
+    color: var(--muted);
+    font-size: .8rem;
+    font-weight: 600;
+    text-align: left;
+  }
+  body[data-pagina="categorias"] .categorias-table td[colspan] {
+    display: block;
+    text-align: left;
+  }
+  body[data-pagina="categorias"] .categorias-table td[colspan]::before {
+    content: none;
+  }
+  body[data-pagina="categorias"] .categorias-table td:last-child {
+    display: block;
+    padding-top: .7rem;
+    border-top: 1px solid rgba(41, 52, 77, .7);
+    text-align: left;
+  }
+  body[data-pagina="categorias"] .categorias-table td:last-child::before {
+    display: block;
+    margin-bottom: .45rem;
+  }
+  body[data-pagina="categorias"] .categorias-table td:last-child .api-actions {
+    justify-content: flex-start;
+    gap: .5rem;
+  }
+  body[data-pagina="categorias"] .categorias-table td:last-child .btn {
+    flex: 1 1 8rem;
+  }
+}
+
 
 /* Ajustes pontuais solicitados: ações, tabelas longas e legibilidade dos fluxos. */
 .api-actions, .api-actions > .btn, .api-actions > button,
