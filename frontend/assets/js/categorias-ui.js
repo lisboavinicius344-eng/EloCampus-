@@ -5,6 +5,7 @@
     tb = $("cat-tbody"),
     av = $("cat-aviso"),
     esc = EloUtil.esc;
+  let contagemPorSetor = new Map();
   function aviso(t, tipo = "info") {
     av.hidden = false;
     av.className = `alert alert-${tipo}`;
@@ -18,10 +19,12 @@
   function carregarSetores() {
     const body = $("setor-tbody"); if (!body) return;
     const setores = lerSetores(); body.replaceChildren();
-    if (!setores.length) { body.innerHTML = '<tr><td colspan="2">Nenhum setor cadastrado.</td></tr>'; return; }
+    if (!setores.length) { body.innerHTML = '<tr><td colspan="3">Nenhum setor cadastrado.</td></tr>'; return; }
     setores.forEach((nome) => {
-      const tr = document.createElement("tr"); const td = document.createElement("td"); td.textContent = nome; tr.append(td);
-      const acoes = document.createElement("td"); acoes.className = "api-actions";
+      const tr = document.createElement("tr"); const td = document.createElement("td"); td.dataset.label = "Setor"; td.textContent = nome;
+      const quantidade = document.createElement("td"); quantidade.dataset.label = "Equipamentos"; quantidade.className = "setor-quantidade"; quantidade.textContent = String(contagemPorSetor.get(nome) || 0);
+      tr.append(td, quantidade);
+      const acoes = document.createElement("td"); acoes.dataset.label = "Ações"; acoes.className = "api-actions";
       const editar = document.createElement("button"); editar.className = "btn btn-line"; editar.type = "button"; editar.textContent = "Editar"; editar.addEventListener("click", () => { $("setor-id").value = nome; $("setor-nome").value = nome; $("setor-save").textContent = "Salvar alterações"; $("setor-cancel").hidden = false; $("setor-nome").focus(); });
       const excluir = document.createElement("button"); excluir.className = "btn btn-ghost"; excluir.type = "button"; excluir.textContent = "Excluir"; excluir.addEventListener("click", () => { if (!confirm(`Remover a sugestão de setor “${nome}”?`)) return; salvarSetores(lerSetores().filter((v) => v !== nome)); carregarSetores(); });
       acoes.append(editar, excluir); tr.append(acoes); body.append(tr);
@@ -30,6 +33,11 @@
   async function incorporarSetoresDoAcervo() {
     try {
       const equipamentos = await ELO.equipamentos();
+      contagemPorSetor = equipamentos.reduce((contagem, equipamento) => {
+        const setor = String(equipamento.setor || "").trim();
+        if (setor) contagem.set(setor, (contagem.get(setor) || 0) + 1);
+        return contagem;
+      }, new Map());
       const setoresDoAcervo = equipamentos.map((e) => e.setor).filter(Boolean);
       salvarSetores([...new Set([...lerSetores(), ...setoresDoAcervo])]);
       carregarSetores();

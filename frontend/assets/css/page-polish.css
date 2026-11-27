@@ -241,6 +241,11 @@ button.btn, a.btn { min-height: 44px; line-height: 1.25; white-space: normal; }
   background: rgba(251, 113, 133, .12);
   color: #fda4af;
 }
+.setores-table .setor-quantidade {
+  color: var(--cyan, #67c9d0);
+  font-weight: 800;
+  text-align: center;
+}
 @media (max-width: 760px) {
   body[data-pagina="categorias"] .categorias-table {
     display: block;
@@ -279,6 +284,27 @@ button.btn, a.btn { min-height: 44px; line-height: 1.25; white-space: normal; }
     text-align: left;
     overflow-wrap: anywhere;
   }
+  body[data-pagina="categorias"] .categorias-table td:first-child {
+    display: block;
+    padding: 0 0 .75rem;
+    border-bottom: 1px solid rgba(91, 108, 145, .35);
+    text-align: center;
+  }
+  body[data-pagina="categorias"] .categorias-table td:first-child::before {
+    content: none;
+  }
+  body[data-pagina="categorias"] .categorias-table td:first-child .api-code {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    min-height: 2.25rem;
+    box-sizing: border-box;
+    padding: .25rem .65rem;
+    border-radius: .7rem;
+    font-size: 1.05rem;
+    line-height: 1;
+  }
   body[data-pagina="categorias"] .categorias-table td::before {
     content: attr(data-label);
     color: var(--muted);
@@ -314,28 +340,92 @@ button.btn, a.btn { min-height: 44px; line-height: 1.25; white-space: normal; }
   }
   body[data-pagina="categorias"] .categorias-table td:last-child .api-actions {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     width: 100%;
-    gap: .55rem;
+    gap: .45rem;
     align-items: stretch;
   }
   body[data-pagina="categorias"] .categorias-table td:last-child .api-actions .btn {
     width: 100%;
     min-width: 0 !important;
-    min-height: 44px;
-    padding-inline: .6rem;
-    white-space: normal;
+    min-height: 38px;
+    padding: .35rem .3rem;
+    font-size: .82rem;
+    line-height: 1.1;
+    white-space: nowrap;
   }
   body[data-pagina="categorias"] .categorias-table td:last-child .api-actions .btn.btn-ghost {
     background: rgba(91, 108, 145, .16);
     border-color: rgba(144, 158, 190, .45);
     color: var(--text);
   }
-  body[data-pagina="categorias"] .categorias-table td:last-child .api-actions .btn:nth-child(3):last-child {
-    grid-column: 1 / -1;
-  }
 }
 
+
+@media (max-width: 760px) {
+  body[data-pagina="categorias"] .setores-table {
+    display: block;
+    width: 100%;
+    min-width: 0 !important;
+  }
+  body[data-pagina="categorias"] .setores-table thead {
+    display: none;
+  }
+  body[data-pagina="categorias"] .setores-table tbody,
+  body[data-pagina="categorias"] .setores-table tr {
+    display: block;
+    width: 100%;
+  }
+  body[data-pagina="categorias"] .setores-table tr {
+    box-sizing: border-box;
+    margin-bottom: .75rem;
+    padding: .75rem 1rem;
+    border: 1px solid rgba(91, 108, 145, .45);
+    border-radius: .85rem;
+  }
+  body[data-pagina="categorias"] .setores-table td {
+    display: grid;
+    grid-template-columns: 6.25rem minmax(0, 1fr);
+    gap: .75rem;
+    align-items: center;
+    padding: .45rem 0;
+    border: 0;
+    text-align: left;
+    overflow-wrap: anywhere;
+  }
+  body[data-pagina="categorias"] .setores-table td::before {
+    content: attr(data-label);
+    color: var(--muted);
+    font-size: .78rem;
+    font-weight: 700;
+  }
+  body[data-pagina="categorias"] .setores-table td[colspan] {
+    display: block;
+  }
+  body[data-pagina="categorias"] .setores-table td[colspan]::before {
+    content: none;
+  }
+  body[data-pagina="categorias"] .setores-table td:last-child {
+    display: block;
+    margin-top: .35rem;
+    padding-top: .7rem;
+    border-top: 1px solid rgba(91, 108, 145, .3);
+  }
+  body[data-pagina="categorias"] .setores-table td:last-child::before {
+    display: block;
+    margin-bottom: .45rem;
+  }
+  body[data-pagina="categorias"] .setores-table td:last-child .api-actions {
+    display: flex;
+    gap: .5rem;
+    flex-wrap: wrap;
+  }
+  body[data-pagina="categorias"] .setores-table td:last-child .api-actions .btn {
+    flex: 1 1 8rem;
+    min-width: 0 !important;
+    min-height: 40px;
+  }
+}
 
 /* Ajustes pontuais solicitados: ações, tabelas longas e legibilidade dos fluxos. */
 .api-actions, .api-actions > .btn, .api-actions > button,
