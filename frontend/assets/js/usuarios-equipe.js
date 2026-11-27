@@ -23,6 +23,46 @@
   function perfilLegivel(papel) {
     return ({ admin: "Administrador", administrador: "Administrador", operador: "Operador", aluno: "Aluno", professor: "Professor", servidor: "Servidor (TAE)", tae: "Servidor (TAE)" })[String(papel || "").toLowerCase()] || "—";
   }
+  // Tipos que a equipe pode atribuir. Para liberar um novo tipo (ex.: portaria), basta incluí-lo aqui
+  // (e no <select> de criação em usuarios.html), depois que a API o aceitar.
+  const PAPEIS_EDITAVEIS = [["operador", "Operador"], ["admin", "Administrador"]];
+  function papelNormalizado(papel) {
+    const valor = String(papel || "").toLowerCase();
+    return valor === "administrador" ? "admin" : valor;
+  }
+  function criarSeletorPerfil(usuario) {
+    const atual = papelNormalizado(usuario.papel);
+    const select = document.createElement("select");
+    select.className = "input team-role-select";
+    select.setAttribute("aria-label", `Alterar perfil de ${usuario.nome}`);
+    PAPEIS_EDITAVEIS.forEach(([valor, texto]) => select.add(new Option(texto, valor)));
+    const editavel = PAPEIS_EDITAVEIS.some(([valor]) => valor === atual);
+    if (!editavel) select.add(new Option(perfilLegivel(usuario.papel), atual), 0);
+    select.value = atual;
+    const propria = Boolean(sessao) && String(sessao.id) === String(usuario.id);
+    // A API continua sendo a autoridade; aqui só evitamos o clique óbvio em si mesmo ou em perfis fora da lista.
+    select.disabled = !editavel || propria;
+    if (propria) select.title = "Você não pode alterar o próprio perfil.";
+    select.addEventListener("change", async () => {
+      const novo = select.value;
+      const rotulo = select.selectedOptions[0].text;
+      if (!confirm(`Alterar o perfil de ${usuario.nome} (${usuario.email}) para ${rotulo}?\n\nAs permissões da conta mudam no próximo acesso.`)) {
+        select.value = atual;
+        return;
+      }
+      select.disabled = true;
+      try {
+        const resultado = await ELO.alterarPapelUsuario(usuario.id, novo);
+        mostrarAviso(resultado?.mensagem || `Perfil de ${usuario.nome} alterado para ${rotulo}.`, "ok");
+        await carregar();
+      } catch (erro) {
+        mostrarAviso(erro.message || "Não foi possível alterar o perfil da conta.", "error");
+        select.value = atual;
+        select.disabled = false;
+      }
+    });
+    return select;
+  }
   function adicionarCelula(linha, texto, rotulo, classe = "") {
     const celula = document.createElement("td");
     celula.textContent = texto || "—";
@@ -76,6 +116,7 @@
         acoes.dataset.label = "Ações";
         acoes.className = "team-actions";
         if (ativo) {
+        acoes.appendChild(criarSeletorPerfil(usuario));
         const reenviar = document.createElement("button");
         reenviar.type = "button";
         reenviar.className = "btn btn-sm btn-line";

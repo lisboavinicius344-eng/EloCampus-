@@ -423,4 +423,6 @@ const ELO = {
   reenviarSenha: (id) => requisitar(`/usuarios/${encodeURIComponent(id)}/reenviar-senha`, { metodo: "PATCH" }),
   desativarUsuario: (id) => requisitar(`/usuarios/${encodeURIComponent(id)}/desativar`, { metodo: "PATCH" }),
   reativarUsuario: (id) => requisitar(`/usuarios/${encodeURIComponent(id)}/reativar`, { metodo: "PATCH" }),
+  // Troca o tipo (perfil) de uma conta da equipe. Contrato assumido: PATCH /usuarios/{id}/papel com { papel }.
+  alterarPapelUsuario: (id, papel) => requisitar(`/usuarios/${encodeURIComponent(id)}/papel`, { metodo: "PATCH", corpo: { papel: String(papel || "").trim().toLowerCase() } }),
 };

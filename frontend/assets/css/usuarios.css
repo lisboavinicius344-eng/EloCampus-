@@ -127,3 +127,6 @@
   opacity: 0.7;
   cursor: default;
 }
+
+/* Seletor de tipo de usuário na coluna de ações. */
+body[data-pagina="usuarios"] .team-role-select { width: auto; min-width: 150px; min-height: 34px; padding-block: .25rem; }
