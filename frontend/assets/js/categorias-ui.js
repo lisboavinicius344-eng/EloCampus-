@@ -24,10 +24,11 @@
       const tr = document.createElement("tr"); const td = document.createElement("td"); td.dataset.label = "Setor"; td.textContent = nome;
       const quantidade = document.createElement("td"); quantidade.dataset.label = "Equipamentos"; quantidade.className = "setor-quantidade"; quantidade.textContent = String(contagemPorSetor.get(nome) || 0);
       tr.append(td, quantidade);
-      const acoes = document.createElement("td"); acoes.dataset.label = "Ações"; acoes.className = "api-actions";
+      const acoes = document.createElement("td"); acoes.dataset.label = "Ações"; acoes.className = "setor-acoes";
+      const acoesConteudo = document.createElement("div"); acoesConteudo.className = "api-actions"; acoes.append(acoesConteudo);
       const editar = document.createElement("button"); editar.className = "btn btn-line"; editar.type = "button"; editar.textContent = "Editar"; editar.addEventListener("click", () => { $("setor-id").value = nome; $("setor-nome").value = nome; $("setor-save").textContent = "Salvar alterações"; $("setor-cancel").hidden = false; $("setor-nome").focus(); });
       const excluir = document.createElement("button"); excluir.className = "btn btn-ghost"; excluir.type = "button"; excluir.textContent = "Excluir"; excluir.addEventListener("click", () => { if (!confirm(`Remover a sugestão de setor “${nome}”?`)) return; salvarSetores(lerSetores().filter((v) => v !== nome)); carregarSetores(); });
-      acoes.append(editar, excluir); tr.append(acoes); body.append(tr);
+      acoesConteudo.append(editar, excluir); tr.append(acoes); body.append(tr);
     });
   }
   async function incorporarSetoresDoAcervo() {

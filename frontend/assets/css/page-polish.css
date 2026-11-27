@@ -340,24 +340,28 @@ button.btn, a.btn { min-height: 44px; line-height: 1.25; white-space: normal; }
   }
   body[data-pagina="categorias"] .categorias-table td:last-child .api-actions {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     width: 100%;
-    gap: .45rem;
+    gap: .55rem;
     align-items: stretch;
   }
   body[data-pagina="categorias"] .categorias-table td:last-child .api-actions .btn {
     width: 100%;
     min-width: 0 !important;
-    min-height: 38px;
-    padding: .35rem .3rem;
-    font-size: .82rem;
-    line-height: 1.1;
-    white-space: nowrap;
+    min-height: 42px;
+    padding: .4rem .6rem;
+    font-size: .88rem;
+    line-height: 1.2;
+    white-space: normal;
   }
   body[data-pagina="categorias"] .categorias-table td:last-child .api-actions .btn.btn-ghost {
     background: rgba(91, 108, 145, .16);
     border-color: rgba(144, 158, 190, .45);
     color: var(--text);
+  }
+  body[data-pagina="categorias"] .categorias-table td:last-child .api-actions .btn:nth-child(3):last-child {
+    grid-column: 1 / -1;
+    min-height: 44px;
   }
 }
 
