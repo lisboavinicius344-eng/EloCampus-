@@ -172,7 +172,7 @@
     }
   });
   $("cat-cancel").addEventListener("click", limpar);
-  $("cat-refresh").addEventListener("click", carregar);
+  $("cat-refresh").addEventListener("click", () => { carregar(); incorporarSetoresDoAcervo(); });
   $("cat-ordem")?.addEventListener("change", carregar);
   $("setor-form")?.addEventListener("submit", (event) => {
     event.preventDefault(); const nome = $("setor-nome").value.trim(); if (!nome) return aviso("Informe o nome do setor.", "error");

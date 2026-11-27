@@ -236,6 +236,8 @@ button.btn, a.btn { min-height: 44px; line-height: 1.25; white-space: normal; }
   color: #86efac;
   font-size: .82rem;
   font-weight: 700;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 .categorias-table .categoria-status.is-inativa {
   background: rgba(251, 113, 133, .12);
@@ -245,6 +247,40 @@ button.btn, a.btn { min-height: 44px; line-height: 1.25; white-space: normal; }
   color: var(--cyan, #67c9d0);
   font-weight: 800;
   text-align: center;
+  white-space: nowrap;
+}
+@media (min-width: 761px) {
+  body[data-pagina="categorias"] .categorias-table th:last-child,
+  body[data-pagina="categorias"] .categorias-table td:last-child {
+    width: 220px;
+    min-width: 220px;
+  }
+  body[data-pagina="categorias"] .categorias-table td[data-label="Situação"] {
+    min-width: 6.5rem;
+    white-space: nowrap;
+  }
+  body[data-pagina="categorias"] .setores-table {
+    table-layout: fixed;
+  }
+  body[data-pagina="categorias"] .setores-table th:nth-child(1),
+  body[data-pagina="categorias"] .setores-table td:nth-child(1) { width: 40%; }
+  body[data-pagina="categorias"] .setores-table th:nth-child(2),
+  body[data-pagina="categorias"] .setores-table td:nth-child(2) {
+    width: 20%;
+    text-align: center;
+  }
+  body[data-pagina="categorias"] .setores-table th:nth-child(3),
+  body[data-pagina="categorias"] .setores-table td:nth-child(3) { width: 40%; }
+  body[data-pagina="categorias"] .setores-table .setor-acoes .api-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    gap: .55rem;
+  }
+  body[data-pagina="categorias"] .setores-table .setor-acoes .btn {
+    min-width: 7rem;
+  }
 }
 @media (max-width: 760px) {
   body[data-pagina="categorias"] .categorias-table {
